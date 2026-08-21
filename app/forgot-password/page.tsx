@@ -1,0 +1,1 @@
+import Link from "next/link";import {ForgotPasswordForm} from "../auth-form";export default function ForgotPassword(){return <main className="auth"><Link href="/" className="brand"><img src="/brand/memento-house-logo.webp" alt="Memento House"/><span>Memento House</span></Link><ForgotPasswordForm/></main>}

@@ -1,0 +1,1 @@
+import Link from "next/link";import {SetPasswordForm} from "../../auth-form";export default function Setup(){return <main className="auth"><Link href="/" className="brand"><img src="/brand/memento-house-logo.webp" alt="Memento House"/><span>Memento House</span></Link><SetPasswordForm mode="invite"/></main>}

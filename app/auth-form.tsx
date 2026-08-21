@@ -1,0 +1,30 @@
+"use client";
+import {useState} from "react";
+import {useRouter} from "next/navigation";
+import {getSupabaseBrowserClient} from "../lib/supabase";
+
+const siteUrl="https://mementohouse.com";
+
+export function LoginForm(){
+ const router=useRouter(),[email,setEmail]=useState(""),[password,setPassword]=useState(""),[error,setError]=useState(""),[busy,setBusy]=useState(false);
+ async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setError("");const client=getSupabaseBrowserClient();if(!client){setError("Account service is not configured.");setBusy(false);return}const{error}=await client.auth.signInWithPassword({email,password});if(error){setError(error.message);setBusy(false);return}router.replace("/dashboard");router.refresh()}
+ return <form onSubmit={submit}><div className="eyebrow">Welcome back</div><h1>Your next adventure awaits.</h1><p>Sign in to manage your wedding keepsake.</p><label>Email<input required type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)}/></label><label>Password<input required type="password" autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)}/></label>{error&&<p className="authError" role="alert">{error}</p>}<button disabled={busy} className="button gold">{busy?"Signing in…":"Sign in →"}</button><p><a href="/forgot-password">Forgot your password?</a></p><p>Have an invitation? Open the secure link in your email.</p></form>
+}
+
+export function SignupForm(){
+ const[p1,setP1]=useState(""),[p2,setP2]=useState(""),[date,setDate]=useState(""),[email,setEmail]=useState(""),[password,setPassword]=useState(""),[message,setMessage]=useState(""),[error,setError]=useState(""),[busy,setBusy]=useState(false);
+ async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setError("");const client=getSupabaseBrowserClient();if(!client){setError("Account service is not configured.");setBusy(false);return}const{error}=await client.auth.signUp({email,password,options:{emailRedirectTo:`${siteUrl}/dashboard`,data:{partner_one_name:p1,partner_two_name:p2,wedding_date:date}}});if(error){setError(error.message);setBusy(false);return}setMessage("Check your email to confirm your account. Your dashboard will open after confirmation.");setBusy(false)}
+ return <form onSubmit={submit}><div className="eyebrow">Begin your keepsake</div><h1>Create your wedding account.</h1><p>Use an email you will keep access to after the wedding.</p><div className="twoCols"><label>Partner one<input required value={p1} onChange={e=>setP1(e.target.value)}/></label><label>Partner two<input required value={p2} onChange={e=>setP2(e.target.value)}/></label></div><label>Wedding date<input required type="date" value={date} onChange={e=>setDate(e.target.value)}/></label><label>Email<input required type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)}/></label><label>Password<input required type="password" minLength={10} autoComplete="new-password" value={password} onChange={e=>setPassword(e.target.value)}/><small>Use at least 10 characters.</small></label>{error&&<p className="authError" role="alert">{error}</p>}{message&&<p className="authSuccess" role="status">{message}</p>}<button disabled={busy||!!message} className="button gold">{busy?"Creating account…":"Create our account →"}</button><p>Already registered? <a href="/login">Sign in</a></p></form>
+}
+
+export function ForgotPasswordForm(){
+ const[email,setEmail]=useState(""),[message,setMessage]=useState(""),[error,setError]=useState(""),[busy,setBusy]=useState(false);
+ async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setError("");const client=getSupabaseBrowserClient();if(!client){setError("Account service is not configured.");setBusy(false);return}const{error}=await client.auth.resetPasswordForEmail(email,{redirectTo:siteUrl});if(error)setError(error.message);else setMessage("If that email has an account, a secure reset link is on its way.");setBusy(false)}
+ return <form onSubmit={submit}><div className="eyebrow">Account recovery</div><h1>Reset your password.</h1><p>We’ll email you a secure link to choose a new password.</p><label>Email<input required type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)}/></label>{error&&<p className="authError" role="alert">{error}</p>}{message&&<p className="authSuccess" role="status">{message}</p>}<button disabled={busy||!!message} className="button gold">{busy?"Sending…":"Send reset link →"}</button><p><a href="/login">Return to sign in</a></p></form>
+}
+
+export function SetPasswordForm({mode}:{mode:"invite"|"recovery"}){
+ const router=useRouter(),[password,setPassword]=useState(""),[confirm,setConfirm]=useState(""),[error,setError]=useState(""),[busy,setBusy]=useState(false);
+ async function submit(e:React.FormEvent){e.preventDefault();if(password!==confirm){setError("Passwords do not match.");return}setBusy(true);setError("");const client=getSupabaseBrowserClient();if(!client){setError("Account service is not configured.");setBusy(false);return}await client.auth.getSession();const{error}=await client.auth.updateUser({password});if(error){setError(error.message);setBusy(false);return}router.replace("/dashboard");router.refresh()}
+ return <form onSubmit={submit}><div className="eyebrow">{mode==="invite"?"Welcome to Memento House":"Secure your account"}</div><h1>{mode==="invite"?"Create your password.":"Choose a new password."}</h1><p>Use at least 10 characters that you do not reuse elsewhere.</p><label>New password<input required type="password" minLength={10} autoComplete="new-password" value={password} onChange={e=>setPassword(e.target.value)}/></label><label>Confirm password<input required type="password" minLength={10} autoComplete="new-password" value={confirm} onChange={e=>setConfirm(e.target.value)}/></label>{error&&<p className="authError" role="alert">{error}</p>}<button disabled={busy} className="button gold">{busy?"Saving…":"Save password →"}</button></form>
+}
