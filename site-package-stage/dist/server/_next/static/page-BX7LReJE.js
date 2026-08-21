@@ -1,0 +1,1 @@
+import{t as e}from"./rsc-DqSGpnEP.js";import{t}from"./framework~index~page~layout~page~page~page~page~app-page-cache-render~app-page-cache~app-ro~czc1rg2u-BUcvsMXk.js";var n=e(()=>{throw Error(`Unexpectedly client reference export 'Dashboard' is called on server`)},`592be278dc93`,`Dashboard`),r=t();function i(){return(0,r.jsx)(n,{})}export{i as default};
