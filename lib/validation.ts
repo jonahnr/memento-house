@@ -1,0 +1,3 @@
+import {z} from "zod";
+export const recommendationSchema=z.object({weddingId:z.string().uuid(),destinationId:z.string().uuid(),guestName:z.string().trim().min(1).max(100),message:z.string().trim().min(5).max(1500),category:z.enum(["Romantic","Adventure","Food","Relaxing","Outdoors","City Trip","Beach","International","Weekend Trip","Bucket List"]).optional(),activityRecommendation:z.string().trim().max(500).optional(),foodRecommendation:z.string().trim().max(500).optional(),bestTimeToVisit:z.string().trim().max(100).optional(),suggestedTripLength:z.string().trim().max(100).optional()});
+export type RecommendationInput=z.infer<typeof recommendationSchema>;
