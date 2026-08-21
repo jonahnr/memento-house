@@ -8,7 +8,7 @@ const seed:Rec[]=[
  {id:2,place:"Nashville, Tennessee, United States",guest:"Sarah & Mark",message:"Explore the neighborhoods, eat too much good food, and catch live music.",category:"Weekend Trip",likes:6,lng:-86.7816,lat:36.1627},
  {id:3,place:"Amalfi Coast, Italy",guest:"The Johnsons",message:"Save this one for an anniversary. Rent a boat for a day and explore the coast.",category:"Romantic",likes:11,lng:14.6029,lat:40.6340},
  {id:4,place:"Tokyo, Japan",guest:"Alex",message:"The food alone makes it worth the trip. Explore a different neighborhood every day.",category:"Food",likes:9,lng:139.6917,lat:35.6895},
- {id:5,place:"Charleston, South Carolina, United States",guest:"Emma",message:"Slow mornings, beautiful streets, and a truly excellent dinner at every turn.",category:"Relaxing",likes:4,lng:-79.9311,lat:32.7765}
+ {id:5,place:"Charleston, South Carolina, United States",guest:"Emma",message:"Slow mornings, beautiful streets, and a truly excellent dinner at every turn.",category:"Relaxing",likes:4,lng:-79.9311,lat:32.7765,status:"visited"}
 ];
 const stories=[{label:"Where We Met",place:"Cincinnati, Ohio",lng:-84.5120,lat:39.1031},{label:"First Weekend Away",place:"Chicago, Illinois",lng:-87.6298,lat:41.8781},{label:"The Trip We Still Talk About",place:"New York City",lng:-74.0060,lat:40.7128}];
 const blank=()=>({place:"",message:"",guest:"",category:"Adventure",lat:NaN,lng:NaN});
