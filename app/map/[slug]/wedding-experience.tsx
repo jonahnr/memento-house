@@ -6,6 +6,13 @@ import {getSupabaseBrowserClient} from "../../../lib/supabase";
 
 type Rec=GeoPin&{destinationId:string};
 type Wedding={id:string;partner_one_name:string;partner_two_name:string;wedding_date:string|null;title:string;slug:string;welcome_message:string};
+const demoWedding:Wedding={id:"demo",partner_one_name:"Jonah",partner_two_name:"Kate",wedding_date:"2026-08-29",title:"Our Adventure Map",slug:"jonah-kate",welcome_message:"See where our story has taken us and help choose where we go next."};
+const demoPins:Rec[]=[
+ {id:"demo-banff",destinationId:"demo-banff",place:"Banff, Alberta, Canada",guest:"Tyler & Megan",message:"Go in September and drive the Icefields Parkway. One of the prettiest places we’ve ever visited.",category:"Adventure",likes:8,lng:-115.5708,lat:51.1784},
+ {id:"demo-nashville",destinationId:"demo-nashville",place:"Nashville, Tennessee",guest:"Sarah & Mark",message:"Explore the neighborhoods, eat too much good food, and catch live music.",category:"Weekend Trip",likes:6,lng:-86.7816,lat:36.1627},
+ {id:"demo-amalfi",destinationId:"demo-amalfi",place:"Amalfi Coast, Italy",guest:"The Johnsons",message:"Save this one for an anniversary. Rent a boat for a day and explore the coast.",category:"Romantic",likes:11,lng:14.6029,lat:40.634},
+ {id:"demo-tokyo",destinationId:"demo-tokyo",place:"Tokyo, Japan",guest:"Alex",message:"The food alone makes it worth the trip. Explore a different neighborhood every day.",category:"Food",likes:9,lng:139.6917,lat:35.6895}
+];
 const blank=()=>({place:"",message:"",guest:"",category:"Adventure",lat:NaN,lng:NaN});
 const normalize=(s:string)=>s.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g," ").trim();
 const dateLabel=(value:string|null)=>value?new Intl.DateTimeFormat("en-US",{month:"long",day:"numeric",year:"numeric",timeZone:"UTC"}).format(new Date(value+"T00:00:00Z")):"";
@@ -16,7 +23,7 @@ export function WeddingExperience({slug}:{slug:string}){
  const load=useCallback(async()=>{
   const client=getSupabaseBrowserClient();if(!client){setError("The map service is unavailable.");setLoading(false);return}
   const{data:w,error:wError}=await client.from("weddings").select("id,partner_one_name,partner_two_name,wedding_date,title,slug,welcome_message").eq("slug",slug).eq("status","active").single();
-  if(wError||!w){setError("This wedding map could not be found.");setLoading(false);return}
+  if(wError||!w){if(slug==="jonah-kate"){setWedding(demoWedding);setRecs(demoPins);setSelected(demoPins[2]);setLoading(false);return}setError("This wedding map could not be found.");setLoading(false);return}
   setWedding(w as Wedding);
   const[{data:r,error:rError},{data:likes}]=await Promise.all([
    client.from("recommendations").select("id,guest_name,message,category,status,destination_id,destination:destinations(location_name,latitude,longitude)").eq("wedding_id",w.id).eq("status","active").order("created_at",{ascending:false}),
@@ -30,6 +37,7 @@ export function WeddingExperience({slug}:{slug:string}){
  useEffect(()=>{load()},[load]);
  const sorted=useMemo(()=>[...recs].sort((a,b)=>sort==="loved"?b.likes-a.likes:String(b.id).localeCompare(String(a.id))),[recs,sort]);
  async function like(pin:Rec){
+  if(wedding?.id==="demo"){setRecs(v=>v.map(r=>r.id===pin.id?{...r,likes:r.likes+1}:r));setSelected(s=>s?.id===pin.id?{...s,likes:s.likes+1}:s);return}
   const client=getSupabaseBrowserClient();if(!client)return;
   let anon=localStorage.getItem("memento-anonymous-id");if(!anon){anon=crypto.randomUUID();localStorage.setItem("memento-anonymous-id",anon)}
   const{error}=await client.from("destination_likes").insert({destination_id:pin.destinationId,anonymous_session_id:anon});
@@ -37,6 +45,7 @@ export function WeddingExperience({slug}:{slug:string}){
  }
  async function submit(e:React.FormEvent){
   e.preventDefault();if(!wedding||!Number.isFinite(form.lat)||!Number.isFinite(form.lng))return;setError("");
+  if(wedding.id==="demo"){const next:Rec={id:`demo-${Date.now()}`,destinationId:`demo-${Date.now()}`,...form,likes:0};setRecs(v=>[next,...v]);setSelected(next);setSuccess(true);return}
   const client=getSupabaseBrowserClient()!,normalized=normalize(form.place);
   let{data:destination}=await client.from("destinations").select("id").eq("wedding_id",wedding.id).eq("normalized_location_name",normalized).maybeSingle();
   if(!destination){const created=await client.from("destinations").insert({wedding_id:wedding.id,location_name:form.place,normalized_location_name:normalized,latitude:form.lat,longitude:form.lng}).select("id").single();if(created.error){setError(created.error.message);return}destination=created.data}
