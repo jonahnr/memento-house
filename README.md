@@ -20,6 +20,10 @@ A mobile-first wedding keepsake by Memento House. Guests recommend future advent
 5. Create an owner in Supabase Auth, replace `OWNER_UUID` in `supabase/seed.sql`, then run it.
 6. Run `npm run dev` and open `http://localhost:3000`.
 
+## Account access
+
+Public visitors and wedding guests do not need an account. Couple account creation is gated by the Memento House access code `forevermemento`; enter it on `/signup` before creating an email/password account. Existing couples sign in normally at `/login`.
+
 The checked-in experience uses polished local demo data when credentials are absent, so it can be reviewed immediately. To make writes durable, connect the form handlers to Supabase using the documented public insert policies; validate on the server and rate-limit guest endpoints before a public launch.
 
 ## Supabase

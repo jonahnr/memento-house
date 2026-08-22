@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import {FormEvent,useCallback,useEffect,useState} from "react";
+import QRCode from "qrcode";
 import {getSupabaseBrowserClient} from "../../lib/supabase";
+import {AdventureMap,type GeoPin} from "../map/[slug]/adventure-map";
 
 type Wedding={id:string;partner_one_name:string;partner_two_name:string;wedding_date:string|null;title:string;slug:string;welcome_message:string;accent_color:string};
-type Recommendation={id:string;guest_name:string;category:string|null;status:"active"|"hidden"|"deleted";destination:{location_name:string}|null};
+type Recommendation={id:string;guest_name:string;message:string;category:string|null;status:"active"|"hidden"|"deleted";destination:{location_name:string;latitude:number;longitude:number}|null};
 const items=["Overview","Our Story","Recommendations","Wedding Map","QR Code","Keepsake","Settings"];
 
 const prettyDate=(value:string|null,short=false)=>{
@@ -23,7 +25,7 @@ export function Dashboard(){
   const{data:w,error:wError}=await client.from("weddings").select("id,partner_one_name,partner_two_name,wedding_date,title,slug,welcome_message,accent_color").eq("owner_user_id",user.id).single();
   if(wError||!w){setError(wError?.message||"Your wedding workspace could not be found.");setLoading(false);return}
   setWedding(w as Wedding);
-  const{data:r,error:rError}=await client.from("recommendations").select("id,guest_name,category,status,destination:destinations(location_name)").eq("wedding_id",w.id).neq("status","deleted").order("created_at",{ascending:false});
+  const{data:r,error:rError}=await client.from("recommendations").select("id,guest_name,message,category,status,destination:destinations(location_name,latitude,longitude)").eq("wedding_id",w.id).neq("status","deleted").order("created_at",{ascending:false});
   if(rError)setError(rError.message); else setData((r||[]) as unknown as Recommendation[]);
   setLoading(false);
  },[]);
@@ -41,17 +43,17 @@ export function Dashboard(){
  const names=`${wedding.partner_one_name} & ${wedding.partner_two_name}`, initials=`${wedding.partner_one_name[0]||""}${wedding.partner_two_name[0]||""}`.toUpperCase();
  const mapPath=`/map/${wedding.slug}`, mapUrl=`https://mementohouse.com${mapPath}`;
  return <main className="dash">
-  <aside><Link href="/" className="brand"><span className="brandMark">M</span><span>Memento <i>Map</i><small>by Memento House</small></span></Link>
+  <aside><Link href="/" className="brand"><img src="/brand/memento-house-logo.webp" alt="Memento House"/><span>Memento <i>Map</i><small>by Memento House</small></span></Link>
    <div className="coupleChip"><span>{initials[0]}<span>&</span>{initials[1]}</span><div><b>{names}</b><small>{prettyDate(wedding.wedding_date,true)}</small></div></div>
    <nav>{items.map((x,i)=><button key={x} onClick={()=>setSection(x)} className={section===x?"active":""}><i>{["⌂","♥","✦","⌖","▦","◇","⚙"][i]}</i>{x}</button>)}</nav>
-   <Link className="publicLink" href={mapPath}>↗ View guest map</Link>
+   <div className="dashboardExit"><Link href="/">← Memento House home</Link><Link href="/#keepsakes">Browse all keepsakes</Link><Link href={mapPath}>↗ View guest map</Link></div>
   </aside>
   <section className="dashMain"><header><div><small>{names.toUpperCase()}’S WEDDING</small><h1>{section}</h1></div><div className="dashActions"><span>{initials}</span></div></header>
    {error&&<div className="authError">{error}</div>}
    {section==="Overview"&&<Overview wedding={wedding} recommendations={data} mapPath={mapPath} onSection={setSection}/>}
    {section==="Recommendations"&&<Recommendations rows={data} onStatus={setStatus} onRemove={remove}/>}
    {section==="Our Story"&&<Empty title="The places that made you, you." text="Add milestones from your relationship so guests can see the story behind the map." action="Story editor coming next"/>}
-   {section==="Wedding Map"&&<div className="panel"><div className="panelHead"><div><small>LIVE GUEST EXPERIENCE</small><h3>{wedding.title}</h3></div><Link href={mapPath}>Open full map ↗</Link></div><p>Your public map uses the exact coordinates guests choose when they add a recommendation.</p><Link href={mapPath} className="button gold">Open live map</Link></div>}
+   {section==="Wedding Map"&&<WeddingMapPanel wedding={wedding} recommendations={data} mapPath={mapPath}/>}
    {section==="QR Code"&&<QR wedding={wedding} mapUrl={mapUrl}/>}
    {section==="Keepsake"&&<Keepsake wedding={wedding} recommendations={data}/>}
    {section==="Settings"&&<Settings wedding={wedding} onSaved={setWedding}/>}
@@ -71,8 +73,10 @@ function Recommendations({rows,onStatus,onRemove}:{rows:Recommendation[];onStatu
 }
 
 function Empty({title,text,action}:{title:string;text:string;action:string}){return <div className="empty"><span>♡</span><h2>{title}</h2><p>{text}</p><button className="button gold" disabled>{action}</button></div>}
-function QR({wedding,mapUrl}:{wedding:Wedding;mapUrl:string}){const names=`${wedding.partner_one_name} & ${wedding.partner_two_name}`;return <div className="qrLayout"><div className="qrCard"><div className="eyebrow">{names}</div><h2>Help Build Our<br/><i>Adventure Map</i></h2><p>Scan to add a place we should visit and tell us why.</p><div className="fakeQr" aria-label="QR preview">{Array.from({length:81},(_,i)=><i key={i} className={(i*7+i%5)%3?"on":""}/>)}</div><b>{mapUrl.replace("https://","")}</b><small>THANK YOU FOR BEING PART OF OUR STORY</small></div><div className="qrTools"><h2>Your Wedding Link</h2><p>Use this link on invitations and guest-table cards.</p><label>Guest map link<input value={mapUrl} readOnly/></label><button className="button light" onClick={()=>navigator.clipboard.writeText(mapUrl)}>Copy link</button><button className="button gold" onClick={()=>window.print()}>Print card ↓</button></div></div>}
-function Keepsake({wedding,recommendations}:{wedding:Wedding;recommendations:Recommendation[]}){return <div className="keepsake"><div className="eyebrow">{wedding.title}</div><h2>{wedding.partner_one_name} <i>&</i> {wedding.partner_two_name}</h2><p>{prettyDate(wedding.wedding_date)}</p><div className="keepsakeMap">{recommendations.slice(0,4).map(r=><span key={r.id}>{r.destination?.location_name}</span>)}</div><div className="keepsakeStats">{recommendations.length} guest memories</div><blockquote>“May every place carry a memory of the people who sent us there.”</blockquote><button className="button gold noPrint" onClick={()=>window.print()}>Print keepsake ↓</button></div>}
+const toPins=(rows:Recommendation[]):GeoPin[]=>rows.filter(r=>r.destination&&Number.isFinite(r.destination.latitude)&&Number.isFinite(r.destination.longitude)).map(r=>({id:r.id,place:r.destination!.location_name,guest:r.guest_name,message:r.message,category:r.category||"Adventure",likes:0,lat:r.destination!.latitude,lng:r.destination!.longitude}));
+function WeddingMapPanel({wedding,recommendations,mapPath}:{wedding:Wedding;recommendations:Recommendation[];mapPath:string}){const pins=toPins(recommendations);return <div className="panel accountMapPanel"><div className="panelHead"><div><small>LIVE GUEST EXPERIENCE</small><h3>{wedding.title}</h3></div><Link href={mapPath}>Open full map ↗</Link></div><div className="accountMap"><AdventureMap recommendations={pins} stories={[]} tab="all" selected={null} onSelect={()=>{}}/></div><p>{pins.length?pins.length+" real locations are mapped from guest contributions.":"Share your public map to begin collecting guest origins and travel recommendations."}</p><Link href={mapPath} className="button gold">Open live map ↗</Link></div>}
+function QR({wedding,mapUrl}:{wedding:Wedding;mapUrl:string}){const names=`${wedding.partner_one_name} & ${wedding.partner_two_name}`,[qr,setQr]=useState("");useEffect(()=>{QRCode.toDataURL(mapUrl,{width:720,margin:2,color:{dark:"#282621",light:"#fffdf8"},errorCorrectionLevel:"H"}).then(setQr)},[mapUrl]);return <div className="qrLayout"><div className="qrCard"><div className="eyebrow">{names}</div><h2>Help Build Our<br/><i>Adventure Map</i></h2><p>Scan to share where you came from or recommend a place for us to visit.</p>{qr?<img className="realQr" src={qr} alt={"Scannable QR code for "+names+"'s wedding map"}/>:<div className="qrLoading">Generating QR code…</div>}<b>{mapUrl.replace("https://","")}</b><small>THANK YOU FOR BEING PART OF OUR STORY</small></div><div className="qrTools"><h2>Your Real Wedding QR Code</h2><p>This code opens your unique public map and is ready for invitations or guest-table cards.</p><label>Guest map link<input value={mapUrl} readOnly/></label><button className="button light" onClick={()=>navigator.clipboard.writeText(mapUrl)}>Copy link</button><button className="button gold" onClick={()=>window.print()}>Print QR card ↓</button></div></div>}
+function Keepsake({wedding,recommendations}:{wedding:Wedding;recommendations:Recommendation[]}){const pins=toPins(recommendations);return <div className="keepsakeSheet"><div className="keepsakeTitle"><div className="eyebrow">Our Wedding World</div><h2>{wedding.partner_one_name} <i>&</i> {wedding.partner_two_name}</h2><p>{prettyDate(wedding.wedding_date)}</p></div><div className="keepsakeRealMap"><AdventureMap recommendations={pins} stories={[]} tab="all" selected={null} onSelect={()=>{}}/></div><div className="keepsakeLegend"><span>✦ {pins.filter(p=>p.category!=="Guest Origin").length} places recommended</span><span>⌂ {pins.filter(p=>p.category==="Guest Origin").length} guest origins</span><span>♡ {recommendations.length} memories</span></div><blockquote>“May every place carry a memory of the people who sent us there.”</blockquote><div className="keepsakeFooter">Memento House · Made for the moment. Kept for a lifetime.</div><button className="button gold noPrint" onClick={()=>window.print()}>Print keepsake ↓</button></div>}
 function Settings({wedding,onSaved}:{wedding:Wedding;onSaved:(w:Wedding)=>void}){
  const[form,setForm]=useState(wedding),[saving,setSaving]=useState(false),[message,setMessage]=useState("");
  const change=(key:keyof Wedding,value:string)=>setForm(v=>({...v,[key]:value}));
