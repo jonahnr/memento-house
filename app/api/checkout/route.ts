@@ -1,5 +1,5 @@
 const catalog:Record<string,{name:string;amount:number}>={
- "map:map":{name:"Memento Map",amount:9900},"map:plus":{name:"Memento Map Plus",amount:12900},"map:keepsake":{name:"Memento Map Keepsake",amount:19900},
+ "map:map":{name:"Memento Map",amount:9900},"map:plus":{name:"Memento Map Plus",amount:12900},
  "deck:essential":{name:"Memento Deck — Essential",amount:13900},"deck:signature":{name:"Memento Deck — Signature",amount:16900},"deck:story":{name:"Memento Deck — Story",amount:21900},"deck:bespoke":{name:"Memento Deck — Bespoke",amount:38900},
  "unity:signature-board":{name:"Unity Tile Signature Board",amount:17900},"unity:bespoke":{name:"Unity Tile Signature Board — Bespoke",amount:37800}
 };

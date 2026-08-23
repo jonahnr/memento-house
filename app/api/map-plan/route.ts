@@ -1,0 +1,13 @@
+import {createClient} from "@supabase/supabase-js";
+
+export async function GET(request:Request){
+ const slug=new URL(request.url).searchParams.get("slug")||"";
+ const url=process.env.NEXT_PUBLIC_SUPABASE_URL||"https://kdcymeoldvwlmfwemfgq.supabase.co",key=process.env.SUPABASE_SERVICE_ROLE_KEY;
+ if(!key||!slug)return Response.json({tier:"map"});
+ const admin=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
+ const{data:wedding}=await admin.from("weddings").select("id,owner_user_id").eq("slug",slug).eq("status","active").maybeSingle();
+ if(!wedding)return Response.json({tier:"map"});
+ const[{data:user},{data:venue}]=await Promise.all([admin.auth.admin.getUserById(wedding.owner_user_id),admin.from("story_locations").select("location_name,latitude,longitude").eq("wedding_id",wedding.id).eq("story_type","Wedding Venue").maybeSingle()]);
+ const tier=user.user?.user_metadata?.product_tier==="plus"?"plus":"map";
+ return Response.json({tier,venue:venue||null},{headers:{"Cache-Control":"no-store"}});
+}
