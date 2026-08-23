@@ -46,3 +46,7 @@ For Vercel, import the repository, add every value from `.env.example`, and depl
 - Add CAPTCHA if public abuse appears
 - Verify RLS with anonymous and authenticated test users
 - Configure image storage policies before enabling uploads
+
+## Payments
+
+Product CTAs post to the server-owned `/api/checkout` route, which validates every product and price before creating a Stripe-hosted Checkout Session. Configure `STRIPE_SECRET_KEY` as a hosted secret to enable live card payments. Never expose this secret as a `NEXT_PUBLIC_` value or commit it to the repository.
