@@ -5,10 +5,12 @@ import {FormEvent,useCallback,useEffect,useRef,useState} from "react";
 import QRCode from "qrcode";
 import {getSupabaseBrowserClient} from "../../lib/supabase";
 import {AdventureMap,type GeoPin} from "../map/[slug]/adventure-map";
+import {LocationSearch} from "../map/[slug]/location-search";
 
 type Wedding={id:string;partner_one_name:string;partner_two_name:string;wedding_date:string|null;title:string;slug:string;welcome_message:string;accent_color:string};
 type Recommendation={id:string;guest_name:string;message:string;category:string|null;status:"active"|"hidden"|"deleted";destination:{id:string;location_name:string;latitude:number;longitude:number}|null};
 type TravelStatus={destination_id:string;status:"want_to_go"|"planning"|"visited";planned_date:string|null;visited_date:string|null;couple_note:string|null;image_url:string|null};
+type Story={id:string;location_name:string;latitude:number;longitude:number;story_type:string;title:string;description:string;event_date:string|null;image_url:string|null;sort_order:number};
 const items=["Overview","Our Story","Recommendations","Travel Journal","Wedding Map","QR Code","Keepsake","Settings"];
 
 const prettyDate=(value:string|null,short=false)=>{
@@ -18,12 +20,13 @@ const prettyDate=(value:string|null,short=false)=>{
 
 export function Dashboard(){
  const[section,setSection]=useState("Overview"),[wedding,setWedding]=useState<Wedding|null>(null),[data,setData]=useState<Recommendation[]>([]);
- const[tier,setTier]=useState("map"),[travel,setTravel]=useState<TravelStatus[]>([]);
+ const[tier,setTier]=useState("map"),[travel,setTravel]=useState<TravelStatus[]>([]),[stories,setStories]=useState<Story[]>([]),[email,setEmail]=useState("");
  const[loading,setLoading]=useState(true),[error,setError]=useState("");
  const load=useCallback(async()=>{
   const client=getSupabaseBrowserClient(); if(!client){setError("Account service is not available.");setLoading(false);return}
   const{data:session}=await client.auth.getSession(); const user=session.session?.user;
   if(!user){setLoading(false);return}
+  setEmail(user.email||"");
   setTier(String(user.user_metadata?.product_tier||"map"));
   const{data:w,error:wError}=await client.from("weddings").select("id,partner_one_name,partner_two_name,wedding_date,title,slug,welcome_message,accent_color").eq("owner_user_id",user.id).single();
   if(wError||!w){setError(wError?.message||"Your wedding workspace could not be found.");setLoading(false);return}
@@ -31,6 +34,7 @@ export function Dashboard(){
   const{data:r,error:rError}=await client.from("recommendations").select("id,guest_name,message,category,status,destination:destinations(id,location_name,latitude,longitude)").eq("wedding_id",w.id).neq("status","deleted").order("created_at",{ascending:false});
   if(rError)setError(rError.message); else setData((r||[]) as unknown as Recommendation[]);
   const{data:t}=await client.from("couple_destination_status").select("destination_id,status,planned_date,visited_date,couple_note,image_url").eq("wedding_id",w.id);setTravel((t||[]) as TravelStatus[]);
+  const{data:s}=await client.from("story_locations").select("id,location_name,latitude,longitude,story_type,title,description,event_date,image_url,sort_order").eq("wedding_id",w.id).order("sort_order");setStories((s||[]) as Story[]);
   setLoading(false);
  },[]);
  useEffect(()=>{load()},[load]);
@@ -47,9 +51,9 @@ export function Dashboard(){
  const names=`${wedding.partner_one_name} & ${wedding.partner_two_name}`, initials=`${wedding.partner_one_name[0]||""}${wedding.partner_two_name[0]||""}`.toUpperCase();
  const mapPath=`/map/${wedding.slug}`, mapUrl=`https://mementohouse.com${mapPath}`;
  return <main className="dash">
-  <aside><Link href="/" className="brand"><img src="/brand/memento-house-logo.webp" alt="Memento House"/><span>Memento <i>Map</i><small>by Memento House</small></span></Link>
+  <aside><div className="brand splitBrand"><a href="/" aria-label="Memento House home"><img src="/brand/memento-house-logo.webp" alt=""/></a><button onClick={()=>setSection("Overview")}><span>Memento <i>Map</i><small>by Memento House</small></span></button></div>
    <div className="coupleChip"><span>{initials[0]}<span>&</span>{initials[1]}</span><div><b>{names}</b><small>{prettyDate(wedding.wedding_date,true)}</small></div></div>
-   <div className="planBadge"><small>CURRENT PLAN</small><b>{tier==="map"?"Memento Map":tier==="plus"?"Map Plus":"Map Keepsake"}</b></div>
+   <div className="planBadge"><small>CURRENT PLAN</small><b>{tier==="map"?"Memento Map":tier==="plus"?"Map Plus":"Map Keepsake"}</b>{email.toLowerCase()==="jonahnr@gmail.com"&&<select aria-label="Admin tier tester" value={tier} onChange={async e=>{const next=e.target.value,client=getSupabaseBrowserClient(),session=(await client!.auth.getSession()).data.session;const response=await fetch("/api/admin/tier",{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${session?.access_token}`},body:JSON.stringify({tier:next})});if(response.ok)setTier(next)}}><option value="map">Test Basic</option><option value="plus">Test Plus</option><option value="keepsake">Test Keepsake</option></select>}</div>
    <nav>{items.filter(x=>tier!=="map"||!(["Travel Journal","Keepsake"].includes(x))).map(x=>{const i=items.indexOf(x);return <button key={x} onClick={()=>setSection(x)} className={section===x?"active":""}><i>{["⌂","♥","✦","✓","⌖","▦","◇","⚙"][i]}</i>{x}</button>})}</nav>
    <div className="dashboardExit"><a href="/">← Memento House home</a><a href="/#keepsakes">Browse all keepsakes</a><a href={mapPath}>↗ Open adventure map</a></div>
   </aside>
@@ -58,11 +62,11 @@ export function Dashboard(){
    {section==="Overview"&&<Overview wedding={wedding} recommendations={data} mapPath={mapPath} onSection={setSection}/>}
    {section==="Recommendations"&&<Recommendations rows={data} onStatus={setStatus} onRemove={remove}/>}
    {section==="Travel Journal"&&tier!=="map"&&<TravelJournal wedding={wedding} rows={data} values={travel} onChange={setTravel}/>}
-   {section==="Our Story"&&<Empty title="The places that made you, you." text="Add milestones from your relationship so guests can see the story behind the map." action="Story editor coming next"/>}
+   {section==="Our Story"&&<StoryEditor wedding={wedding} values={stories} onChange={setStories}/>}
    {section==="Wedding Map"&&<WeddingMapPanel wedding={wedding} recommendations={data} mapPath={mapPath}/>}
    {section==="QR Code"&&<QR wedding={wedding} mapUrl={mapUrl}/>}
    {section==="Keepsake"&&tier!=="map"&&<Keepsake wedding={wedding} recommendations={data}/>}
-   {section==="Settings"&&<Settings wedding={wedding} onSaved={setWedding}/>}
+   {section==="Settings"&&<><PlanGuide tier={tier}/><Settings wedding={wedding} onSaved={setWedding}/></>}
   </section>
  </main>
 }
@@ -86,6 +90,8 @@ function TravelJournal({wedding,rows,values,onChange}:{wedding:Wedding;rows:Reco
 }
 
 function Empty({title,text,action}:{title:string;text:string;action:string}){return <div className="empty"><span>♡</span><h2>{title}</h2><p>{text}</p><button className="button gold" disabled>{action}</button></div>}
+function PlanGuide({tier}:{tier:string}){return <div className="panel planGuide"><div className="panelHead"><div><small>PLAN GUIDE</small><h3>What each Memento Map plan includes</h3></div></div><div><article className={tier==="map"?"current":""}><b>Basic</b><p>Guest origins, travel recommendations, QR sharing, and moderation.</p></article><article className={tier==="plus"?"current":""}><b>Plus</b><p>Everything in Basic, plus your Story, Want to Go/Planning/Visited tracking, notes, dates, and photos.</p></article><article className={tier==="keepsake"?"current":""}><b>Keepsake</b><p>Everything in Plus, plus the high-resolution printable map keepsake.</p></article></div></div>}
+function StoryEditor({wedding,values,onChange}:{wedding:Wedding;values:Story[];onChange:(v:Story[])=>void}){const blank={title:"",description:"",story_type:"Milestone",event_date:"",image_url:"",location_name:"",latitude:NaN,longitude:NaN},[form,setForm]=useState(blank),[saving,setSaving]=useState(false);async function add(e:FormEvent){e.preventDefault();if(!Number.isFinite(form.latitude))return;setSaving(true);const client=getSupabaseBrowserClient(),result=await client!.from("story_locations").insert({...form,event_date:form.event_date||null,image_url:form.image_url||null,wedding_id:wedding.id,sort_order:values.length}).select().single();setSaving(false);if(!result.error){onChange([...values,result.data as Story]);setForm(blank)}}async function remove(id:string){const client=getSupabaseBrowserClient(),result=await client!.from("story_locations").delete().eq("id",id);if(!result.error)onChange(values.filter(v=>v.id!==id))}return <div className="storyWorkspace"><form className="panel storyForm" onSubmit={add}><div className="panelHead"><div><small>YOUR RELATIONSHIP, MAPPED</small><h3>Add a story milestone</h3><p>Milestones appear as a separate story layer guests can explore.</p></div></div><label>Milestone title<input required value={form.title} onChange={e=>setForm({...form,title:e.target.value})} placeholder="Where we first met"/></label><label>Place<LocationSearch value={form.location_name} onSelect={p=>setForm({...form,location_name:p.name,latitude:p.lat,longitude:p.lng})}/></label><div className="twoCols"><label>Milestone type<select value={form.story_type} onChange={e=>setForm({...form,story_type:e.target.value})}>{["First Met","First Date","Engagement","Home","Wedding","Adventure","Milestone"].map(v=><option key={v}>{v}</option>)}</select></label><label>Date<input type="date" value={form.event_date} onChange={e=>setForm({...form,event_date:e.target.value})}/></label></div><label>Your story<textarea required value={form.description} onChange={e=>setForm({...form,description:e.target.value})} placeholder="Tell guests why this place matters…"/></label><label>Photo URL (optional)<input type="url" value={form.image_url} onChange={e=>setForm({...form,image_url:e.target.value})}/></label><button className="button gold" disabled={saving||!Number.isFinite(form.latitude)}>{saving?"Adding milestone…":"Add milestone"}</button></form><div className="panel storyList"><h3>Your milestones</h3>{values.map(v=><article key={v.id}>{v.image_url&&<img src={v.image_url} alt=""/>}<div><small>{v.story_type}{v.event_date?` · ${prettyDate(v.event_date,true)}`:""}</small><b>{v.title}</b><p>{v.location_name}</p><p>{v.description}</p></div><button onClick={()=>remove(v.id)} aria-label={`Remove ${v.title}`}>Remove</button></article>)}{!values.length&&<p>Add your first relationship milestone to begin the story layer.</p>}</div></div>}
 const toPins=(rows:Recommendation[]):GeoPin[]=>rows.filter(r=>r.destination&&Number.isFinite(r.destination.latitude)&&Number.isFinite(r.destination.longitude)).map(r=>({id:r.id,place:r.destination!.location_name,guest:r.guest_name,message:r.message,category:r.category||"Adventure",likes:0,lat:r.destination!.latitude,lng:r.destination!.longitude}));
 function WeddingMapPanel({wedding,recommendations,mapPath}:{wedding:Wedding;recommendations:Recommendation[];mapPath:string}){const pins=toPins(recommendations);return <div className="panel accountMapPanel"><div className="panelHead"><div><small>LIVE GUEST EXPERIENCE</small><h3>{wedding.title}</h3></div><a href={mapPath}>Open full map ↗</a></div><div className="accountMap"><AdventureMap recommendations={pins} stories={[]} tab="all" selected={null} onSelect={()=>{}}/></div><p>{pins.length?pins.length+" real locations are mapped from guest contributions.":"Share your public map to begin collecting guest origins and travel recommendations."}</p><a href={mapPath} className="button gold">Open live map ↗</a></div>}
 function QR({wedding,mapUrl}:{wedding:Wedding;mapUrl:string}){const names=`${wedding.partner_one_name} & ${wedding.partner_two_name}`,[qr,setQr]=useState(""),[copied,setCopied]=useState(false);useEffect(()=>{QRCode.toDataURL(mapUrl,{width:720,margin:2,color:{dark:"#282621",light:"#fffdf8"},errorCorrectionLevel:"H"}).then(setQr)},[mapUrl]);return <div className="qrLayout"><div className="qrCard"><div className="eyebrow">{names}</div><h2>Help Build Our<br/><i>Adventure Map</i></h2><p>Scan to share where you came from or recommend a place for us to visit.</p>{qr?<img className="realQr" src={qr} alt={"Scannable QR code for "+names+"'s wedding map"}/>:<div className="qrLoading">Generating QR code…</div>}<b>{mapUrl.replace("https://","")}</b><small>THANK YOU FOR BEING PART OF OUR STORY</small></div><div className="qrTools"><h2>Your Real Wedding QR Code</h2><p>This code opens your unique public map and is ready for invitations or guest-table cards.</p><label>Guest map link<input value={mapUrl} readOnly/></label><a href={mapUrl} className="button gold">Open adventure map ↗</a><button className="button light" onClick={async()=>{await navigator.clipboard.writeText(mapUrl);setCopied(true);setTimeout(()=>setCopied(false),1800)}}>{copied?"Link copied ✓":"Copy link"}</button><button className="button light" onClick={()=>window.print()}>Print QR card ↓</button></div></div>}
