@@ -50,3 +50,5 @@ For Vercel, import the repository, add every value from `.env.example`, and depl
 ## Payments
 
 Product CTAs post to the server-owned `/api/checkout` route, which validates every product and price before creating a Stripe-hosted Checkout Session. Configure `STRIPE_SECRET_KEY` as a hosted secret to enable live card payments. Never expose this secret as a `NEXT_PUBLIC_` value or commit it to the repository.
+
+The publishable `pk_...` key alone cannot create Checkout sessions. Automatic Memento Map tier assignment also requires the hosted secrets `STRIPE_WEBHOOK_SECRET` and `SUPABASE_SERVICE_ROLE_KEY`. In Stripe Workbench, register `https://mementohouse.com/api/stripe-webhook` for `checkout.session.completed`. When the checkout email matches the customer's account email, the verified webhook assigns `product_tier` as `map`, `plus`, or `keepsake`; unassigned accounts default to Memento Map Basic.
