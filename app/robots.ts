@@ -1,0 +1,1 @@
+import type {MetadataRoute} from "next";export default function robots():MetadataRoute.Robots{return{rules:{userAgent:"*",allow:["/","/memento-map","/memento-deck","/unity-tile-signature-board","/privacy","/terms","/refunds","/shipping","/contact"],disallow:["/dashboard","/account","/api","/order/success"]},sitemap:"https://mementohouse.com/sitemap.xml"}}

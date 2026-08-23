@@ -1,0 +1,1 @@
+import type {MetadataRoute} from "next";export default function sitemap():MetadataRoute.Sitemap{return["","/memento-map","/memento-deck","/unity-tile-signature-board","/privacy","/terms","/refunds","/shipping","/contact"].map(path=>({url:`https://mementohouse.com${path}`,lastModified:new Date(),changeFrequency:path?"monthly":"weekly",priority:path?0.8:1}))}

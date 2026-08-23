@@ -12,5 +12,9 @@ export async function POST(request:Request){
  const event=JSON.parse(body),session=event.data?.object;if(event.type!=="checkout.session.completed"||session?.payment_status!=="paid"||session?.metadata?.product!=="map")return new Response("ok");
  const email=String(session.customer_details?.email||"").toLowerCase(),tier=String(session.metadata?.tier||"map");if(!email)return new Response("No customer email",{status:400});
  const admin=createClient(url,serviceKey,{auth:{persistSession:false,autoRefreshToken:false}});let page=1,user:any=null;while(!user&&page<20){const result=await admin.auth.admin.listUsers({page,perPage:100});if(result.error)return new Response(result.error.message,{status:500});user=result.data.users.find(u=>u.email?.toLowerCase()===email);if(result.data.users.length<100)break;page++}
- if(!user)return new Response("Account not found for checkout email",{status:202});const result=await admin.auth.admin.updateUserById(user.id,{user_metadata:{...user.user_metadata,product_tier:tier}});return result.error?new Response(result.error.message,{status:500}):new Response("ok");
+ if(!user){
+  const invited=await admin.auth.admin.inviteUserByEmail(email,{redirectTo:"https://mementohouse.com/account/setup",data:{product_tier:tier,purchase_status:"paid"}});
+  return invited.error?new Response(invited.error.message,{status:500}):new Response("ok");
+ }
+ const result=await admin.auth.admin.updateUserById(user.id,{user_metadata:{...user.user_metadata,product_tier:tier,purchase_status:"paid"}});return result.error?new Response(result.error.message,{status:500}):new Response("ok");
 }

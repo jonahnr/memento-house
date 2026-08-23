@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import {FormEvent,useCallback,useEffect,useState} from "react";
 import QRCode from "qrcode";
 import {getSupabaseBrowserClient} from "../../lib/supabase";
@@ -11,7 +10,7 @@ type Wedding={id:string;partner_one_name:string;partner_two_name:string;wedding_
 type Recommendation={id:string;guest_name:string;message:string;category:string|null;status:"active"|"hidden"|"deleted";destination:{id:string;location_name:string;latitude:number;longitude:number}|null};
 type TravelStatus={destination_id:string;status:"want_to_go"|"planning"|"visited";planned_date:string|null;visited_date:string|null;couple_note:string|null;image_url:string|null};
 type Story={id:string;location_name:string;latitude:number;longitude:number;story_type:string;title:string;description:string;event_date:string|null;image_url:string|null;sort_order:number};
-const items=["Overview","Our Story","Recommendations","Travel Journal","Wedding Map","QR Code","Keepsake","Settings"];
+const items=["Overview","Our Story","Recommendations","Travel Journal","Wedding Map","QR Code","Settings"];
 
 const prettyDate=(value:string|null,short=false)=>{
  if(!value)return "Wedding date to come";
@@ -54,7 +53,7 @@ export function Dashboard(){
   <aside><div className="brand splitBrand"><a href="/" aria-label="Memento House home"><img src="/brand/memento-house-logo.webp" alt=""/></a><button onClick={()=>setSection("Overview")}><span>Memento <i>Map</i><small>by Memento House</small></span></button></div>
    <div className="coupleChip"><span>{initials[0]}<span>&</span>{initials[1]}</span><div><b>{names}</b><small>{prettyDate(wedding.wedding_date,true)}</small></div></div>
    <div className="planBadge"><small>CURRENT PLAN</small><b>{tier==="plus"?"Map Plus":"Memento Map"}</b>{email.toLowerCase()==="jonahnr@gmail.com"&&<select aria-label="Admin tier tester" value={tier} onChange={async e=>{const next=e.target.value,client=getSupabaseBrowserClient(),session=(await client!.auth.getSession()).data.session;const response=await fetch("/api/admin/tier",{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${session?.access_token}`},body:JSON.stringify({tier:next})});if(response.ok)setTier(next)}}><option value="map">Test Basic</option><option value="plus">Test Plus</option></select>}</div>
-   <nav>{items.filter(x=>tier!=="map"||!(["Travel Journal","Keepsake"].includes(x))).map(x=>{const i=items.indexOf(x);return <button key={x} onClick={()=>setSection(x)} className={section===x?"active":""}><i>{["⌂","♥","✦","✓","⌖","▦","◇","⚙"][i]}</i>{x}</button>})}</nav>
+   <nav>{items.map(x=>{const i=items.indexOf(x),locked=tier==="map"&&["Our Story","Travel Journal"].includes(x);return <button key={x} title={locked?`${x} is included with Map Plus`:x} onClick={()=>locked?setSection("Settings"):setSection(x)} className={section===x?"active":""}><i>{["⌂","♥","✦","✓","⌖","▦","⚙"][i]}</i>{x}{locked&&<span className="navLock"> 🔒</span>}</button>})}</nav>
    <div className="dashboardExit"><a href="/">← Memento House home</a><a href="/#keepsakes">Browse all keepsakes</a><a href={mapPath}>↗ Open adventure map</a></div>
   </aside>
   <section className="dashMain"><header><div><small>{names.toUpperCase()}’S WEDDING</small><h1>{section}</h1></div><div className="dashActions"><span>{initials}</span></div></header>
@@ -62,10 +61,9 @@ export function Dashboard(){
    {section==="Overview"&&<Overview wedding={wedding} recommendations={data} mapPath={mapPath} onSection={setSection}/>}
    {section==="Recommendations"&&<Recommendations rows={data} onStatus={setStatus} onRemove={remove}/>}
    {section==="Travel Journal"&&tier!=="map"&&<TravelJournal wedding={wedding} rows={data} values={travel} onChange={setTravel}/>}
-   {section==="Our Story"&&<StoryEditor wedding={wedding} values={stories} onChange={setStories}/>}
+   {section==="Our Story"&&tier!=="map"&&<StoryEditor wedding={wedding} values={stories} onChange={setStories}/>}
    {section==="Wedding Map"&&<WeddingMapPanel wedding={wedding} recommendations={data} mapPath={mapPath}/>}
    {section==="QR Code"&&<QR wedding={wedding} mapUrl={mapUrl}/>}
-   {section==="Keepsake"&&tier!=="map"&&<Keepsake wedding={wedding} recommendations={data}/>}
    {section==="Settings"&&<><PlanGuide tier={tier}/><VenueSetup wedding={wedding} values={stories} onChange={setStories}/><Settings wedding={wedding} onSaved={setWedding}/></>}
   </section>
  </main>
