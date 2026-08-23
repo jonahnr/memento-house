@@ -17,6 +17,7 @@
     "@supabase/supabase-js": "^2.112.3",
     "@types/qrcode": "^1.5.6",
     "drizzle-orm": "0.45.2",
+    "html-to-image": "^1.11.13",
     "maplibre-gl": "^6.4.1",
     "qrcode": "^1.5.4",
     "react": "19.2.6",
