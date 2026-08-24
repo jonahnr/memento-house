@@ -7,6 +7,8 @@ interface Env {
   DB: D1Database;
   STRIPE_SECRET_KEY?: string;
   STRIPE_WEBHOOK_SECRET?: string;
+  STRIPE_TEST_SECRET_KEY?: string;
+  STRIPE_TEST_WEBHOOK_SECRET?: string;
   SUPABASE_SERVICE_ROLE_KEY?: string;
   ADMIN_EMAILS?: string;
   STRIPE_PRICE_MAP_BASIC?: string;
@@ -41,7 +43,7 @@ const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     // Sites provides production secrets as Worker bindings. Mirror only the
     // server-side values that route handlers read through Node's process.env.
-    for (const key of ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET", "SUPABASE_SERVICE_ROLE_KEY", "ADMIN_EMAILS", "STRIPE_PRICE_MAP_BASIC", "STRIPE_PRICE_MAP_PLUS", "STRIPE_PRICE_DECK_ESSENTIAL", "STRIPE_PRICE_DECK_SIGNATURE", "STRIPE_PRICE_DECK_STORY", "STRIPE_PRICE_DECK_BESPOKE", "STRIPE_PRICE_UNITY_STANDARD", "STRIPE_PRICE_UNITY_BESPOKE"] as const) {
+    for (const key of ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET", "STRIPE_TEST_SECRET_KEY", "STRIPE_TEST_WEBHOOK_SECRET", "SUPABASE_SERVICE_ROLE_KEY", "ADMIN_EMAILS", "STRIPE_PRICE_MAP_BASIC", "STRIPE_PRICE_MAP_PLUS", "STRIPE_PRICE_DECK_ESSENTIAL", "STRIPE_PRICE_DECK_SIGNATURE", "STRIPE_PRICE_DECK_STORY", "STRIPE_PRICE_DECK_BESPOKE", "STRIPE_PRICE_UNITY_STANDARD", "STRIPE_PRICE_UNITY_BESPOKE"] as const) {
       if (env[key]) process.env[key] = env[key];
     }
 
