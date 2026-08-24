@@ -1,0 +1,13 @@
+export type CategoryId='couple'|'remember'|'advise'|'predict'|'adventure'|'together'|'confess'|'divider'|'delayed'|'instruction'|'firstRead'|'tableSign';
+export type ProductTier='essential'|'signature'|'story'|'bespoke';
+export type ThemeId='vintage'|'minimal'|'romantic'|'moody'|'deco'|'botanical'|'letterpress'|'regency'|'celestial'|'tuscan'|'coastal'|'luxe';
+export type PaletteId=string;
+export interface PromptField{label:string;lines?:number}
+export interface CardTemplate{id:CategoryId;badge:string;title:string;prompt:string;prompts:string[];fields:PromptField[];active:boolean;prefix:string;purpose:string}
+export interface CoupleInfo{projectName:string;orderNumber:string;customerName:string;partner1:string;partner2:string;lastName:string;weddingDate:string;venue:string;city:string;state:string;weddingYear:string;yearsTogether:string;engagementDate:string;quote:string;funFact:string;funFact2:string;notes:string;firstMet:string;firstDate:string;story:string;howMet:string;favoriteCity:string;pets:string;favoriteVacation:string;college:string;sportsTeams:string;insideJokes:string;hobbies:string;proposalLocation:string;favoriteRestaurant:string}
+export interface DelayedCard{title:string;prompt:string;active:boolean}
+export interface PhotoState{dataUrl:string;width:number;height:number;zoom:number;x:number;y:number;rotation:number}
+export interface Palette{background:string;primary:string;accent:string}
+export interface ProjectSettings{tier:ProductTier;theme:ThemeId;paletteId:PaletteId;customPalette:Palette;textColor?:string;frontTextColor?:string;backTextColor?:string;showBranding:boolean;numbering:'simple'|'category'|'off';writingLines:'none'|'light'|'dotted';guestQuantity:number;quantities:Record<string,number>;showGuides:boolean;includePrinterGuides:boolean;proofWatermark:boolean;experienceMode:'choose'|'draw'|'mixed';rareCount:number;includeDividers:boolean;includeOpenOnAddOn:boolean;bespokePromptCount:number;fonts:{display:string;body:string;label:string}}
+export interface Project{version:1;info:CoupleInfo;photo:PhotoState;templates:CardTemplate[];settings:ProjectSettings;delayedCards:DelayedCard[];instructionText:string;signText:string;updatedAt:string}
+export interface Piece{id:string;category:CategoryId;side:'front'|'back';number:number;categoryIndex:number;total:number;label:string;relatedCategory?:CategoryId;customPrompt?:string;openLabel?:string;recipient?:string;sender?:string}

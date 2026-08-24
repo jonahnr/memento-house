@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Memento House</title>
+  <style>
+    :root {
+      --ink:#29251f; --muted:#716c63; --canvas:#ecebe7; --surface:#fff; --line:#d7d2c8;
+      --accent:#9f4c3f; --board:#a98250; --cell:#d9c299; --cell-line:#967345;
+      --tile:#f5dfac; --tile-ink:#30261a; --tile-shadow:#89693e; --page-bg:#fffdf8;
+      --page-pattern:none; --artwork:none; --display-font:Georgia,serif; --tw:#a9483e; --dw:#e3a39a; --tl:#397782; --dl:#a4cdd1;
+      --page-w:16in; --page-h:20in; --page-ratio:16/20;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:var(--canvas); font-family:Arial,sans-serif; }
+    button,input,select { font:inherit; color:inherit; } button { cursor:pointer; }
+    .app { min-height:100vh; display:grid; grid-template-rows:56px minmax(0,1fr); }
+    header { display:flex; align-items:center; padding:0 22px; border-bottom:1px solid var(--line); background:var(--surface); }
+    .brand { font:700 21px var(--display-font); }
+    .brand span { margin-left:8px; color:var(--muted); font:600 10px Arial; letter-spacing:1.2px; text-transform:uppercase; }
+    .save-state { margin-left:auto; color:var(--muted); font-size:12px; }
+    .workspace { display:grid; grid-template-columns:288px minmax(480px,1fr) 258px; min-height:0; }
+    .panel { padding:18px; overflow:auto; border-right:1px solid var(--line); background:var(--surface); }
+    .panel.right { border:0; border-left:1px solid var(--line); }
+    .section { padding-bottom:18px; margin-bottom:18px; border-bottom:1px solid var(--line); }
+    .section:last-child { border:0; }
+    h2 { margin:0 0 12px; color:var(--muted); font-size:11px; letter-spacing:1.1px; text-transform:uppercase; }
+    .field { display:block; margin:10px 0 5px; font-size:12px; font-weight:700; }
+    .control { width:100%; height:38px; padding:0 10px; border:1px solid var(--line); border-radius:4px; background:var(--surface); }
+    .word-input { text-transform:uppercase; font-size:18px; font-weight:700; letter-spacing:1px; }
+    .two { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .seg { display:grid; grid-auto-flow:column; grid-auto-columns:1fr; overflow:hidden; border:1px solid var(--line); border-radius:4px; }
+    .seg button { height:36px; border:0; border-right:1px solid var(--line); background:var(--surface); }
+    .seg button:last-child { border:0; } .seg button.active { color:#fff; background:var(--ink); }
+    .btn { height:38px; border:1px solid var(--line); border-radius:4px; background:var(--surface); font-weight:700; }
+    .btn.primary { width:100%; color:#fff; border-color:var(--accent); background:var(--accent); }
+    .btn:disabled { opacity:.42; cursor:not-allowed; }
+    .message { min-height:38px; margin:10px 0; padding:8px 9px; border-left:3px solid var(--line); color:var(--muted); font-size:12px; line-height:1.5; }
+    .message.valid { color:#2d674f; border-color:#3b795e; } .message.invalid { color:#96382a; border-color:var(--accent); }
+    .theme-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+    .theme { height:58px; padding:0; position:relative; overflow:hidden; border:1px solid var(--line); border-radius:4px; background:var(--swatch); }
+    .theme::before { content:"A"; position:absolute; top:7px; right:8px; width:24px; height:24px; display:grid; place-items:center; border:1px solid var(--shadow); border-radius:2px; color:var(--chip-ink); background:var(--chip); box-shadow:0 2px 0 var(--shadow); font:700 14px Georgia; }
+    .theme.active { outline:2px solid var(--ink); outline-offset:2px; }
+    .theme span { position:absolute; left:6px; bottom:5px; padding:2px 4px; color:var(--label-ink); background:var(--label); font-size:9px; font-weight:700; }
+    .tool-row { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; }
+    .stage { padding:24px; overflow:auto; display:grid; place-items:start center; background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px); background-size:24px 24px; }
+    .page { width:min(var(--page-w),100%); aspect-ratio:var(--page-ratio); min-width:440px; padding:7.5%; position:relative; container-type:inline-size; color:var(--ink); background-color:var(--page-bg); background-image:var(--page-pattern); background-size:var(--pattern-size,16px 16px); background-position:center; background-repeat:repeat; box-shadow:0 12px 40px #29251f24; }
+    .page-head { display:grid; grid-template-columns:1fr auto; align-items:end; gap:16px; padding-bottom:8px; border-bottom:2px solid var(--ink); }
+    .title { min-width:0; overflow:hidden; padding:0; border:0; background:transparent; font-family:var(--display-font); font-size:5.2cqw; line-height:1; font-weight:700; white-space:nowrap; }
+    .date-display { text-align:right; color:var(--accent); font-family:var(--display-font); font-size:2.1cqw; line-height:1.1; font-style:italic; font-weight:600; white-space:nowrap; }
+    .signing { position:absolute; left:7.5%; right:7.5%; top:15.5cqw; bottom:calc(var(--board-size,70.588cqw) + 16.472cqw); min-height:0; padding:10px 0 0; display:grid; grid-template-rows:auto minmax(0,1fr); background:transparent; }
+    .signing-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:9px; }
+    .signing-head strong { font-family:var(--display-font); font-size:1.8cqw; font-style:italic; font-weight:600; } .signing-head span { color:var(--muted); font-size:.8cqw; letter-spacing:.8px; text-transform:uppercase; }
+    .signature-lines { min-height:0; display:grid; grid-template-columns:repeat(var(--signature-cols,4),1fr); grid-auto-rows:1fr; column-gap:12px; }
+    .signature-line { height:0; align-self:end; border-bottom:1px solid color-mix(in srgb,var(--ink) 45%,transparent); }
+    .page[data-capacity="medium"] { --signature-cols:6; --signature-gap:9px; --signature-height:16px; }
+    .page[data-capacity="large"] { --signature-cols:8; --signature-gap:7px; --signature-height:13px; }
+    .page[data-capacity="xl"] { --signature-cols:8; --signature-gap:5px; --signature-height:11px; }
+    .page[data-capacity="large"] .signing,.page[data-capacity="xl"] .signing { padding-top:7px; padding-bottom:9px; }
+    .board-wrap { height:var(--board-size,70.588cqw); position:absolute; left:7.5%; right:7.5%; bottom:12.352cqw; display:grid; place-items:center; }
+    .rail { position:absolute; top:0; bottom:0; width:calc((100% - var(--board-size,70.588cqw))/2); overflow:hidden; pointer-events:none; }
+    .rail.left { left:0; } .rail.right { right:0; }
+    .rail-crop { position:absolute; top:50%; overflow:hidden; transform:translateY(-50%); }
+    .rail-art { position:absolute; top:0; max-width:none; }
+    .rail.left .rail-art { left:0; } .rail.right .rail-art { right:0; }
+    .rail[hidden] { display:none; }
+    .board { --n:13; width:var(--board-size,70.588cqw); height:var(--board-size,70.588cqw); position:relative; z-index:1; display:grid; grid-template-columns:repeat(var(--n),1fr); gap:var(--grid-gap,2px); padding:var(--grid-pad,7px); border:0; outline:2px solid var(--cell-line); background:var(--board); user-select:none; }
+    .cell { position:relative; min-width:0; padding:0; border:0; background:var(--cell); box-shadow:inset 0 0 0 1px var(--cell-line); }
+    .cell.selected { outline:3px solid var(--accent); outline-offset:-2px; z-index:3; }
+    .cell.premium::after { content:attr(data-premium); position:absolute; inset:0; display:grid; place-items:center; color:#fff; font-size:clamp(5px,.58vw,8px); font-weight:800; letter-spacing:.2px; }
+    .cell.tw { background:var(--tw); } .cell.dw { background:var(--dw); } .cell.tl { background:var(--tl); } .cell.dl { background:var(--dl); }
+    .cell.dw.center::after { content:"★"; font-size:clamp(9px,1vw,16px); }
+    .tile,.ghost { position:absolute; inset:8%; z-index:2; display:grid; place-items:center; border:1px solid var(--tile-shadow); border-radius:3px; color:var(--tile-ink); background:var(--tile); box-shadow:0 2px 0 var(--tile-shadow); font-family:var(--display-font); font-size:clamp(9px,1.65vw,23px); font-weight:700; text-transform:uppercase; }
+    .tile small,.ghost small { position:absolute; right:8%; bottom:3%; font:700 clamp(4px,.5vw,7px) Arial; }
+    .ghost { opacity:.63; } .ghost.bad { color:var(--accent); background:#f7d8d2; border-color:var(--accent); box-shadow:none; }
+    .page-foot { position:absolute; left:7.5%; right:7.5%; bottom:8.823cqw; display:flex; justify-content:space-between; color:var(--muted); font-size:1.2cqw; letter-spacing:.4px; }
+    .stats { display:flex; gap:12px; color:var(--muted); font-size:11px; } .stats strong { display:block; color:var(--ink); font-size:18px; }
+    .legend { display:grid; grid-template-columns:1fr 1fr; gap:6px 10px; font-size:10px; }
+    .legend span::before { content:attr(data-code); width:24px; height:18px; margin-right:6px; display:inline-grid; place-items:center; color:#fff; background:var(--color); font-weight:800; }
+    .word-list { display:grid; gap:4px; } .word-item { display:grid; grid-template-columns:1fr auto; align-items:center; padding:7px 0; border-bottom:1px solid var(--line); }
+    .preview-notice { display:none; padding:8px 16px; color:#fff; background:#9f4c3f; text-align:center; font-size:10px; font-weight:800; letter-spacing:1.5px; }
+    body.demo-mode .app { grid-template-rows:56px 34px minmax(0,1fr); }
+    body.demo-mode .preview-notice { display:grid; place-items:center; }
+    body.demo-mode .output-section { display:none; }
+    body.demo-mode .page::after { content:"© MEMENTO HOUSE · INTERACTIVE PREVIEW"; position:absolute; inset:0; z-index:30; display:grid; place-items:center; color:#704f3788; font:700 2.2cqw Georgia,serif; letter-spacing:.12em; transform:rotate(-27deg); pointer-events:none; }
+    .word-main { padding:0; border:0; background:transparent; text-align:left; } .word-main strong { display:block; font-size:13px; } .word-main small,.empty { color:var(--muted); font-size:10px; }
+    .icon { width:30px; height:30px; border:0; background:transparent; font-size:18px; } .import { display:none; }
+    @media(max-width:980px){.workspace{grid-template-columns:260px minmax(450px,1fr)}.panel.right{grid-column:1/-1;border-left:0;border-top:1px solid var(--line)}.word-list{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
+    @media(max-width:720px){.workspace{display:block}.panel{border-right:0;border-bottom:1px solid var(--line)}.stage{padding:14px}.page{min-width:0}.board{width:100%}.save-state{display:none}.signature-lines{column-gap:7px}}
+    @media print{@page{size:var(--page-w) var(--page-h);margin:0}header,.panel{display:none}.app,.workspace,.stage{display:block;padding:0;background:none}.page{width:var(--page-w);height:var(--page-h);min-width:0;padding:7.5%;box-shadow:none}.board{width:var(--board-size);height:var(--board-size);max-height:none}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header><div class="brand">Memento House <span>Celebration word boards</span></div><div class="save-state" id="saveState">Saved locally</div></header>
+  <div class="preview-notice">INTERACTIVE PREVIEW · WATERMARKED · DOWNLOADS DISABLED</div>
+  <div class="workspace">
+    <aside class="panel">
+      <section class="section">
+        <h2>Place a word</h2>
+        <label class="field" for="word">Word or guest name</label><input class="control word-input" id="word" maxlength="17" autocomplete="off" placeholder="TYPE HERE">
+        <div class="two"><div><label class="field" for="row">Row</label><input class="control" id="row" type="number" min="1" value="8"></div><div><label class="field" for="col">Column</label><input class="control" id="col" type="number" min="1" value="6"></div></div>
+        <label class="field">Direction</label><div class="seg" id="directions"><button class="active" data-dir="across">Across</button><button data-dir="down">Down</button></div>
+        <div class="message" id="message">Click any square, then type a word.</div><button class="btn primary" id="place" disabled>Place word</button>
+      </section>
+      <section class="section">
+        <h2>Keepsake details</h2>
+        <label class="field" for="title">Couple or celebration</label><input class="control" id="title" value="Avery & Morgan">
+        <label class="field" for="date">Wedding date</label><input class="control" id="date" type="date" value="2026-09-19">
+        <label class="field" for="font">Typography</label><select class="control" id="font"><option value="editorial">Editorial serif</option><option value="romantic">Romantic script</option><option value="calligraphy">Regency calligraphy</option><option value="formal">Formal invitation</option><option value="modern">Modern sans</option><option value="classic">Classic book</option><option value="playful">Playful rounded</option></select>
+        <label class="field" for="capacity">Signature capacity</label><select class="control" id="capacity"><option value="small">20–40 signatures</option><option value="medium">40–80 signatures</option><option value="large">80–100 signatures</option><option value="xl">100–120 signatures</option></select>
+        <label class="field" for="motif">Celebration motif</label><select class="control" id="motif"><option value="none">Quiet paper</option><option value="lace">Bridal lace</option><option value="rings">Wedding bands</option><option value="florals">Bridal florals</option><option value="champagne">Champagne toast</option><option value="balloons">Balloons</option><option value="confetti">Confetti ribbons</option><option value="stars">Celestial stars</option><option value="disco">Disco balls</option><option value="botanical">Botanical</option><option value="cincinnati">Cincinnati skyline</option><option value="cincinnati2">Cincinnati landmarks</option><option value="artdeco">Art deco celebration</option></select>
+      </section>
+      <section class="section">
+        <h2>Board setup</h2>
+        <label class="field" for="size">Grid size · 0.8 in tile fit</label><select class="control" id="size"><option value="9">9 × 9</option><option value="11">11 × 11</option><option value="13" selected>13 × 13</option><option value="15">15 × 15</option><option value="17">17 × 17</option></select>
+        <label class="field" for="paper">Poster size</label><select class="control" id="paper"><option value="16x20" selected>16 × 20 in · intimate</option><option value="18x24">18 × 24 in · standard</option><option value="24x36">24 × 36 in · grand</option></select>
+      </section>
+      <section class="section"><h2>Wedding style</h2><div class="theme-grid" id="themes"></div></section>
+      <section class="section output-section"><h2>Output</h2><div class="tool-row"><button class="btn" id="export">PNG</button><button class="btn" id="import">Import</button><button class="btn" id="print">Print</button></div><input class="import" id="file" type="file" accept="application/json"></section>
+    </aside>
+    <main class="stage">
+      <article class="page" id="keepsake" data-capacity="small">
+        <div class="page-head"><div class="title" id="titleDisplay">Avery & Morgan</div><div class="date-display" id="dateDisplay">September 19, 2026</div></div>
+        <section class="signing"><div class="signing-head"><strong>Leave your mark on our story</strong><span>Signatures</span></div><div class="signature-lines" id="signatureLines"></div></section>
+        <div class="board-wrap"><span class="rail left" id="railLeft" hidden><span class="rail-crop"><img class="rail-art" alt=""></span></span><span class="rail right" id="railRight" hidden><span class="rail-crop"><img class="rail-art" alt=""></span></span><div class="board" id="board" role="grid" aria-label="Interactive wedding word board"></div></div>
+        <div class="page-foot"><span>Memento House · Made for the Moment. Kept for a Lifetime.</span></div>
+      </article>
+    </main>
+    <aside class="panel right">
+      <section class="section"><h2>Placed words</h2><p class="empty">Select a word below to reposition or edit it.</p></section>
+      <section class="section"><h2>Premium squares</h2><div class="legend"><span data-code="TW" style="--color:var(--tw)">Triple word</span><span data-code="DW" style="--color:var(--dw)">Double word</span><span data-code="TL" style="--color:var(--tl)">Triple letter</span><span data-code="DL" style="--color:var(--dl)">Double letter</span></div></section>
+      <section class="section"><div class="word-list" id="wordList"></div></section>
+      <section class="section"><div class="tool-row"><button class="btn" id="undo">Undo</button><button class="btn" id="sample">Sample</button><button class="btn" id="clear">Clear</button></div></section>
+    </aside>
+  </div>
+</div>
+<script src="word-grid-engine.js"></script>
+<script src="word-grid-artwork.js"></script>
+<script>
+(function(){
+  const requestedAdmin=new URLSearchParams(location.search).get('mode')==='admin';
+  const adminMode=requestedAdmin&&document.referrer.includes('/admin/word-grid-studio');
+  document.body.classList.add(adminMode?'admin-mode':'demo-mode');
+  const {WordGrid,LETTER_VALUES:VALUES}=window.WordGridEngine;
+  const $=s=>document.querySelector(s);
+  const THEMES={
+    heirloom:{name:'Heirloom',page:'#fffaf0',board:'#9c784a',cell:'#dbc8a5',line:'#8c693d',tile:'#f3deb0',ink:'#34281b',shadow:'#826238',accent:'#9b493e',tw:'#a8463c',dw:'#dda099',tl:'#477985',dl:'#a6cbd0',pattern:'radial-gradient(circle at 12px 12px,#b9915730 1px,transparent 1.5px)'},
+    garden:{name:'Garden',page:'#f7fbf4',board:'#657c57',cell:'#cbd9bd',line:'#718465',tile:'#fff2cf',ink:'#2e3c27',shadow:'#9e9168',accent:'#7d526a',tw:'#8e4d6d',dw:'#d5a9bd',tl:'#426f65',dl:'#a9cec2',pattern:'radial-gradient(ellipse at 12px 8px,#6f8e6422 0 3px,transparent 3.5px)'},
+    coastal:{name:'Coastal',page:'#f4fbfc',board:'#527c8c',cell:'#c7dde1',line:'#668d98',tile:'#f8eed0',ink:'#263c43',shadow:'#9d9878',accent:'#c5654e',tw:'#ba5948',dw:'#e9aca0',tl:'#376c80',dl:'#a6d3dc',pattern:'repeating-linear-gradient(135deg,transparent 0 18px,#72a5ae14 18px 19px)'},
+    blacktie:{name:'Black Tie',page:'#f8f7f3',board:'#242521',cell:'#55564f',line:'#151612',tile:'#f0eee5',ink:'#1f201d',shadow:'#a7a49a',accent:'#b8923f',tw:'#8f3030',dw:'#c69b8d',tl:'#325a63',dl:'#7fa3aa',pattern:'linear-gradient(45deg,#1e1f1b0a 25%,transparent 25% 75%,#1e1f1b0a 75%)'},
+    wildflower:{name:'Wildflower',page:'#fff8fb',board:'#795f77',cell:'#d8c5d6',line:'#8d738b',tile:'#f4d778',ink:'#483523',shadow:'#b0913f',accent:'#b34d70',tw:'#aa4666',dw:'#e2a7ba',tl:'#4c7681',dl:'#add0d5',pattern:'radial-gradient(circle at 8px 8px,#c3557d24 0 2px,transparent 2.5px),radial-gradient(circle at 22px 20px,#6d8b6120 0 2px,transparent 2.5px)'},
+    terracotta:{name:'Terracotta',page:'#fff8f0',board:'#9b6049',cell:'#e1bba3',line:'#a16f57',tile:'#dae3c5',ink:'#34402c',shadow:'#8d9c75',accent:'#ad4f39',tw:'#a84736',dw:'#e5a798',tl:'#3f7371',dl:'#a7d0c8',pattern:'repeating-linear-gradient(0deg,transparent 0 23px,#b9684515 23px 24px)'},
+    champagne:{name:'Champagne',page:'#fffdf7',board:'#a28b65',cell:'#e3d8bd',line:'#a08d6b',tile:'#fbf8ee',ink:'#55452c',shadow:'#bbb095',accent:'#9b7653',tw:'#9d5145',dw:'#dfb2a7',tl:'#657a73',dl:'#b7cbc4',pattern:'radial-gradient(circle at center,#b89b6030 0 1px,transparent 1.5px)'},
+    frenchblue:{name:'French Blue',page:'#fffdf9',board:'#647d89',cell:'#d7e0df',line:'#536c76',tile:'#f5e9cf',ink:'#2d3940',shadow:'#9b8e72',accent:'#a35f69',tw:'#94515d',dw:'#d8a6ad',tl:'#386675',dl:'#a9ccd0',pattern:'repeating-linear-gradient(135deg,transparent 0 25px,#7d99a414 25px 26px)'}
+  };
+  const STANDARD={
+    TW:[[0,0],[0,7],[0,14],[7,0],[7,14],[14,0],[14,7],[14,14]],
+    DW:[[1,1],[2,2],[3,3],[4,4],[7,7],[10,10],[11,11],[12,12],[13,13],[1,13],[2,12],[3,11],[4,10],[10,4],[11,3],[12,2],[13,1]],
+    TL:[[1,5],[1,9],[5,1],[5,5],[5,9],[5,13],[9,1],[9,5],[9,9],[9,13],[13,5],[13,9]],
+    DL:[[0,3],[0,11],[2,6],[2,8],[3,0],[3,7],[3,14],[6,2],[6,6],[6,8],[6,12],[7,3],[7,11],[8,2],[8,6],[8,8],[8,12],[11,0],[11,7],[11,14],[12,6],[12,8],[14,3],[14,11]]
+  };
+  const FONTS={editorial:'Georgia,serif',romantic:'"Segoe Script","Brush Script MT",cursive',calligraphy:'"Edwardian Script ITC","Kunstler Script","Segoe Script",cursive',formal:'"Monotype Corsiva","Lucida Calligraphy","Segoe Script",cursive',modern:'Arial,sans-serif',classic:'Garamond,Georgia,serif',playful:'"Trebuchet MS",Arial,sans-serif'};
+  const MOTIFS={
+    none:'none',
+    lace:'none',rings:'none',florals:'none',champagne:'none',
+    balloons:'radial-gradient(ellipse at 14px 12px,color-mix(in srgb,var(--accent) 16%,transparent) 0 5px,transparent 5.5px),repeating-linear-gradient(72deg,transparent 0 31px,color-mix(in srgb,var(--accent) 9%,transparent) 31px 32px)',
+    confetti:'radial-gradient(circle at 12px 18px,rgba(180,83,70,.28) 0 2px,transparent 2.5px),radial-gradient(circle at 32px 9px,rgba(66,119,130,.25) 0 2px,transparent 2.5px),repeating-linear-gradient(125deg,transparent 0 29px,rgba(190,145,65,.22) 29px 32px,transparent 32px 51px)',
+    stars:'radial-gradient(circle at 12px 12px,rgba(177,130,45,.34) 0 2px,transparent 2.5px),radial-gradient(circle at 35px 28px,rgba(169,72,62,.22) 0 1.5px,transparent 2px)',
+    botanical:'radial-gradient(ellipse at 10px 7px,color-mix(in srgb,#63845c 18%,transparent) 0 4px,transparent 4.5px),radial-gradient(ellipse at 19px 15px,color-mix(in srgb,#63845c 12%,transparent) 0 3px,transparent 3.5px)',
+    cincinnati:'none',cincinnati2:'none',artdeco:'none',disco:'none'
+  };
+  const ART_ASSETS=window.WORD_GRID_ARTWORK||{};
+  const PRINT_SIZES={'16x20':{w:16,h:20,dpi:300,minGrid:9,maxGrid:13},'18x24':{w:18,h:24,dpi:300,minGrid:9,maxGrid:15},'24x36':{w:24,h:36,dpi:150,minGrid:11,maxGrid:17}};
+  const ART_LAYOUTS={
+    '16x20':{9:'wide',11:'tall',13:'tall'},
+    '18x24':{9:'wide',11:'tall',13:'tall',15:'tall'},
+    '24x36':{9:'wide',11:'wide',13:'wide',15:'balanced',17:'tight'}
+  };
+  const TILE_IN=.8,GRID_GAP_IN=.03,BOARD_PAD_IN=.12;
+  const engine=new WordGrid(13);
+  let direction='across',selected={row:7,col:5},editing=null,theme='heirloom',font='editorial',capacity='small',motif='none';
+
+  function premiumMap(n){
+    if(n===9){const map=new Map(),sets={TW:[[0,0],[0,8],[8,0],[8,8]],DW:[[1,1],[1,7],[4,4],[7,1],[7,7]],TL:[[2,4],[4,2],[4,6],[6,4]],DL:[[0,4],[4,0],[4,8],[8,4]]};for(const [code,points] of Object.entries(sets))for(const [r,c] of points)map.set(r+','+c,code);return map}
+    const map=new Map(),priority={DL:1,TL:2,DW:3,TW:4};
+    for(const [code,points] of Object.entries(STANDARD)) for(const [r,c] of points){
+      const rr=Math.round(r*(n-1)/14),cc=Math.round(c*(n-1)/14),key=rr+','+cc;
+      if(!map.has(key)||priority[code]>priority[map.get(key)])map.set(key,code);
+    }
+    map.set(Math.floor(n/2)+','+Math.floor(n/2),'DW');
+    return map;
+  }
+  function tile(letter,cls){return '<span class="'+cls+'">'+letter+'<small>'+(VALUES[letter]||0)+'</small></span>'}
+  function renderBoard(positions=[],valid=false){
+    const ghosts=new Map(positions.map(p=>[p.row+','+p.col,p])),premiums=premiumMap(engine.size),board=$('#board');
+    board.style.setProperty('--n',engine.size); board.innerHTML='';
+    for(let r=0;r<engine.size;r++)for(let c=0;c<engine.size;c++){
+      const cell=document.createElement('button'),key=r+','+c,code=premiums.get(key);
+      cell.className='cell'+(selected.row===r&&selected.col===c?' selected':'');
+      cell.setAttribute('aria-label','Row '+(r+1)+', column '+(c+1)+(code?', '+code:''));
+      if(code){cell.classList.add('premium',code.toLowerCase());cell.dataset.premium=code}
+      if(code==='DW'&&r===Math.floor(engine.size/2)&&c===Math.floor(engine.size/2))cell.classList.add('center');
+      const existing=engine.cells[r][c],ghost=ghosts.get(key);
+      if(existing){cell.classList.add('occupied');cell.innerHTML=tile(existing.letter,'tile')}
+      if(ghost&&(!existing||existing.letter!==ghost.letter))cell.insertAdjacentHTML('beforeend',tile(ghost.letter,'ghost '+(valid?'':'bad')));
+      cell.onclick=()=>{selected={row:r,col:c};$('#row').value=r+1;$('#col').value=c+1;preview()};
+      board.append(cell);
+    }
+  }
+  function preview(){
+    const raw=$('#word').value,row=Number($('#row').value)-1,col=Number($('#col').value)-1,result=engine.validate(raw,row,col,direction,{ignoreId:editing}),msg=$('#message');
+    selected={row,col};msg.textContent=result.message;msg.className='message '+(raw?(result.ok?'valid':'invalid'):'');$('#place').disabled=!result.ok;renderBoard(result.positions||[],result.ok);
+  }
+  function formatDate(value){if(!value)return 'Choose your wedding date';return new Date(value+'T12:00:00').toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'})}
+  function boardInches(n){return n*TILE_IN+(n-1)*GRID_GAP_IN+2*BOARD_PAD_IN}
+  function artworkLayout(){return ART_LAYOUTS[$('#paper').value]?.[engine.size]||'balanced'}
+  function artworkSource(mode=artworkLayout()){
+    const asset=ART_ASSETS[motif];
+    if(!asset)return null;
+    if(typeof asset==='string')return asset;
+    return ['tight','tall'].includes(mode)?asset.tight:asset.wide;
+  }
+  function artworkCropFraction(mode=artworkLayout()){return ['tight','tall'].includes(mode) ? .15 : .28}
+  function artworkPlacement(side,railWidth,artWidth,mode){
+    if(mode==='wide'||mode==='tall')return side==='left'?railWidth-artWidth:0;
+    return (railWidth-artWidth)/2;
+  }
+  function fitRailArtwork(){
+    const mode=artworkLayout();
+    const wrap=$('.board-wrap'),wrapRect=wrap.getBoundingClientRect(),pageRect=$('#keepsake').getBoundingClientRect(),boardRect=$('#board').getBoundingClientRect();
+    for(const rail of [$('#railLeft'),$('#railRight')]){
+      if(rail.hidden)continue;
+      const side=rail.classList.contains('left')?'left':'right';
+      if(mode==='tall'){
+        const target=side==='left'?pageRect.left:boardRect.right,edge=side==='left'?boardRect.left:pageRect.right;
+        rail.style.left=(target-wrapRect.left)+'px';rail.style.right='auto';rail.style.width=(edge-target)+'px';
+      }else{rail.style.left='';rail.style.right='';rail.style.width=''}
+      const crop=rail.querySelector('.rail-crop'),img=rail.querySelector('img'),rect=rail.getBoundingClientRect();
+      if(!img.naturalWidth||!rect.width||!rect.height)continue;
+      const cropSourceWidth=img.naturalWidth*artworkCropFraction(mode),heightLimit=rect.height*((mode==='wide'||mode==='tall') ? .96 : mode==='balanced' ? .92 : .88),widthLimit=rect.width*(mode==='tight'?1:.94),scale=mode==='tall'?Math.min(heightLimit/img.naturalHeight,rect.width/cropSourceWidth):Math.min(widthLimit/cropSourceWidth,heightLimit/img.naturalHeight),sourceStripWidth=cropSourceWidth*scale,cropWidth=sourceStripWidth,cropHeight=img.naturalHeight*scale,imageOffset=0;
+      crop.style.width=cropWidth+'px';crop.style.height=cropHeight+'px';crop.style.left=artworkPlacement(side,rect.width,cropWidth,mode)+'px';
+      img.style.width=img.naturalWidth*scale+'px';img.style.height=cropHeight+'px';
+      img.style.left=side==='left'?imageOffset+'px':'auto';img.style.right=side==='right'?imageOffset+'px':'auto';
+      rail.dataset.layout=mode;
+    }
+  }
+  function applyBoardGeometry(){const paper=PRINT_SIZES[$('#paper').value],innerWidth=paper.w*.85,root=document.documentElement;root.style.setProperty('--board-size',(boardInches(engine.size)/innerWidth*100)+'cqw');root.style.setProperty('--grid-gap',(GRID_GAP_IN/innerWidth*100)+'cqw');root.style.setProperty('--grid-pad',(BOARD_PAD_IN/innerWidth*100)+'cqw');const source=artworkSource();for(const rail of [$('#railLeft'),$('#railRight')]){const img=rail.querySelector('img');if(source&&img.src!==source)img.src=source}requestAnimationFrame(fitRailArtwork)}
+  function enforceGridCap(){const {minGrid:min,maxGrid:max}=PRINT_SIZES[$('#paper').value],sizeSelect=$('#size');[...sizeSelect.options].forEach(option=>{const value=Number(option.value);option.disabled=value<min||value>max});if(engine.size<min||engine.size>max){const next=Math.min(max,Math.max(min,engine.size));engine.reset(next);sizeSelect.value=next;selected={row:Math.floor(next/2),col:Math.floor(next/2)};$('#row').value=selected.row+1;$('#col').value=selected.col+1;cancelEdit();$('#message').textContent='Grid adjusted to preserve real-tile scale for this poster.';$('#message').className='message valid'}applyBoardGeometry()}
+  function save(){localStorage.setItem('memento-house-board',engine.toJSON());localStorage.setItem('memento-house-details',JSON.stringify({title:$('#title').value,date:$('#date').value,theme,font,capacity,motif,paper:$('#paper').value}))}
+  function renderSignatures(){const settings={small:{count:24},medium:{count:48},large:{count:96},xl:{count:120}}[capacity],holder=$('#signatureLines');$('#keepsake').dataset.capacity=capacity;holder.innerHTML='';for(let i=0;i<settings.count;i++){const line=document.createElement('span');line.className='signature-line';holder.append(line)}}
+  function renderAll(){
+    applyBoardGeometry();
+    renderBoard();
+    $('#titleDisplay').textContent=$('#title').value||'Our Wedding Words';$('#dateDisplay').textContent=formatDate($('#date').value);renderSignatures();
+    $('#row').max=engine.size;$('#col').max=engine.size;$('#word').maxLength=engine.size;
+    const list=$('#wordList');list.innerHTML=engine.words.length?'':'<p class="empty">No words yet. Select a square to begin.</p>';
+    engine.words.forEach(item=>{const el=document.createElement('div');el.className='word-item';el.innerHTML='<button class="word-main"><strong>'+item.word+'</strong><small>R'+(item.row+1)+' C'+(item.col+1)+' · '+item.direction+'</small></button><button class="icon" aria-label="Remove '+item.word+'">×</button>';el.querySelector('.word-main').onclick=()=>edit(item);el.querySelector('.icon').onclick=()=>{engine.remove(item.id);cancelEdit();changed('Word removed')};list.append(el)});
+    save();preview();
+  }
+  function cancelEdit(){editing=null;$('#word').value='';$('#place').textContent='Place word'}
+  function edit(item){editing=item.id;$('#word').value=item.word;$('#row').value=item.row+1;$('#col').value=item.col+1;selected={row:item.row,col:item.col};setDirection(item.direction);$('#place').textContent='Update word';preview()}
+  function changed(text){renderAll();$('#saveState').textContent=text;setTimeout(()=>$('#saveState').textContent='Saved locally',1100)}
+  function setDirection(dir){direction=dir;document.querySelectorAll('#directions button').forEach(b=>b.classList.toggle('active',b.dataset.dir===dir));preview()}
+  function applyTheme(key){theme=key;const t=THEMES[key],root=document.documentElement;for(const prop of ['board','cell','tile','ink','accent','tw','dw','tl','dl'])root.style.setProperty('--'+(prop==='ink'?'tile-ink':prop),t[prop]);root.style.setProperty('--cell-line',t.line);root.style.setProperty('--tile-shadow',t.shadow);root.style.setProperty('--page-bg',t.page);root.style.setProperty('--page-pattern',MOTIFS[motif]);document.querySelectorAll('.theme').forEach(b=>b.classList.toggle('active',b.dataset.theme===key));save()}
+  function applyFont(value){font=value;document.documentElement.style.setProperty('--display-font',FONTS[font]);save()}
+  function applyCapacity(value){capacity=value;const current=$('#paper').value;if(value==='medium'&&current==='16x20'){$('#paper').value='18x24';$('#paper').onchange({target:$('#paper')})}if(['large','xl'].includes(value)&&current!=='24x36'){$('#paper').value='24x36';$('#paper').onchange({target:$('#paper')})}renderSignatures();save()}
+  function applyMotif(value){motif=value;const root=document.documentElement,asset=artworkSource(),rails=[$('#railLeft'),$('#railRight')];rails.forEach(rail=>{rail.hidden=!asset;const img=rail.querySelector('img');img.onload=fitRailArtwork;if(asset)img.src=asset;else img.removeAttribute('src')});root.style.setProperty('--page-pattern',asset?'none':MOTIFS[motif]);root.style.setProperty('--pattern-size',motif==='none'?'16px 16px':'auto');requestAnimationFrame(fitRailArtwork);save()}
+
+  function drawCanvasMotif(ctx,W,H,color){
+    if(motif==='none')return;
+    ctx.save();ctx.globalAlpha=.13;ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=2;
+    for(let y=42;y<H;y+=86)for(let x=42+(Math.floor(y/86)%2)*28;x<W;x+=86){
+      if(motif==='none'){ctx.beginPath();ctx.arc(x,y,1.5,0,Math.PI*2);ctx.fill()}
+      else if(motif==='hearts'){ctx.beginPath();ctx.arc(x-4,y,5,Math.PI,0);ctx.arc(x+5,y,5,Math.PI,0);ctx.lineTo(x,y+11);ctx.closePath();ctx.fill()}
+      else if(motif==='balloons'){ctx.beginPath();ctx.ellipse(x,y,7,9,0,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(x,y+9);ctx.lineTo(x+3,y+22);ctx.stroke()}
+      else if(motif==='confetti'){ctx.save();ctx.translate(x,y);ctx.rotate((x+y)%5);ctx.fillRect(-2,-7,4,14);ctx.restore()}
+      else if(motif==='stars'){ctx.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?3:8;ctx.lineTo(x+Math.cos(a)*r,y+Math.sin(a)*r)}ctx.closePath();ctx.fill()}
+      else if(motif==='botanical'){ctx.beginPath();ctx.ellipse(x-4,y,7,3,-.5,0,Math.PI*2);ctx.ellipse(x+5,y+5,7,3,-.5,0,Math.PI*2);ctx.fill()}
+    }ctx.restore();
+  }
+
+  async function drawArtwork(ctx,x,y,w,h,boardX,boardSize){
+    const src=artworkSource();
+    if(!src)return;
+    const mode=artworkLayout();
+    await new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>{const cropW=img.width*artworkCropFraction(mode),drawCrop=(baseSx,tx,tw,side)=>{const heightLimit=h*((mode==='wide'||mode==='tall') ? .96 : mode==='balanced' ? .92 : .88),widthLimit=tw*(mode==='tight'?1:.94),scale=mode==='tall'?heightLimit/img.height:Math.min(widthLimit/cropW,heightLimit/img.height),visibleSourceWidth=mode==='tall'?Math.min(cropW,tw/scale):cropW,dw=visibleSourceWidth*scale,dh=img.height*scale,sx=baseSx+(cropW-visibleSourceWidth)/2,dx=tx+artworkPlacement(side,tw,dw,mode);ctx.drawImage(img,sx,0,visibleSourceWidth,img.height,dx,y+(h-dh)/2,dw,dh)};drawCrop(0,x,boardX-x,'left');drawCrop(img.width-cropW,boardX+boardSize,x+w-boardX-boardSize,'right');resolve()};img.onerror=()=>reject(new Error('The embedded artwork could not be decoded.'));img.src=src});
+  }
+
+  function canvasBlob(canvas){return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('The browser could not create the PNG file.')),'image/png'))}
+  function fitCanvasFont(ctx,text,maxWidth,size,style,family){while(size>12){ctx.font=style+' '+Math.round(size)+'px '+family;if(ctx.measureText(text).width<=maxWidth)break;size-=2}return size}
+  function crc32(bytes){let crc=-1;for(const byte of bytes){crc^=byte;for(let bit=0;bit<8;bit++)crc=(crc>>>1)^((crc&1)?0xedb88320:0)}return(crc^-1)>>>0}
+  async function setPngDpi(blob,dpi){const input=new Uint8Array(await blob.arrayBuffer()),parts=[input.slice(0,8)],ppm=Math.round(dpi/0.0254),data=new Uint8Array(9),view=new DataView(data.buffer);view.setUint32(0,ppm);view.setUint32(4,ppm);data[8]=1;const type=new TextEncoder().encode('pHYs'),crcInput=new Uint8Array(13);crcInput.set(type);crcInput.set(data,4);const chunk=new Uint8Array(21),chunkView=new DataView(chunk.buffer);chunkView.setUint32(0,9);chunk.set(type,4);chunk.set(data,8);chunkView.setUint32(17,crc32(crcInput));let offset=8,inserted=false;while(offset<input.length){const length=new DataView(input.buffer,input.byteOffset+offset,4).getUint32(0),end=offset+12+length,name=String.fromCharCode(...input.slice(offset+4,offset+8));if(name!=='pHYs')parts.push(input.slice(offset,end));if(name==='IHDR'&&!inserted){parts.push(chunk);inserted=true}offset=end}return new Blob(parts,{type:'image/png'})}
+
+  async function downloadPNG(){
+    const button=$('#export'),original=button.textContent;button.disabled=true;button.textContent='Preparing PNG…';await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    try{
+    const paper=$('#paper').value,size=PRINT_SIZES[paper],canvas=document.createElement('canvas'),ctx=canvas.getContext('2d'),t=THEMES[theme],W=size.w*size.dpi,H=size.h*size.dpi,margin=Math.round(W*.075);
+    if(!ctx)throw new Error('Canvas export is not supported in this browser.');
+    canvas.width=W;canvas.height=H;ctx.fillStyle=t.page;ctx.fillRect(0,0,W,H);if(!artworkSource())drawCanvasMotif(ctx,W,H,t.accent);
+    const canvasFont=FONTS[font];
+    const titleText=$('#title').value||'Our Wedding Words',dateText=formatDate($('#date').value),dateSize=Math.round(W*.021);ctx.font='italic '+dateSize+'px '+canvasFont;const dateWidth=ctx.measureText(dateText).width,titleSize=fitCanvasFont(ctx,titleText,W-2*margin-dateWidth-W*.03,W*.052,'bold',canvasFont);
+    const titleY=margin+W*.036,ruleY=margin+W*.054,signingHeadY=margin+W*.105;
+    ctx.fillStyle='#29251f';ctx.font='bold '+titleSize+'px '+canvasFont;ctx.textAlign='left';ctx.fillText(titleText,margin,titleY);
+    ctx.fillStyle=t.accent;ctx.font='italic '+dateSize+'px '+canvasFont;ctx.textAlign='right';ctx.fillText(dateText,W-margin,titleY);
+    ctx.strokeStyle='#29251f';ctx.lineWidth=Math.max(2,W*.0014);ctx.beginPath();ctx.moveTo(margin,ruleY);ctx.lineTo(W-margin,ruleY);ctx.stroke();
+    ctx.textAlign='left';ctx.fillStyle='#29251f';ctx.font='italic '+Math.round(W*.018)+'px '+canvasFont;ctx.fillText('Leave your mark on our story',margin,signingHeadY);
+    const signatureSettings={small:{count:24,cols:4,rows:6},medium:{count:48,cols:6,rows:8},large:{count:96,cols:8,rows:12},xl:{count:120,cols:8,rows:15}}[capacity],lineY=margin+W*.15,maxBoard=boardInches(engine.size)*size.dpi,top=H-margin-W*.018-maxBoard,boardX=(W-maxBoard)/2,lineGap=(W-2*margin)/signatureSettings.cols,lineBottom=top-W*.035,lineStep=(lineBottom-lineY)/(signatureSettings.rows-1),gap=GRID_GAP_IN*size.dpi,pad=BOARD_PAD_IN*size.dpi,cell=TILE_IN*size.dpi,premiums=premiumMap(engine.size),colors={TW:t.tw,DW:t.dw,TL:t.tl,DL:t.dl};ctx.lineWidth=Math.max(1,W*.00055);ctx.globalAlpha=.45;for(let row=0;row<signatureSettings.rows;row++)for(let col=0;col<signatureSettings.cols;col++){const x=margin+col*lineGap,y=lineY+row*lineStep;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+lineGap-W*.005,y);ctx.stroke()}ctx.globalAlpha=1;
+    const artworkMargin=artworkLayout()==='tall'?0:margin;
+    await drawArtwork(ctx,artworkMargin,top,W-2*artworkMargin,maxBoard,boardX,maxBoard);
+    ctx.fillStyle=t.board;ctx.fillRect(boardX,top,maxBoard,maxBoard);
+    for(let r=0;r<engine.size;r++)for(let c=0;c<engine.size;c++){const x=boardX+pad+c*(cell+gap),y=top+pad+r*(cell+gap),code=premiums.get(r+','+c),entry=engine.cells[r][c],isCenter=r===Math.floor(engine.size/2)&&c===Math.floor(engine.size/2);ctx.fillStyle=code?colors[code]:t.cell;ctx.fillRect(x,y,cell,cell);if(entry){const inset=cell*.08;ctx.fillStyle=t.tile;ctx.fillRect(x+inset,y+inset,cell-2*inset,cell-2*inset);ctx.strokeStyle=t.shadow;ctx.lineWidth=2;ctx.strokeRect(x+inset,y+inset,cell-2*inset,cell-2*inset);ctx.fillStyle=t.ink;ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='bold '+Math.round(cell*.58)+'px '+canvasFont;ctx.fillText(entry.letter,x+cell/2,y+cell*.51);ctx.textAlign='right';ctx.font='bold '+Math.max(9,Math.round(cell*.15))+'px Arial';ctx.fillText(VALUES[entry.letter]||0,x+cell*.84,y+cell*.82)}else if(code){ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='bold '+Math.max(10,Math.round(cell*(isCenter ? .38 : .21)))+'px Arial';ctx.fillText(isCenter?'★':code,x+cell/2,y+cell/2)}}
+    ctx.fillStyle='#716c63';ctx.font=Math.round(W*.012)+'px Arial';ctx.textAlign='left';ctx.fillText('Memento House · Made for the Moment. Kept for a Lifetime.',margin,H-margin);
+    const blob=await setPngDpi(await canvasBlob(canvas),size.dpi),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=($('#title').value||'wedding-word-board').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'-'+paper+'-'+size.dpi+'dpi.png';a.style.display='none';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
+    button.textContent='PNG downloaded';setTimeout(()=>{button.textContent=original},1600);
+    }catch(error){console.error('PNG export failed',error);alert('PNG export failed: '+error.message);button.textContent=original}finally{button.disabled=false}
+  }
+
+  $('#word').oninput=preview;$('#row').oninput=preview;$('#col').oninput=preview;$('#directions').onclick=e=>{if(e.target.dataset.dir)setDirection(e.target.dataset.dir)};
+  $('#place').onclick=()=>{try{engine.place($('#word').value,Number($('#row').value)-1,Number($('#col').value)-1,direction,{ignoreId:editing});cancelEdit();changed('Word placed')}catch(error){$('#message').textContent=error.message;$('#message').className='message invalid'}};
+  $('#size').onchange=e=>{const requested=Number(e.target.value),{minGrid:min,maxGrid:max}=PRINT_SIZES[$('#paper').value];if(requested<min||requested>max){e.target.value=engine.size;return}if(engine.words.length&&!confirm('Changing size clears the board. Continue?')){e.target.value=engine.size;return}engine.reset(requested);selected={row:Math.floor(engine.size/2),col:Math.floor(engine.size/2)};$('#row').value=selected.row+1;$('#col').value=selected.col+1;cancelEdit();changed('Board resized for 0.8 in tiles')};
+  $('#undo').onclick=()=>{engine.undo();cancelEdit();changed('Last word removed')};$('#clear').onclick=()=>{if(!engine.words.length||confirm('Clear all words?')){engine.reset();cancelEdit();changed('Board cleared')}};
+  $('#sample').onclick=()=>{const n=PRINT_SIZES[$('#paper').value].maxGrid,mid=Math.floor(n/2),start=Math.max(0,mid-3);engine.reset(n);$('#size').value=n;engine.place('FOREVER',mid,start,'across');engine.place('VOW',mid,start+4,'down');selected={row:mid,col:start+4};cancelEdit();changed('Sample loaded')};
+  $('#title').oninput=renderAll;$('#date').oninput=renderAll;$('#font').onchange=e=>applyFont(e.target.value);$('#capacity').onchange=e=>applyCapacity(e.target.value);$('#motif').onchange=e=>applyMotif(e.target.value);if(adminMode){$('#print').onclick=()=>window.print();$('#export').onclick=downloadPNG}else{$('#print').disabled=true;$('#export').disabled=true;$('#import').disabled=true}
+  $('#paper').onchange=e=>{const size=PRINT_SIZES[e.target.value],root=document.documentElement;root.style.setProperty('--page-w',size.w+'in');root.style.setProperty('--page-h',size.h+'in');root.style.setProperty('--page-ratio',size.w+'/'+size.h);enforceGridCap();renderAll();save()};
+  $('#import').onclick=()=>$('#file').click();$('#file').onchange=async e=>{try{const data=JSON.parse(await e.target.files[0].text());engine.load(data);$('#size').value=engine.size;changed('Board imported')}catch(error){alert('Could not import: '+error.message)}e.target.value=''};
+  Object.entries(THEMES).forEach(([key,t])=>{const b=document.createElement('button');b.className='theme';b.dataset.theme=key;b.style.cssText='--swatch:'+t.board+';--chip:'+t.tile+';--chip-ink:'+t.ink+';--shadow:'+t.shadow+';--label:'+t.page+';--label-ink:'+t.ink;b.innerHTML='<span>'+t.name+'</span>';b.onclick=()=>applyTheme(key);$('#themes').append(b)});
+  try{const saved=localStorage.getItem('memento-house-board')||localStorage.getItem('ever-after-board'),details=JSON.parse(localStorage.getItem('memento-house-details')||localStorage.getItem('ever-after-details')||'{}');if(saved){engine.load(saved);if(engine.size>17)engine.reset(15);$('#size').value=engine.size}if(details.title)$('#title').value=details.title;if(details.date)$('#date').value=details.date;if(['16x20','18x24','24x36'].includes(details.paper))$('#paper').value=details.paper;if(details.theme&&THEMES[details.theme])theme=details.theme;if(details.font&&FONTS[details.font])font=details.font;if(['small','medium','large','xl'].includes(details.capacity))capacity=details.capacity;if(MOTIFS[details.motif])motif=details.motif}catch(error){localStorage.removeItem('memento-house-board')}
+  window.addEventListener('resize',fitRailArtwork);
+  $('#font').value=font;$('#capacity').value=capacity;$('#motif').value=motif;$('#paper').onchange({target:$('#paper')});applyFont(font);applyCapacity(capacity);applyTheme(theme);applyMotif(motif);renderAll();
+})();
+</script>
+</body>
+</html>

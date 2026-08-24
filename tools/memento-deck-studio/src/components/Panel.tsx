@@ -1,0 +1,2 @@
+import type {ReactNode} from 'react';export function Section({title,eyebrow,children}:{title:string;eyebrow?:string;children:ReactNode}){return <section className="config-section">{eyebrow&&<span className="section-eyebrow">{eyebrow}</span>}<h2>{title}</h2>{children}</section>};
+export function Field({label,value,onChange,type='text',wide=false}:{label:string;value:string;onChange:(v:string)=>void;type?:string;wide?:boolean}){return <label className={wide?'wide':''}><span>{label}</span><input type={type} value={value} onChange={e=>onChange(e.target.value)}/></label>}
