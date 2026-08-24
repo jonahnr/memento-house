@@ -1,21 +1,21 @@
 import {createClient} from "@supabase/supabase-js";
 
-const attempts=new Map<string,{count:number;reset:number}>();
 const clean=(value:unknown,max:number)=>String(value||"").trim().slice(0,max);
 const normalize=(s:string)=>s.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g," ").trim();
+const digest=async(value:string)=>Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(value)))).map(v=>v.toString(16).padStart(2,"0")).join("");
 
 export async function POST(request:Request){
  const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!url||!key)return Response.json({error:"Contribution service is unavailable."},{status:503});
  const body=await request.json().catch(()=>null) as any;if(!body)return Response.json({error:"Invalid request."},{status:400});
  if(clean(body.website,200))return Response.json({ok:true});
- const anonymousId=clean(body.anonymousId,100),ip=clean(request.headers.get("cf-connecting-ip")||request.headers.get("x-forwarded-for")?.split(",")[0]||"unknown",80),now=Date.now(),startedAt=Number(body.startedAt||0),rateKey=`${ip}:${anonymousId}`,rate=attempts.get(rateKey);
+ const anonymousId=clean(body.anonymousId,100),ip=clean(request.headers.get("cf-connecting-ip")||request.headers.get("x-forwarded-for")?.split(",")[0]||"unknown",80),now=Date.now(),startedAt=Number(body.startedAt||0);
  if(anonymousId.length<10||!startedAt||now-startedAt<1200)return Response.json({error:"Please take a moment and try again."},{status:400});
- if(rate&&rate.reset>now&&rate.count>=4)return Response.json({error:"Too many contributions. Please try again later."},{status:429});
- attempts.set(rateKey,{count:rate&&rate.reset>now?rate.count+1:1,reset:rate&&rate.reset>now?rate.reset:now+900000});
  const weddingId=clean(body.weddingId,50),place=clean(body.place,180),guest=clean(body.guest,100),message=clean(body.message,1000),category=clean(body.category,60),type=body.contributionType==="origin"?"origin":"recommendation",lat=Number(body.lat),lng=Number(body.lng);
  if(!weddingId||place.length<2||guest.length<1||!Number.isFinite(lat)||!Number.isFinite(lng)||lat<-90||lat>90||lng<-180||lng>180||type==="recommendation"&&message.length<5)return Response.json({error:"Please complete each required field."},{status:400});
  const admin=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}}),{data:wedding}=await admin.from("weddings").select("id,wedding_date").eq("id",weddingId).eq("status","active").maybeSingle();
  if(!wedding)return Response.json({error:"This map is not accepting contributions."},{status:404});
+ const actorHash=await digest(`${ip}:${anonymousId}`),claimed=await admin.rpc("claim_guest_action",{p_wedding_id:weddingId,p_actor_hash:actorHash,p_action:"contribution",p_limit:4,p_window_seconds:900});
+ if(!claimed.error&&!claimed.data)return Response.json({error:"Too many contributions. Please try again later."},{status:429});
  if(wedding.wedding_date){const closes=new Date(`${wedding.wedding_date}T23:59:59Z`);closes.setUTCDate(closes.getUTCDate()+14);if(new Date()>closes)return Response.json({error:"This wedding map is now closed to new guest contributions."},{status:403})}
  let{data:destination}=await admin.from("destinations").select("id").eq("wedding_id",weddingId).eq("normalized_location_name",normalize(place)).maybeSingle();
  if(!destination){const created=await admin.from("destinations").insert({wedding_id:weddingId,location_name:place,normalized_location_name:normalize(place),latitude:lat,longitude:lng}).select("id").single();if(created.error)return Response.json({error:"That place could not be saved."},{status:500});destination=created.data}

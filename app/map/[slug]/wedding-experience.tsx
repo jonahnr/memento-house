@@ -28,7 +28,7 @@ export function WeddingExperience(){
  const params=useParams(),slug=String(params.slug||"");
  const[wedding,setWedding]=useState<Wedding|null>(null),[recs,setRecs]=useState<Rec[]>([]),[stories,setStories]=useState<StoryPin[]>([]),[open,setOpen]=useState(false),[selected,setSelected]=useState<Rec|null>(null);
  const[tab,setTab]=useState("recommendations"),[sort,setSort]=useState("loved"),[success,setSuccess]=useState(false),[form,setForm]=useState(blank()),[loading,setLoading]=useState(true),[error,setError]=useState(""),[notice,setNotice]=useState("");
- const[demoPlan,setDemoPlan]=useState<"map"|"plus">("map"),[layers,setLayers]=useState(["origins","recommendations"]),[venue,setVenue]=useState<{location_name:string;latitude:number;longitude:number}|null>(null);
+ const[demoPlan,setDemoPlan]=useState<"map"|"plus">("map"),[layers,setLayers]=useState(["origins","recommendations"]),[venue,setVenue]=useState<{location_name:string;latitude:number;longitude:number}|null>(null),[liked,setLiked]=useState<Set<string>>(new Set());
  const modalRef=useRef<HTMLElement>(null),startedAt=useRef(Date.now());
  const load=useCallback(async()=>{
   const client=getSupabaseBrowserClient();if(!client){setError("The map service is unavailable.");setLoading(false);return}
@@ -54,10 +54,10 @@ export function WeddingExperience(){
  const totalMiles=venue?Math.round(recs.filter(r=>r.category==="Guest Origin").reduce((sum,r)=>sum+miles({lat:r.lat,lng:r.lng},{lat:venue.latitude,lng:venue.longitude}),0)):null;
  async function like(pin:Rec){
   setNotice("");
-  if(wedding?.id==="demo"){setRecs(v=>v.map(r=>r.id===pin.id?{...r,likes:r.likes+1}:r));setSelected(s=>s?.id===pin.id?{...s,likes:s.likes+1}:s);return}
+  if(wedding?.id==="demo"){const wasLiked=liked.has(pin.destinationId),delta=wasLiked?-1:1;setLiked(v=>{const n=new Set(v);wasLiked?n.delete(pin.destinationId):n.add(pin.destinationId);return n});setRecs(v=>v.map(r=>r.destinationId===pin.destinationId?{...r,likes:Math.max(0,r.likes+delta)}:r));setSelected(s=>s?.destinationId===pin.destinationId?{...s,likes:Math.max(0,s.likes+delta)}:s);setNotice(wasLiked?"Heart removed.":"Saved to your favorites.");return}
   let anon=localStorage.getItem("memento-anonymous-id");if(!anon){anon=crypto.randomUUID();localStorage.setItem("memento-anonymous-id",anon)}
   const response=await fetch("/api/like",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({destinationId:pin.destinationId,anonymousId:anon})}),result=await response.json();
-  if(response.ok){setRecs(v=>v.map(r=>r.id===pin.id?{...r,likes:r.likes+1}:r));setSelected(s=>s?.id===pin.id?{...s,likes:s.likes+1}:s);setNotice("Your heart was added.")}else setNotice(result.error||"Your heart could not be saved.")
+  if(response.ok){const delta=Number(result.delta||0);setLiked(v=>{const n=new Set(v);result.liked?n.add(pin.destinationId):n.delete(pin.destinationId);return n});setRecs(v=>v.map(r=>r.destinationId===pin.destinationId?{...r,likes:Math.max(0,r.likes+delta)}:r));setSelected(s=>s?.destinationId===pin.destinationId?{...s,likes:Math.max(0,s.likes+delta)}:s);setNotice(result.liked?"Saved to your favorites.":"Heart removed.")}else setNotice(result.error||"Your heart could not be saved.")
  }
  async function submit(e:React.FormEvent){
   e.preventDefault();if(!wedding||!Number.isFinite(form.lat)||!Number.isFinite(form.lng))return;setError("");
