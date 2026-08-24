@@ -7,5 +7,5 @@ export async function POST(request:Request){
  const testOrders=Array.isArray(user.user_metadata?.admin_test_orders)?user.user_metadata.admin_test_orders:[],order={id:`test_${Date.now()}`,product,tier,addon,created_at:new Date().toISOString()},metadata={...user.user_metadata,purchase_status:"admin_test",last_test_purchase:order,admin_test_orders:[order,...testOrders].slice(0,20),...(product==="map"?{product_tier:tier}:{})};
  const updated=await admin.auth.admin.updateUserById(user.id,{user_metadata:metadata});if(updated.error)return new Response(updated.error.message,{status:500});
  const saved=await admin.from("orders").insert({customer_user_id:user.id,customer_email:user.email||ADMIN,customer_name:"Jonah (admin test)",product,tier,addons:addon&&addon!=="none"?[addon]:[],payment_status:"admin_bypass",questionnaire_status:"not_sent",design_status:"awaiting_questionnaire",entitlement_status:product==="map"?"active":"not_applicable",is_test:true});if(saved.error)return new Response(saved.error.message,{status:500});
- return Response.json({ok:true,product,tier,redirect:"/order/success"});
+ return Response.json({ok:true,product,tier,redirect:`/order/success?product=${encodeURIComponent(product)}&tier=${encodeURIComponent(tier)}&addon=${encodeURIComponent(addon)}`});
 }
