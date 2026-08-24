@@ -1,0 +1,2 @@
+export const CAPABILITIES={map_basic:["map.view","map.origins","map.recommendations","map.qr"],map_plus:["map.view","map.origins","map.recommendations","map.qr","map.story","map.travel","map.likes","map.photos","map.export.premium"]} as const;
+export function hasCapability(entitlement:string|undefined,capability:string){return !!entitlement&&((CAPABILITIES as Record<string,readonly string[]>)[entitlement]?.includes(capability)??false)}

@@ -1,0 +1,3 @@
+import {createClient,type SupabaseClient, type User} from "@supabase/supabase-js";
+export const ADMIN_EMAILS=(process.env.ADMIN_EMAILS||"jonahnr@gmail.com").toLowerCase().split(",").map(x=>x.trim()).filter(Boolean);
+export async function requireAdmin(request:Request):Promise<{admin:SupabaseClient;user:User}|null>{const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY,token=(request.headers.get("authorization")||"").replace(/^Bearer\s+/i,"");if(!url||!key||!token)return null;const admin=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}}),auth=await admin.auth.getUser(token),user=auth.data.user;if(!user||!ADMIN_EMAILS.includes(user.email?.toLowerCase()||""))return null;return{admin,user}}

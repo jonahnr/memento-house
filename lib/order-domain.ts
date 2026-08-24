@@ -1,0 +1,7 @@
+export const PHYSICAL_STATES=["payment_pending","paid","questionnaire_pending","questionnaire_in_progress","design_pending","proof_ready","revision_requested","approved","in_production","shipped","fulfilled","cancelled","refunded"] as const;
+export const DIGITAL_STATES=["payment_pending","paid","account_ready","active","cancelled","refunded"] as const;
+export type OrderState=(typeof PHYSICAL_STATES)[number]|(typeof DIGITAL_STATES)[number];
+const transitions:Record<string,string[]>={payment_pending:["paid","cancelled"],paid:["questionnaire_pending","account_ready","refunded"],questionnaire_pending:["questionnaire_in_progress","cancelled","refunded"],questionnaire_in_progress:["design_pending","cancelled","refunded"],design_pending:["proof_ready","cancelled","refunded"],proof_ready:["revision_requested","approved","cancelled","refunded"],revision_requested:["proof_ready","cancelled","refunded"],approved:["in_production","cancelled","refunded"],in_production:["shipped","cancelled","refunded"],shipped:["fulfilled","refunded"],account_ready:["active","refunded"],active:["refunded"],fulfilled:["refunded"],cancelled:[],refunded:[]};
+export function canTransition(from:string,to:string){return transitions[from]?.includes(to)??false}
+export function initialPaidState(workflow:"digital_map"|"custom_print"){return workflow==="digital_map"?"account_ready":"questionnaire_pending"}
+export function assertTransition(from:string,to:string){if(!canTransition(from,to))throw new Error(`Invalid order transition: ${from} → ${to}`)}

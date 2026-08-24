@@ -28,6 +28,12 @@ The checked-in experience uses polished local demo data when credentials are abs
 
 ## Supabase
 
+### Required production migrations
+
+Apply the numbered SQL migrations in `supabase/migrations` in order. The commerce refactor requires `006_commerce_fulfillment_architecture.sql` before deploying the corresponding application version. It adds webhook idempotency, authoritative order state, entitlements, resumable questionnaires, fulfillment jobs, order audit events, saved checkout customization, and atomic Travel Journal reordering. Do not publish the commerce routes before this migration is applied.
+
+After applying it, verify that the `stripe_events`, `entitlements`, `questionnaires`, `fulfillment_jobs`, and `order_events` tables exist and that anonymous/authenticated roles cannot write to the server-owned commerce tables.
+
 Create a Supabase project, enable email/password authentication, and add the Site URL plus `http://localhost:3000` as allowed redirect URLs. The migration creates tenant-scoped tables for weddings, story locations, normalized destinations, recommendations, anonymous destination likes, and couple status. Owner mutations are protected by `auth.uid()`; public access is limited to active content and validated inserts. Keep the service-role key server-only.
 
 ## Mapbox

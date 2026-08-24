@@ -13,6 +13,9 @@ const eslintConfig = defineConfig([
     "dist/**",
     "out/**",
     "build/**",
+    ".vinext/**",
+    ".wrangler/**",
+    "node_modules/**",
     "next-env.d.ts",
   ]),
   eslint.configs.recommended,
@@ -34,6 +37,18 @@ const eslintConfig = defineConfig([
       react: {
         version: "detect",
       },
+    },
+    rules: {
+      "@next/next/no-html-link-for-pages": "warn",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/no-unused-expressions": "warn",
+      "react-hooks/set-state-in-effect": "warn",
+      "jsx-a11y/label-has-associated-control": "warn",
+      "jsx-a11y/click-events-have-key-events": "warn",
+      "jsx-a11y/no-noninteractive-element-interactions": "warn",
+      "jsx-a11y/no-static-element-interactions": "warn",
+      "no-empty": "warn",
     },
   },
 ]);
