@@ -3,6 +3,7 @@ export type ProductTier={id:string;name:string;price:number;subtitle:string;cta:
 export const mapTiers:ProductTier[]=[
  {id:"map",name:"Memento Map",price:99,subtitle:"Create your wedding map together.",cta:"Choose Memento Map",features:["Personalized interactive map and QR code","Couple story places, guest recommendations, and guest hometowns","Coordinated category colors and layer legend","Guest messages, couple dashboard, and permanent digital access"]},
  {id:"plus",name:"Memento Map Plus",price:129,subtitle:"Turn your wedding map into a map of your life together.",cta:"Choose Map Plus",popular:true,features:["Everything in Memento Map","Want to Go → Planning → Visited tracking","Voting, grouped recommendations, and advanced statistics","Visit dates, photos, memories, and print-ready PNG export"]}
+ ,{id:"timeline-plus",name:"Timeline Plus",price:0,subtitle:"Coming soon · available for private testing",cta:"Preview Timeline Plus",features:["Everything in Map Plus","A synchronized map and chronological relationship timeline","Guest memories with couple approval","Shareable story view and combined keepsake export"]}
 ];
 
 export const deckTiers:ProductTier[]=[
@@ -17,5 +18,5 @@ export const unityTiers:ProductTier[]=[
  {id:"bespoke",name:"Bespoke Upgrade",price:199,subtitle:"Add to the Signature Board · $378 total",cta:"Choose Bespoke",popular:true,features:["Everything in the Signature Board","Custom palette, board and art direction","Custom typography and personalized wording","Up to two revision rounds"]}
 ];
 
-export const canUseMapFeature=(tier:string,feature:"export"|"travelTracking"|"memories"|"physical")=>tier==="plus"&&feature!=="physical";
+export const canUseMapFeature=(tier:string,feature:"export"|"travelTracking"|"memories"|"timeline"|"physical")=>tier==="timeline-plus"?feature!=="physical":tier==="plus"&&feature!=="timeline"&&feature!=="physical";
 export const orderHref=(product:string,tier:string)=>`/order?product=${encodeURIComponent(product)}&tier=${encodeURIComponent(tier)}`;

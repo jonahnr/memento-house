@@ -30,6 +30,7 @@ export function WeddingExperience(){
  const[tab,setTab]=useState("recommendations"),[sort,setSort]=useState("loved"),[success,setSuccess]=useState(false),[form,setForm]=useState(blank()),[loading,setLoading]=useState(true),[error,setError]=useState(""),[notice,setNotice]=useState("");
  const[demoPlan,setDemoPlan]=useState<"map"|"plus">("map"),[layers,setLayers]=useState(["origins","recommendations"]),[venue,setVenue]=useState<{location_name:string;latitude:number;longitude:number}|null>(null),[liked,setLiked]=useState<Set<string>>(new Set());
  const modalRef=useRef<HTMLElement>(null),startedAt=useRef(Date.now());
+ useEffect(()=>{if(!notice)return;const timer=setTimeout(()=>setNotice(""),2200);return()=>clearTimeout(timer)},[notice]);
  const load=useCallback(async()=>{
   const client=getSupabaseBrowserClient();if(!client){setError("The map service is unavailable.");setLoading(false);return}
   const{data:w,error:wError}=await client.from("weddings").select("id,partner_one_name,partner_two_name,wedding_date,title,slug,welcome_message").eq("slug",slug).eq("status","active").single();
