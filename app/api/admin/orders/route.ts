@@ -1,6 +1,7 @@
 import {requireAdmin} from "../../../../lib/admin";
 import {catalogPublic} from "../../../../lib/product-catalog";
 import {assertTransition} from "../../../../lib/order-domain";
+import {sendShipmentEmail} from "../../../../lib/customer-email";
 
 async function enrich(context:any,orders:any[]){
   if(!orders.length)return orders;
@@ -51,8 +52,11 @@ export async function PATCH(request:Request){
     if(body.order_status)await context.admin.from("order_events").insert({order_id:id,event_type:"admin_transition",from_status:current.data.order_status,to_status:body.order_status,actor_type:"admin",actor_id:context.user.id});
     if(body.order_status==="shipped"){
       if(!body.tracking_number)throw new Error("Add a tracking number before marking an order shipped.");
-      await context.admin.from("customer_notifications").insert({order_id:id,customer_user_id:current.data.customer_user_id,recipient_email:current.data.customer_email,notification_type:"order_shipped",subject:"Your Memento House order is on the way",payload:{carrier:body.shipping_carrier||"Carrier",tracking_number:body.tracking_number,tracking_url:body.tracking_url||""}});
-      await context.admin.from("orders").update({shipping_notified_at:new Date().toISOString()}).eq("id",id);
+      const queued=await context.admin.from("customer_notifications").insert({order_id:id,customer_user_id:current.data.customer_user_id,recipient_email:current.data.customer_email,notification_type:"order_shipped",subject:"Your Memento House order is on the way",payload:{carrier:body.shipping_carrier||"Carrier",tracking_number:body.tracking_number,tracking_url:body.tracking_url||""}}).select("id").single();
+      const delivery=await sendShipmentEmail({recipient:current.data.customer_email,orderId:id,carrier:body.shipping_carrier||"Carrier",trackingNumber:body.tracking_number,trackingUrl:body.tracking_url||""});
+      if(queued.data?.id)await context.admin.from("customer_notifications").update(delivery.sent?{status:"sent",provider_message_id:delivery.id,sent_at:new Date().toISOString()}:{status:"failed",error_message:delivery.error}).eq("id",queued.data.id);
+      if(delivery.sent)await context.admin.from("orders").update({shipping_notified_at:new Date().toISOString()}).eq("id",id);
+      else throw new Error(`Shipment saved, but the customer email was not sent: ${delivery.error}`);
     }
     return Response.json({order:result.data});
   }catch(error){return Response.json({error:error instanceof Error?error.message:"Update failed"},{status:400})}
