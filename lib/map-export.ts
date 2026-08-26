@@ -1,5 +1,5 @@
 export const PRINT_PRESETS={"8x10":{width:2400,height:3000,dpi:300},"11x14":{width:3300,height:4200,dpi:300},"16x20":{width:4800,height:6000,dpi:300},"18x24":{width:5400,height:7200,dpi:300}} as const;
-export const MAP_STYLES=["atlas","minimal","heritage","botanical","midnight"] as const;
+export const MAP_STYLES=["atlas","states","counties","minimal","heritage","botanical","midnight"] as const;
 export const MAP_COMPOSITIONS=["world_story","venue_focus","journey_focus"] as const;
 export const MAP_FRAMES=["world","fit_markers","regional","manual"] as const;
 export type Coordinate={lng:number;lat:number};
