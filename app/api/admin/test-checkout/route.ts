@@ -1,9 +1,9 @@
-import {requireAdmin} from "../../../../lib/admin";
+import {adminFailure,requireAdmin} from "../../../../lib/admin";
 import {ADDONS,resolveCatalog} from "../../../../lib/product-catalog";
 import {requestOrigin} from "../../../../lib/site-url";
 
 export async function POST(request:Request){
- const context=await requireAdmin(request);if(!context)return new Response("Forbidden",{status:403});
+ const context=await requireAdmin(request);if(!context)return adminFailure(request);
  const origin=requestOrigin(request);
  const key=process.env.STRIPE_TEST_SECRET_KEY;if(!key)return Response.json({error:"Stripe test mode is not configured."},{status:503});
  try{

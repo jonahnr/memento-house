@@ -1,4 +1,4 @@
-import {requireAdmin} from "../../../../lib/admin";
+import {adminFailure,requireAdmin} from "../../../../lib/admin";
 import {catalogPublic} from "../../../../lib/product-catalog";
 import {assertTransition} from "../../../../lib/order-domain";
 import {sendShipmentEmail} from "../../../../lib/customer-email";
@@ -26,7 +26,7 @@ async function enrich(context:any,orders:any[]){
 }
 
 export async function GET(request:Request){
-  const context=await requireAdmin(request);if(!context)return new Response("Forbidden",{status:403});
+  const context=await requireAdmin(request);if(!context)return adminFailure(request);
   const url=new URL(request.url),id=url.searchParams.get("id"),showArchived=url.searchParams.get("archived")==="true";
   let query=context.admin.from("orders").select("*");
   if(id)query=query.eq("id",id);else{if(!showArchived)query=query.is("archived_at",null);query=query.order("created_at",{ascending:false}).limit(500)}
@@ -40,7 +40,7 @@ export async function GET(request:Request){
 }
 
 export async function PATCH(request:Request){
-  const context=await requireAdmin(request);if(!context)return new Response("Forbidden",{status:403});
+  const context=await requireAdmin(request);if(!context)return adminFailure(request);
   try{
     const body=await request.json(),id=String(body.id||"");if(!id)return new Response("Invalid order",{status:400});
     const current=await context.admin.from("orders").select("*").eq("id",id).single();if(current.error)throw current.error;
@@ -63,7 +63,7 @@ export async function PATCH(request:Request){
 }
 
 export async function DELETE(request:Request){
-  const context=await requireAdmin(request);if(!context)return new Response("Forbidden",{status:403});
+  const context=await requireAdmin(request);if(!context)return adminFailure(request);
   try{
     const body=await request.json(),id=String(body.id||""),current=await context.admin.from("orders").select("id,is_test,payment_status").eq("id",id).single();if(current.error)throw current.error;
     if(current.data.is_test){const deleted=await context.admin.from("orders").delete().eq("id",id);if(deleted.error)throw deleted.error;return Response.json({deleted:true,permanent:true})}

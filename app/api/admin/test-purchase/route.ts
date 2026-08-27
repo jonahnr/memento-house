@@ -1,5 +1,15 @@
-import {requireAdmin} from "../../../../lib/admin";
+import {adminFailure,requireAdmin} from "../../../../lib/admin";
 import {fulfillPurchase} from "../../../../lib/fulfillment";
 import {resolveCatalog} from "../../../../lib/product-catalog";
 import {sendTestOrderEmail} from "../../../../lib/customer-email";
-export async function POST(request:Request){const context=await requireAdmin(request);if(!context)return new Response("Forbidden",{status:403});try{const body=await request.json(),product=String(body.product||""),tier=String(body.tier||""),addons=body.addons||String(body.addon||"").split(",").filter((x:string)=>x&&x!=="none"),item=resolveCatalog(product,tier,addons),sourceId=`admin_${crypto.randomUUID()}`;let customizationId:null|string=null;if(body.customization){try{const payload=JSON.parse(String(body.customization)),saved=await context.admin.from("checkout_customizations").insert({product,tier,payload}).select("id").single();if(!saved.error)customizationId=saved.data.id}catch{}}const recipient=String(body.customerEmail||context.user.email).toLowerCase(),result=await fulfillPurchase(context.admin,{source:"admin",sourceId,email:recipient,name:String(body.customerName||"Admin test customer"),userId:body.customerEmail?null:context.user.id,product,tier,addons,amount:item.price,currency:"usd",customizationId}),testEmail=await sendTestOrderEmail({recipient,orderId:result.order.id,productName:item.displayName});return Response.json({ok:true,order:result.order,testEmail,entitlement:item.entitlement,questionnaire:item.questionnaireType,workflow:item.fulfillmentWorkflow,nextSteps:item.nextSteps,redirect:`/order/test-success?order=${result.order.id}`})}catch(error){return new Response(error instanceof Error?error.message:"Simulation failed",{status:400})}}
+
+export async function POST(request:Request){
+ const context=await requireAdmin(request);if(!context)return adminFailure(request);
+ try{
+  const body=await request.json(),product=String(body.product||""),tier=String(body.tier||""),addons=body.addons||String(body.addon||"").split(",").filter((value:string)=>value&&value!=="none"),item=resolveCatalog(product,tier,addons),sourceId=`admin_${crypto.randomUUID()}`;
+  let customizationId:null|string=null;
+  if(body.customization){try{const payload=JSON.parse(String(body.customization)),saved=await context.admin.from("checkout_customizations").insert({product,tier,payload}).select("id").single();if(!saved.error)customizationId=saved.data.id}catch{}}
+  const recipient=String(body.customerEmail||context.user.email).toLowerCase(),result=await fulfillPurchase(context.admin,{source:"admin",sourceId,email:recipient,name:String(body.customerName||"Admin test customer"),userId:body.customerEmail?null:context.user.id,product,tier,addons,amount:item.price,currency:"usd",customizationId}),testEmail=await sendTestOrderEmail({recipient,orderId:result.order.id,productName:item.displayName});
+  return Response.json({ok:true,order:result.order,testEmail,entitlement:item.entitlement,questionnaire:item.questionnaireType,workflow:item.fulfillmentWorkflow,nextSteps:item.nextSteps,redirect:`/order/test-success?order=${result.order.id}`});
+ }catch(error){return Response.json({error:error instanceof Error?error.message:"Simulation failed"},{status:400})}
+}
