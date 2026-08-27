@@ -5,7 +5,7 @@ This branch migrates Memento House from the Vinext/Cloudflare Worker hosting she
 ## Framework and build
 
 - Framework preset: **Next.js** (auto-detected)
-- Node.js: **22.x** (`package.json` requires Node 22.13 or newer)
+- Node.js: **22.x** (`package.json` pins the deployment to the Node 22 major line)
 - Install command: `npm install`
 - Build command: `npm run build`
 - Output directory: leave blank; Vercel manages `.next`
