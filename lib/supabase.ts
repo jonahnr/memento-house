@@ -1,6 +1,9 @@
-import {createClient} from "@supabase/supabase-js";
+import {createClient,type SupabaseClient} from "@supabase/supabase-js";
 
-let browserClient: ReturnType<typeof createClient> | null = null;
+// This application intentionally uses Supabase without generated database
+// types. Keep the schema generic explicit so native Next.js type checking does
+// not infer every untyped mutation payload as `never`.
+let browserClient: SupabaseClient<any,"public",any> | null = null;
 
 export function getSupabaseBrowserClient(){
   // These are public browser credentials, not privileged secrets. The fallback

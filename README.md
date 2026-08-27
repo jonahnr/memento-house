@@ -42,7 +42,7 @@ Create a public token with Styles and Search access. Add it as `NEXT_PUBLIC_MAPB
 
 ## Deploying
 
-For Vercel, import the repository, add every value from `.env.example`, and deploy. Set `NEXT_PUBLIC_SITE_URL` to the production origin. Run the Supabase migration before inviting guests. This repository also contains `.openai/hosting.json` for a Codex Sites preview.
+This branch runs on the native Next.js runtime and is ready for Vercel's Next.js framework preset. Import the `vercel-migration` branch, add the values documented in `VERCEL_DEPLOYMENT.md`, and use `npm run build`. Run the required Supabase migrations before inviting guests.
 
 ## Production checklist
 
