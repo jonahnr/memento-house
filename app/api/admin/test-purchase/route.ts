@@ -1,10 +1,10 @@
-import {adminFailure,requireAdmin} from "../../../../lib/admin";
+import {paymentTesterFailure,requirePaymentTester} from "../../../../lib/payment-tester";
 import {fulfillPurchase} from "../../../../lib/fulfillment";
 import {resolveCatalog} from "../../../../lib/product-catalog";
 import {sendTestOrderEmail} from "../../../../lib/customer-email";
 
 export async function POST(request:Request){
- const context=await requireAdmin(request);if(!context)return adminFailure(request);
+ const context=await requirePaymentTester(request);if(!context)return paymentTesterFailure(request);
  try{
   const body=await request.json(),product=String(body.product||""),tier=String(body.tier||""),addons=body.addons||String(body.addon||"").split(",").filter((value:string)=>value&&value!=="none"),item=resolveCatalog(product,tier,addons),sourceId=`admin_${crypto.randomUUID()}`;
   let customizationId:null|string=null;

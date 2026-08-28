@@ -22,3 +22,19 @@ Subject: `Confirm your Memento House account`
 Use the same shell, logo, colors, and sender identity for **Reset Password**, changing the title, explanation, and button label to `Reset my password →`. Keep Supabase's `{{ .ConfirmationURL }}` variable as the button URL.
 
 After saving, send a test email from Supabase and confirm that the logo URL is publicly reachable, the sender domain passes SPF/DKIM, and the link returns to the production `/auth/callback` URL.
+# Required delivery configuration
+
+Account confirmation and resend requests are delivered by **Supabase Auth**, not by the application's transactional-email route. A successful API response only means Supabase accepted the request; it does not prove the message reached the inbox.
+
+In **Supabase → Project Settings → Authentication → SMTP Settings**, enable custom SMTP and use the verified Resend domain:
+
+- Host: `smtp.resend.com`
+- Port: `465`
+- Username: `resend`
+- Password: the current Resend API key (store it only in Supabase; never commit it)
+- Sender name: `Memento House`
+- Sender email: a verified `@mementohouse.com` address such as `accounts@mementohouse.com`
+
+Then confirm **Authentication → URL Configuration** contains the production Vercel URL and `/auth/callback` is permitted as a redirect URL. Use **Authentication → Logs** immediately after a signup or resend request: an SMTP rejection there is the authoritative reason an email did not leave Supabase.
+
+If an email address is already registered, Supabase may intentionally return a non-revealing success response without creating a second signup email. In that case, use Sign in or Reset password.

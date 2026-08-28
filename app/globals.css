@@ -123,3 +123,5 @@
 .questionnairePhoto{display:grid;gap:10px;margin-top:8px}.questionnairePhoto img{width:min(260px,100%);max-height:220px;object-fit:contain;border:1px solid var(--line)}
 .authHelp{display:grid;gap:10px;padding:14px;border:1px solid var(--line);background:#f7f1e7}.authHelp p{margin:0}.authTroubleshoot{display:block;margin-top:16px;line-height:1.5;color:var(--muted)}
 .layerControls .visitedControl{font-size:0}.layerControls .visitedControl:after{content:"Bucket List";font-size:11px}
+.accountTopbar{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:24px}.accountTopbar .button{width:auto;margin:0;white-space:nowrap}
+@media(max-width:640px){.accountTopbar{align-items:flex-start}.accountTopbar .houseBrand small{display:none}.accountTopbar .button{padding:12px 16px}}

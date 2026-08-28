@@ -1,10 +1,10 @@
-import {adminFailure,requireAdmin} from "../../../../lib/admin";
+import {paymentTesterFailure,requirePaymentTester} from "../../../../lib/payment-tester";
 import {ADDONS,resolveCatalog} from "../../../../lib/product-catalog";
 import {requestOrigin} from "../../../../lib/site-url";
 import {stripeServerConfig} from "../../../../lib/server-config";
 
 export async function POST(request:Request){
- const context=await requireAdmin(request);if(!context)return adminFailure(request);
+ const context=await requirePaymentTester(request);if(!context)return paymentTesterFailure(request);
  const origin=requestOrigin(request);
  const key=stripeServerConfig().testSecretKey;if(!key)return Response.json({error:"STRIPE_TEST_SECRET_KEY is not available to this deployment. Confirm its Preview/Production scope and redeploy."},{status:503});
  try{
