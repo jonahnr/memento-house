@@ -21,7 +21,7 @@ async function enrich(context:any,orders:any[]){
     fulfillment_jobs:(jobs.data||[]).filter((item:any)=>item.order_id===order.id),
     proofs:(proofs.data||[]).filter((item:any)=>item.order_id===order.id),
     events:(events.data||[]).filter((item:any)=>item.order_id===order.id),
-    customization:(customizations.data||[]).find((item:any)=>item.claimed_order_id===order.id)||null,
+    customization:(()=>{const saved=(customizations.data||[]).find((item:any)=>item.claimed_order_id===order.id),questionnaire=(questionnaires.data||[]).find((item:any)=>item.order_id===order.id);return(saved||questionnaire)?{...(saved||{}),payload:{...(saved?.payload||{}),...(questionnaire?.answers||{})},questionnaire_status:questionnaire?.status||null}:null})(),
   }));
 }
 
