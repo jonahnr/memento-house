@@ -152,3 +152,4 @@ header{height:64px}.workbench{height:calc(100vh - 64px);grid-template-columns:35
 .export-render-host .card-canvas{width:320px!important;height:448px!important}.export-render-host .sign.card-canvas{width:326px!important;height:450px!important}
 
 .demo-notice{height:28px;display:grid;place-items:center;background:#9a743d;color:#fff;font-size:9px;font-weight:800;letter-spacing:.18em}.studio-demo .app-shell{height:calc(100vh - 28px)}.studio-demo .card-canvas:after{content:'© MEMENTO HOUSE · INTERACTIVE PREVIEW';position:absolute;inset:0;z-index:20;display:grid;place-items:center;color:#6e563799;font:700 16px Georgia;letter-spacing:.12em;transform:rotate(-28deg);pointer-events:none}
+.studio-demo .project-chip{display:none}.studio-demo .config-section>.form-grid:first-of-type label:nth-child(-n+3){display:none}.studio-demo.tier-basic .form-divider,.studio-demo.tier-basic .form-divider~*{display:none}
