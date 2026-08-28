@@ -29,7 +29,7 @@ export function Dashboard(){
   const{data:session}=await client.auth.getSession(); const user=session.session?.user;
   if(!user){setLoading(false);return}
   setEmail(user.email||"");
-  const{data:ownedOrders}=await client.from("orders").select("id,catalog_key,product,tier,amount_total,currency,order_status,questionnaire_status,tracking_number,shipping_carrier,tracking_url,created_at,order_proofs(id,version,status,file_name,customer_feedback)").eq("customer_user_id",user.id).order("created_at",{ascending:false});setAccountOrders(ownedOrders||[]);
+  const{data:ownedOrders,error:ordersError}=await client.from("orders").select("id,catalog_key,product,tier,amount_total,currency,order_status,questionnaire_status,tracking_number,shipping_carrier,tracking_url,created_at").eq("customer_user_id",user.id).order("created_at",{ascending:false});if(ordersError)setError(ordersError.message);setAccountOrders(ownedOrders||[]);
   let{data:w,error:wError}=await client.from("weddings").select("id,partner_one_name,partner_two_name,wedding_date,title,slug,welcome_message,accent_color,keepsake_settings").eq("owner_user_id",user.id).single() as unknown as {data:Wedding|null;error:{code?:string;message:string}|null};
   if(wError?.code==="42703")({data:w,error:wError}=await client.from("weddings").select("id,partner_one_name,partner_two_name,wedding_date,title,slug,welcome_message,accent_color").eq("owner_user_id",user.id).single() as unknown as {data:Wedding|null;error:{code?:string;message:string}|null});
   if(wError||!w){if((ownedOrders||[]).length){setLoading(false);return}setError(wError?.message||"Your account is ready, but it does not have an order yet.");setLoading(false);return}
