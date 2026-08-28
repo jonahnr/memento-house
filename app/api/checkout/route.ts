@@ -9,7 +9,7 @@ export async function POST(request:Request){
  const form=await request.formData(),product=String(form.get("product")||""),tier=String(form.get("tier")||""),addon=String(form.get("addon")||"none"),addons=addon==="none"?[]:[addon];let item;
  try{item=resolveCatalog(product,tier,addons)}catch(error){return new Response(error instanceof Error?error.message:"Invalid product selection",{status:400})}
  const raw=String(form.get("customization")||"");
- if(product==="unity"&&tier==="signature-board"&&!raw)return new Response("Complete and save the Unity Tile builder before checkout.",{status:400});
+ if(product==="unity"&&!raw)return new Response("Complete and save the Unity Tile builder before checkout.",{status:400});
  const key=stripeServerConfig().liveSecretKey;if(!key)return Response.json({error:"STRIPE_SECRET_KEY is not available to this deployment. Confirm its Preview/Production scope and redeploy."},{status:503});
  let customizationId="";
  const server=supabaseServerConfig();if(raw&&raw.length<=250_000&&server.serviceRoleKey){try{const payload=JSON.parse(raw),admin=createClient(server.url,server.serviceRoleKey,{auth:{persistSession:false,autoRefreshToken:false}}),saved=await admin.from("checkout_customizations").insert({product,tier,payload}).select("id").single();if(!saved.error)customizationId=saved.data.id}catch{}}

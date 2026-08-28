@@ -66,7 +66,6 @@ export async function DELETE(request:Request){
   const context=await requireAdmin(request);if(!context)return adminFailure(request);
   try{
     const body=await request.json(),id=String(body.id||""),current=await context.admin.from("orders").select("id,is_test,payment_status").eq("id",id).single();if(current.error)throw current.error;
-    if(current.data.is_test){const deleted=await context.admin.from("orders").delete().eq("id",id);if(deleted.error)throw deleted.error;return Response.json({deleted:true,permanent:true})}
     const archived=await context.admin.from("orders").update({archived_at:new Date().toISOString(),archived_by:context.user.id,updated_at:new Date().toISOString()}).eq("id",id);if(archived.error)throw archived.error;
     await context.admin.from("order_events").insert({order_id:id,event_type:"order_archived",actor_type:"admin",actor_id:context.user.id});
     return Response.json({deleted:true,permanent:false});
