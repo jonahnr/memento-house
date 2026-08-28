@@ -8,8 +8,8 @@ export async function POST(request:Request){
  if(!user)return new Response("Unauthorized",{status:401});
  const body=await request.json().catch(()=>null) as any,proofId=String(body?.proofId||""),decision=String(body?.decision||""),feedback=String(body?.feedback||"").trim().slice(0,4000);
  if(!proofId||!["viewed","approved","changes_requested"].includes(decision))return new Response("Invalid proof response",{status:400});
- const proof=await admin.from("order_proofs").select("id,order_id,status,orders!inner(id,customer_user_id,order_status)").eq("id",proofId).single();
- const order=(proof.data as any)?.orders;if(proof.error||!order||order.customer_user_id!==user.id)return new Response("Not found",{status:404});
+ const proof=await admin.from("order_proofs").select("id,order_id,status").eq("id",proofId).single();if(proof.error)return new Response("Not found",{status:404});
+ const orderResult=await admin.from("orders").select("id,customer_user_id,order_status").eq("id",proof.data.order_id).eq("customer_user_id",user.id).single(),order=orderResult.data;if(orderResult.error||!order)return new Response("Not found",{status:404});
  const target=decision==="approved"?"approved":decision==="changes_requested"?"changes_requested":"awaiting_customer_approval";
  if(target!==order.order_status)try{assertTransition(order.order_status,target)}catch(error){return new Response(error instanceof Error?error.message:"Invalid transition",{status:409})}
  const now=new Date().toISOString(),proofPatch:any={status:decision,updated_at:now};if(decision==="viewed")proofPatch.viewed_at=now;else{proofPatch.responded_at=now;proofPatch.customer_feedback=feedback}
