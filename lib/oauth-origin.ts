@@ -2,7 +2,7 @@ export function canonicalAuthOrigin(){
  if(typeof window==="undefined")return "";
  const hostname=window.location.hostname.toLowerCase();
  if(hostname==="localhost"||hostname==="127.0.0.1"||hostname==="::1")return window.location.origin;
- return "https://mementohouse.com";
+ return "https://www.mementohouse.com";
 }
 
 export function moveToCanonicalAuth(path:string){

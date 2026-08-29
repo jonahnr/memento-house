@@ -32,7 +32,7 @@ export async function POST(request:Request){
  }
  if(!target)return Response.json({error:"No Memento House account was found for that email."},{status:404});
  const metadata={...(target.user_metadata||{})};
- if(access==="automatic")delete metadata.map_access_override;
+ if(access==="automatic")metadata.map_access_override=null;
  else metadata.map_access_override=access;
  if(["map","plus","timeline-plus"].includes(access))metadata.product_tier=access;
  const update=await context.admin.auth.admin.updateUserById(target.id,{user_metadata:metadata});
