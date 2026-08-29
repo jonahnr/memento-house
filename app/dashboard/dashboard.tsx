@@ -34,7 +34,9 @@ export function Dashboard(){
   if(wError?.code==="42703")({data:w,error:wError}=await client.from("weddings").select("id,partner_one_name,partner_two_name,wedding_date,title,slug,welcome_message,accent_color").eq("owner_user_id",user.id).single() as unknown as {data:Wedding|null;error:{code?:string;message:string}|null});
   if(wError||!w){if((ownedOrders||[]).length){setLoading(false);return}setError(wError?.message||"Your account is ready, but it does not have an order yet.");setLoading(false);return}
   setWedding(w as Wedding);
-  const plan=await fetch(`/api/map-plan?slug=${encodeURIComponent(w.slug)}`,{cache:"no-store"}).then(response=>response.ok?response.json():null).catch(()=>null),resolvedTier=String(plan?.tier||user.user_metadata?.product_tier||"map");setTier(resolvedTier);
+  const plan=await fetch(`/api/map-plan?slug=${encodeURIComponent(w.slug)}`,{cache:"no-store"}).then(response=>response.ok?response.json():null).catch(()=>null);
+  if(plan?.access===false){setWedding(null);setError("Memento Map access is currently paused for this account. Contact Memento House if you believe this is a mistake.");setLoading(false);return}
+  const resolvedTier=String(plan?.tier||user.user_metadata?.product_tier||"map");setTier(resolvedTier);
   const{data:r,error:rError}=await client.from("recommendations").select("id,guest_name,message,category,status,destination:destinations(id,location_name,latitude,longitude)").eq("wedding_id",w.id).neq("status","deleted").order("created_at",{ascending:false});
   if(rError)setError(rError.message); else setData((r||[]) as unknown as Recommendation[]);
   const{data:t}=await client.from("couple_destination_status").select("destination_id,status,planned_date,visited_date,couple_note,image_url,priority_rank").eq("wedding_id",w.id);setTravel((t||[]) as TravelStatus[]);
