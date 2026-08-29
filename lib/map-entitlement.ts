@@ -9,7 +9,14 @@ export function resolveMapAccessOverride(metadata?:Record<string,unknown>):MapAc
  return ["off","map","plus","timeline-plus"].includes(value)?value as MapAccessOverride:"automatic";
 }
 
-export function mapAccessEnabled(metadata?:Record<string,unknown>){return resolveMapAccessOverride(metadata)!=="off"}
+export async function resolveMapAccess(admin:SupabaseClient,userId:string,metadata?:Record<string,unknown>,email?:string|null){
+ const override=resolveMapAccessOverride(metadata);
+ if(override==="off")return false;
+ if(override!=="automatic")return true;
+ if(email?.toLowerCase()==="jonahnr@gmail.com")return true;
+ const result=await admin.from("entitlements").select("id").eq("user_id",userId).eq("status","active").in("entitlement",["map_basic","map_plus","map_timeline_plus"]).limit(1);
+ return Boolean(result.data?.length);
+}
 
 export async function resolveMapTier(admin:SupabaseClient,userId:string,metadata?:Record<string,unknown>,email?:string|null):Promise<MapTier>{
  const override=resolveMapAccessOverride(metadata);

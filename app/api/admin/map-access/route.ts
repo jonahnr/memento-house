@@ -1,6 +1,21 @@
 import {requireAdmin} from "../../../../lib/admin";
+import {resolveMapAccessOverride} from "../../../../lib/map-entitlement";
 
 const allowed=new Set(["automatic","off","map","plus","timeline-plus"]);
+
+const entitlementTier=(values:string[])=>values.includes("map_timeline_plus")?"timeline-plus":values.includes("map_plus")?"plus":values.includes("map_basic")?"map":"none";
+
+export async function GET(request:Request){
+ const context=await requireAdmin(request);
+ if(!context)return Response.json({error:"Administrator access is required."},{status:403});
+ const users:any[]=[];let page=1;
+ while(page<=20){const result=await context.admin.auth.admin.listUsers({page,perPage:100});if(result.error)return Response.json({error:result.error.message},{status:500});users.push(...result.data.users);if(result.data.users.length<100)break;page++}
+ const entitlements=await context.admin.from("entitlements").select("user_id,entitlement,status").eq("status","active").in("entitlement",["map_basic","map_plus","map_timeline_plus"]);
+ if(entitlements.error)return Response.json({error:entitlements.error.message},{status:500});
+ const byUser=new Map<string,string[]>();for(const row of entitlements.data||[])byUser.set(row.user_id,[...(byUser.get(row.user_id)||[]),row.entitlement]);
+ const customers=users.filter(user=>user.email).map(user=>{const override=resolveMapAccessOverride(user.user_metadata),automaticTier=entitlementTier(byUser.get(user.id)||[]),effectiveTier=override==="automatic"?automaticTier:override==="off"?"none":override;return{id:user.id,email:user.email,createdAt:user.created_at,lastSignInAt:user.last_sign_in_at,override,automaticTier,effectiveTier,timelineStatus:effectiveTier==="timeline-plus"?"Active":override==="off"?"Paused":automaticTier==="timeline-plus"?"Active":"Not included"}}).sort((a,b)=>a.email.localeCompare(b.email));
+ return Response.json({customers},{headers:{"Cache-Control":"no-store"}});
+}
 
 export async function POST(request:Request){
  const context=await requireAdmin(request);
