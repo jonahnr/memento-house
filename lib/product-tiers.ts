@@ -7,10 +7,10 @@ export const mapTiers:ProductTier[]=[
 ];
 
 export const deckTiers:ProductTier[]=[
- {id:"essential",name:"Essential",price:139,subtitle:"Core experience",cta:"Choose Essential",features:["Up to 50 personalized cards","Custom couple deck photo","Standard designs and prompt collection","Full-color premium card production"]},
- {id:"signature",name:"Signature",price:169,subtitle:"More capacity",cta:"Choose Signature",features:["Up to 75 cards","Everything in Essential","Expanded prompt variety for larger celebrations"]},
- {id:"story",name:"Story",price:219,subtitle:"More couple-specific personalization",cta:"Choose Story",popular:true,features:["Up to 95 cards and everything in Signature","Rare Cards","10 uniquely personalized story cards","Relationship-inspired prompts"]},
- {id:"bespoke",name:"Bespoke",price:389,subtitle:"Fully customized around the couple",cta:"Choose Bespoke",features:["Up to 175 cards and Rare Cards","Open When package included","Fully custom prompts, categories, and card concepts","Deep story personalization"]}
+ {id:"essential",name:"Essential",price:139,subtitle:"Core experience",cta:"Choose Essential",features:["50 guest Mementos","Custom couple deck photo","Standard designs and prompt collection","Full-color premium card production"]},
+ {id:"signature",name:"Signature",price:169,subtitle:"More capacity",cta:"Choose Signature",features:["75 guest Mementos","Everything in Essential","Expanded prompt variety for larger celebrations"]},
+ {id:"story",name:"Story",price:219,subtitle:"More couple-specific personalization",cta:"Choose Story",popular:true,features:["95 guest Mementos and everything in Signature","Rare Cards","10 uniquely personalized story cards","Relationship-inspired prompts"]},
+ {id:"bespoke",name:"Bespoke",price:389,subtitle:"Fully customized around the couple",cta:"Choose Bespoke",features:["175 guest Mementos and Rare Cards","Open When add-on cards included","Fully custom prompts, categories, and card concepts","Deep story personalization"]}
 ];
 
 export const unityTiers:ProductTier[]=[
