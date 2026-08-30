@@ -12,8 +12,13 @@ export async function POST(request:Request){
  if(anonymousId.length<10||!startedAt||now-startedAt<1200)return Response.json({error:"Please take a moment and try again."},{status:400});
  const weddingId=clean(body.weddingId,50),place=clean(body.place,180),guest=clean(body.guest,100),message=clean(body.message,1000),category=clean(body.category,60),type=body.contributionType==="origin"?"origin":"recommendation",lat=Number(body.lat),lng=Number(body.lng);
  if(!weddingId||place.length<2||guest.length<1||!Number.isFinite(lat)||!Number.isFinite(lng)||lat<-90||lat>90||lng<-180||lng>180||type==="recommendation"&&message.length<5)return Response.json({error:"Please complete each required field."},{status:400});
- const admin=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}}),{data:wedding}=await admin.from("weddings").select("id,wedding_date").eq("id",weddingId).eq("status","active").maybeSingle();
+ const admin=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});let weddingResult=await admin.from("weddings").select("id,wedding_date,contribution_status,contribution_closes_at").eq("id",weddingId).eq("status","active").maybeSingle();
+ if(weddingResult.error?.code==="42703")weddingResult=await admin.from("weddings").select("id,wedding_date").eq("id",weddingId).eq("status","active").maybeSingle() as typeof weddingResult;
+ const wedding=weddingResult.data;
  if(!wedding)return Response.json({error:"This map is not accepting contributions."},{status:404});
+ if(wedding.contribution_status==="paused")return Response.json({error:"Guest contributions are temporarily paused by the couple."},{status:403});
+ if(wedding.contribution_status==="closed")return Response.json({error:"This map is closed to new guest contributions."},{status:403});
+ if(wedding.contribution_closes_at&&new Date(wedding.contribution_closes_at)<=new Date())return Response.json({error:"The contribution window for this map has closed."},{status:403});
  const actorHash=await digest(`${ip}:${anonymousId}`),claimed=await admin.rpc("claim_guest_action",{p_wedding_id:weddingId,p_actor_hash:actorHash,p_action:"contribution",p_limit:4,p_window_seconds:900});
  if(!claimed.error&&!claimed.data)return Response.json({error:"Too many contributions. Please try again later."},{status:429});
  if(wedding.wedding_date){const closes=new Date(`${wedding.wedding_date}T23:59:59Z`);closes.setUTCDate(closes.getUTCDate()+14);if(new Date()>closes)return Response.json({error:"This wedding map is now closed to new guest contributions."},{status:403})}

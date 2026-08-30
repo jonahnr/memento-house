@@ -1,5 +1,3 @@
-import {Suspense} from "react";
-
-export default function OrderLayout({children}:{children:React.ReactNode}){
-  return <Suspense fallback={<main className="orderPage"><p>Preparing your order…</p></main>}>{children}</Suspense>;
-}
+import type {Metadata} from "next";
+export const metadata:Metadata={robots:{index:false,follow:false},title:"Secure checkout — Memento House"};
+export default function OrderLayout({children}:{children:React.ReactNode}){return children}
