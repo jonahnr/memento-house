@@ -1,11 +1,10 @@
-import {createClient} from "@supabase/supabase-js";
 import {assertTransition} from "../../../lib/order-domain";
+import {requireUser} from "../../../lib/request-user";
 
 export async function POST(request:Request){
- const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY,token=(request.headers.get("authorization")||"").replace(/^Bearer\s+/i,"");
- if(!url||!key||!token)return new Response("Unauthorized",{status:401});
- const admin=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}}),auth=await admin.auth.getUser(token),user=auth.data.user;
- if(!user)return new Response("Unauthorized",{status:401});
+ const context=await requireUser(request);
+ if(!context)return Response.json({error:"Your session expired. Sign in again, reopen this proof, and retry."},{status:401});
+ const {admin,user}=context;
  const body=await request.json().catch(()=>null) as any,proofId=String(body?.proofId||""),decision=String(body?.decision||""),feedback=String(body?.feedback||"").trim().slice(0,4000);
  if(!proofId||!["viewed","approved","changes_requested"].includes(decision))return new Response("Invalid proof response",{status:400});
  if(decision==="approved"&&feedback.toUpperCase()!=="APPROVE")return Response.json({error:"Type APPROVE exactly to confirm this proof."},{status:400});
