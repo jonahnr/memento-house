@@ -65,7 +65,7 @@ export async function PUT(request:Request){
  if(submit){const missing=item.questionnaire.filter(f=>f.required&&!String(clean[f.id]??"").trim());if(missing.length)return Response.json({error:`Please complete: ${missing.map(x=>x.label).join(", ")}`},{status:400})}
  const now=new Date().toISOString(),status=submit?"submitted":"in_progress",updated=await auth.admin.from("questionnaires").update({answers:clean,status,started_at:now,submitted_at:submit?now:null,updated_at:now}).eq("id",current.data.id).select().single();
  if(updated.error)return Response.json({error:updated.error.message},{status:500});
- const orderUpdate=await auth.admin.from("orders").update({questionnaire_status:status,order_status:submit?"ready_for_design":"awaiting_customer_information",questionnaire_started_at:now,updated_at:now}).eq("id",orderId);
+ const orderUpdate=await auth.admin.from("orders").update({questionnaire_status:status,order_status:submit?"proof_ready":"awaiting_customer_information",questionnaire_started_at:now,updated_at:now}).eq("id",orderId);
  if(orderUpdate.error)return Response.json({error:`Questionnaire saved, but the order could not be advanced: ${orderUpdate.error.message}`},{status:500});
  return Response.json({questionnaire:updated.data});
 }
