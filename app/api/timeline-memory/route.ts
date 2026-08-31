@@ -20,7 +20,7 @@ export async function POST(request:Request){
  if(!claimed.error&&!claimed.data)return Response.json({error:"Too many memories were submitted. Please try again later."},{status:429});
  let{data:destination}=await admin.from("destinations").select("id").eq("wedding_id",weddingId).eq("normalized_location_name",normalize(place)).maybeSingle();
  if(!destination){const created=await admin.from("destinations").insert({wedding_id:weddingId,location_name:place,normalized_location_name:normalize(place),latitude:lat,longitude:lng}).select("id").single();if(created.error)return Response.json({error:"That place could not be saved."},{status:500});destination=created.data}
- const created=await admin.from("timeline_entries").insert({wedding_id:weddingId,destination_id:destination.id,date_value:date,date_precision:"exact",approximate_date_label:null,sort_date:date,title,category:"Guest Memory",story,contributor_name:guest,visibility:"link",status:"pending"}).select("id").single();
+ const created=await admin.from("timeline_entries").insert({wedding_id:weddingId,destination_id:destination.id,date_value:date,date_precision:"exact",approximate_date_label:null,sort_date:date,title,category:"Guest Memory",story,contributor_name:guest,visibility:"link",status:"published"}).select("id").single();
  if(created.error)return Response.json({error:"Your memory could not be saved."},{status:500});
  let photoSaved=false;
  if(photo instanceof File&&photo.size){
@@ -28,5 +28,6 @@ export async function POST(request:Request){
   const extension=photo.type==="image/png"?"png":photo.type==="image/webp"?"webp":"jpg",path=`guest-memories/${weddingId}/${created.data.id}.${extension}`,uploaded=await admin.storage.from(bucket).upload(path,photo,{contentType:photo.type,upsert:false});
   if(!uploaded.error){const publicUrl=admin.storage.from(bucket).getPublicUrl(path).data.publicUrl,photoRow=await admin.from("timeline_photos").insert({entry_id:created.data.id,storage_path:path,public_url:publicUrl,alt_text:`Memory shared by ${guest}`});photoSaved=!photoRow.error}
  }
- return Response.json({id:created.data.id,photoSaved});
+ const photoRow=await admin.from("timeline_photos").select("public_url,alt_text").eq("entry_id",created.data.id).maybeSingle();
+ return Response.json({entry:{id:created.data.id,date_value:date,approximate_date_label:null,sort_date:date,title,category:"Guest Memory",story,contributor_name:guest,photo:photoRow.data||null,destination:{location_name:place,latitude:lat,longitude:lng}},photoSaved});
 }

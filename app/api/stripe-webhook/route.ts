@@ -1,6 +1,8 @@
 import {createClient} from "@supabase/supabase-js";
 import {fulfillPurchase} from "../../../lib/fulfillment";
 import {resolveCatalog} from "../../../lib/product-catalog";
+import {deliverOrderConfirmation} from "../../../lib/order-notifications";
+import {revokeRefundedOrder} from "../../../lib/refund-lifecycle";
 const hex=(bytes:ArrayBuffer)=>Array.from(new Uint8Array(bytes)).map(b=>b.toString(16).padStart(2,"0")).join("");
 const safeEqual=(a:string,b:string)=>{if(a.length!==b.length)return false;let mismatch=0;for(let i=0;i<a.length;i++)mismatch|=a.charCodeAt(i)^b.charCodeAt(i);return mismatch===0};
 export async function POST(request:Request){
@@ -11,8 +13,10 @@ export async function POST(request:Request){
  if(existing.data)await admin.from("stripe_events").update({status:"processing",attempts:(existing.data.attempts||1)+1,updated_at:new Date().toISOString()}).eq("event_id",event.id);else{const claimed=await admin.from("stripe_events").insert({event_id:event.id,event_type:event.type});if(claimed.error&&claimed.error.code!=="23505")return new Response(claimed.error.message,{status:500})}
  try{const session=event.data?.object;if(event.type==="checkout.session.completed"&&session?.payment_status==="paid"){
    const email=String(session.customer_details?.email||"").toLowerCase(),product=String(session.metadata?.product||""),tier=String(session.metadata?.tier||""),addons=String(session.metadata?.addons||"").split(",").filter(Boolean),item=resolveCatalog(product,tier,addons);if(!email||session.metadata?.catalog_key!==item.key)throw new Error("Invalid checkout metadata");
-   await fulfillPurchase(admin,{source:"stripe",sourceId:String(session.id),eventId:event.id,email,name:String(session.customer_details?.name||""),userId:String(session.metadata?.customer_user_id||session.client_reference_id||"")||null,product,tier,addons,amount:Number(session.amount_total||0),currency:String(session.currency||"usd"),customizationId:String(session.metadata?.customization_id||"")||null,paymentIntentId:String(session.payment_intent||"")||null,isTest:session.metadata?.test_checkout==="true"});
- }else if(["charge.refunded","checkout.session.expired"].includes(event.type)){const reference=String(session?.checkout_session||session?.id||"");if(reference)await admin.from("orders").update({order_status:event.type==="charge.refunded"?"refunded":"cancelled",updated_at:new Date().toISOString()}).or(`stripe_session_id.eq.${reference},stripe_payment_intent_id.eq.${String(session?.payment_intent||session?.id||"")}`)}
+   const result=await fulfillPurchase(admin,{source:"stripe",sourceId:String(session.id),eventId:event.id,email,name:String(session.customer_details?.name||""),userId:String(session.metadata?.customer_user_id||session.client_reference_id||"")||null,product,tier,addons,amount:Number(session.amount_total||0),currency:String(session.currency||"usd"),customizationId:String(session.metadata?.customization_id||"")||null,paymentIntentId:String(session.payment_intent||"")||null,isTest:session.metadata?.test_checkout==="true"});
+   await deliverOrderConfirmation(admin,result.order,result.item.displayName,"stripe");
+ }else if(event.type==="charge.refunded"){const paymentIntent=String(session?.payment_intent||""),found=paymentIntent?await admin.from("orders").select("*").eq("stripe_payment_intent_id",paymentIntent).maybeSingle():{data:null,error:null};if(found.error)throw found.error;if(found.data&&found.data.payment_status!=="refunded")await revokeRefundedOrder(admin,found.data,{actorType:"stripe",stripeRefundId:String(session?.refunds?.data?.[0]?.id||""),amount:Number(session?.amount_refunded||found.data.amount_total)})
+ }else if(event.type==="checkout.session.expired"){await admin.from("orders").update({order_status:"cancelled",updated_at:new Date().toISOString()}).eq("stripe_session_id",String(session?.id||""))}
  await admin.from("stripe_events").update({status:"processed",processed_at:new Date().toISOString(),error_message:null,updated_at:new Date().toISOString()}).eq("event_id",event.id);return new Response("ok")
  }catch(error){const message=error instanceof Error?error.message:"Webhook processing failed";await admin.from("stripe_events").update({status:"failed",error_message:message,updated_at:new Date().toISOString()}).eq("event_id",event.id);return new Response(message,{status:500})}
 }
