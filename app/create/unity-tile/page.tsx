@@ -3,7 +3,7 @@ import {useEffect,useRef,useState} from "react";
 
 export default function UnityBuilder(){
  const[summary,setSummary]=useState<any>(),[tier,setTier]=useState("signature-board"),[studioSession]=useState(()=>crypto.randomUUID()),frame=useRef<HTMLIFrameElement>(null);
- useEffect(()=>{if(new URLSearchParams(location.search).get("tier")==="bespoke")setTier("bespoke");const raw=localStorage.getItem("memento-builder:unity");if(raw)try{const saved=JSON.parse(raw);setSummary(saved.summary);if(saved.tier)setTier(saved.tier)}catch{}},[]);
+ useEffect(()=>{const requestedTier=new URLSearchParams(location.search).get("tier"),raw=localStorage.getItem("memento-builder:unity");if(raw)try{const saved=JSON.parse(raw);setSummary(saved.summary);if(!requestedTier&&["signature-board","bespoke"].includes(saved.tier))setTier(saved.tier)}catch{}if(requestedTier==="signature-board"||requestedTier==="bespoke")setTier(requestedTier)},[]);
  useEffect(()=>{const receive=(event:MessageEvent)=>{if(event.origin!==location.origin||event.data?.type!=="unity-board-customization")return;localStorage.setItem("memento-builder:unity",JSON.stringify({kind:"unity",board:event.data.board,details:event.data.details,summary:event.data.summary,tier}));setSummary(event.data.summary)};addEventListener("message",receive);return()=>removeEventListener("message",receive)},[tier]);
  useEffect(()=>{const raw=localStorage.getItem("memento-builder:unity");if(!raw)return;try{localStorage.setItem("memento-builder:unity",JSON.stringify({...JSON.parse(raw),tier}))}catch{}},[tier]);
  function restore(){const raw=localStorage.getItem("memento-builder:unity");if(!raw)return;try{frame.current?.contentWindow?.postMessage({type:"load-order-customization",payload:JSON.parse(raw)},location.origin)}catch{}}

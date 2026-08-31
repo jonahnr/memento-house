@@ -1,6 +1,7 @@
 "use client";
 import {useCallback,useEffect,useMemo,useRef,useState} from "react";
 import {useParams} from "next/navigation";
+import {sendGAEvent} from "@next/third-parties/google";
 import {AdventureMap,type GeoPin,type StoryPin} from "./adventure-map";
 import {LocationSearch} from "./location-search";
 import {getSupabaseBrowserClient} from "../../../lib/supabase";
@@ -41,8 +42,9 @@ export function WeddingExperience(){
  const[wedding,setWedding]=useState<Wedding|null>(null),[recs,setRecs]=useState<Rec[]>([]),[stories,setStories]=useState<StoryPin[]>([]),[timeline,setTimeline]=useState<TimelineCard[]>([]),[open,setOpen]=useState(false),[memoryOpen,setMemoryOpen]=useState(false),[selected,setSelected]=useState<Rec|null>(null);
  const[tab,setTab]=useState("recommendations"),[sort,setSort]=useState("loved"),[success,setSuccess]=useState(false),[form,setForm]=useState(blank()),[loading,setLoading]=useState(true),[error,setError]=useState(""),[notice,setNotice]=useState("");
  const[demoPlan,setDemoPlan]=useState<"map"|"plus"|"timeline-plus">("map"),[layers,setLayers]=useState(["origins","recommendations"]),[venue,setVenue]=useState<{location_name:string;latitude:number;longitude:number}|null>(null),[liked,setLiked]=useState<Set<string>>(new Set());
- const modalRef=useRef<HTMLElement>(null),startedAt=useRef(Date.now());
+ const modalRef=useRef<HTMLElement>(null),startedAt=useRef(Date.now()),demoTracked=useRef(false);
  useEffect(()=>{if(!notice)return;const timer=setTimeout(()=>setNotice(""),2200);return()=>clearTimeout(timer)},[notice]);
+ useEffect(()=>{if(wedding?.id!=="demo"||demoTracked.current)return;demoTracked.current=true;sendGAEvent("event","demo_use",{demo_name:"Memento Map",demo_slug:slug})},[wedding,slug]);
  const load=useCallback(async()=>{
   const client=getSupabaseBrowserClient();if(!client){setError("The map service is unavailable.");setLoading(false);return}
   const{data:w,error:wError}=await client.from("weddings").select("id,partner_one_name,partner_two_name,wedding_date,title,slug,welcome_message").eq("slug",slug).eq("status","active").single();

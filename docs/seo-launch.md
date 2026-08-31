@@ -21,7 +21,7 @@ The application now supplies canonical metadata, Organization and product struct
 
 - Earn relevant links through local wedding vendors, planners, venues, photographers, directories, and real product features rather than buying links.
 - Ask partners to link to the closest product or guide page, not always the home page.
-- Connect privacy-respecting analytics and record checkout-start, checkout-complete, demo-use, and contact conversions.
+- Google Analytics is connected with measurement ID `G-NZ4F5DWT17`. The site records checkout starts, confirmed purchases, and demo use; add contact conversion tracking if the contact page gains an on-site form.
 - Review Search Console queries monthly and improve pages that receive impressions but weak click-through or engagement.
 
 ## Before legal launch

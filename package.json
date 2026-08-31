@@ -13,6 +13,7 @@
     "lint": "eslint app lib tests"
   },
   "dependencies": {
+    "@next/third-parties": "^16.3.3",
     "@supabase/supabase-js": "^2.112.3",
     "@types/qrcode": "^1.5.6",
     "html-to-image": "^1.11.13",

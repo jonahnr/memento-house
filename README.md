@@ -24,7 +24,7 @@ A mobile-first wedding keepsake by Memento House. Guests recommend future advent
 
 Public visitors and wedding guests do not need an account. Couple account creation is gated by the Memento House access code `forevermemento`; enter it on `/signup` before creating an email/password account. Existing couples sign in normally at `/login`.
 
-The checked-in experience uses polished local demo data when credentials are absent, so it can be reviewed immediately. To make writes durable, connect the form handlers to Supabase using the documented public insert policies; validate on the server and rate-limit guest endpoints before a public launch.
+The checked-in experience uses polished local demo data when credentials are absent, so it can be reviewed immediately. Production guest submissions are validated and rate-limited by server routes, with durable records stored in Supabase.
 
 ## Supabase
 
@@ -38,7 +38,7 @@ Create a Supabase project, enable email/password authentication, and add the Sit
 
 ## Mapbox
 
-Create a public token with Styles and Search access. Add it as `NEXT_PUBLIC_MAPBOX_TOKEN`. For production, replace the built-in illustrated fallback map with Mapbox GL and call the Search Box API from `LocationAutocomplete`; persist `mapbox_id`, formatted name, latitude, and longitude. The fallback deliberately keeps the demo usable without a token.
+Create a public token and add it as `NEXT_PUBLIC_MAPBOX_TOKEN`. The application uses MapLibre for interactive maps and the configured geocoding service for location search, while preserving a credential-free demo fallback for local review.
 
 ## Deploying
 

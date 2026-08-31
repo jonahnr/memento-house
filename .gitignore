@@ -37,3 +37,8 @@ yarn-error.log*
 /dist/
 /outputs/
 /work/
+
+# generated framework and TypeScript artifacts
+/.vinext/
+/.wrangler/
+*.tsbuildinfo
