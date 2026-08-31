@@ -14,6 +14,8 @@ type Story={id:string;location_name:string;latitude:number;longitude:number;stor
 type TimelineEntry={id:string;wedding_id:string;destination_id:string|null;date_value:string|null;date_precision:"exact"|"month"|"year"|"season"|"unknown";approximate_date_label:string|null;sort_date:string;title:string;category:string;story:string;contributor_name:string;visibility:"private"|"link"|"public";status:"pending"|"published"|"rejected"|"private";destination?:{id:string;location_name:string;latitude:number;longitude:number}|null};
 const baseItems=["Overview","Our Story","Recommendations","Travel Journal","Wedding Map","QR Code","Keepsake","Settings","My Account"];
 
+function CustomerAccountActions(){async function signOut(){await getSupabaseBrowserClient()?.auth.signOut();location.href="/"}return <aside className="customerAccountActions" aria-label="Customer account actions"><a href="/">Return to storefront</a><button type="button" onClick={signOut}>Sign out</button></aside>}
+
 const prettyDate=(value:string|null,short=false)=>{
  if(!value)return "Wedding date to come";
  return new Intl.DateTimeFormat("en-US",{month:short?"short":"long",day:"numeric",year:"numeric",weekday:short?undefined:"long",timeZone:"UTC"}).format(new Date(value+"T00:00:00Z"));
@@ -40,7 +42,7 @@ export function Dashboard(){
   const{data:r,error:rError}=await client.from("recommendations").select("id,guest_name,message,category,status,destination:destinations(id,location_name,latitude,longitude)").eq("wedding_id",w.id).neq("status","deleted").order("created_at",{ascending:false});
   if(rError)setError(rError.message); else setData((r||[]) as unknown as Recommendation[]);
   const{data:t}=await client.from("couple_destination_status").select("destination_id,status,planned_date,visited_date,couple_note,image_url,priority_rank").eq("wedding_id",w.id);setTravel((t||[]) as TravelStatus[]);
-  const{data:s}=await client.from("story_locations").select("id,location_name,latitude,longitude,story_type,title,description,event_date,image_url,sort_order").eq("wedding_id",w.id).order("sort_order");setStories((s||[]) as Story[]);
+  const{data:s}=await client.from("story_locations").select("id,location_name,latitude,longitude,story_type,title,description,event_date,image_url,sort_order").eq("wedding_id",w.id).order("event_date",{ascending:true,nullsFirst:false}).order("sort_order");setStories((s||[]) as Story[]);
   if(resolvedTier==="timeline-plus"){const{data:tl}=await client.from("timeline_entries").select("*,destination:destinations(id,location_name,latitude,longitude)").eq("wedding_id",w.id).order("sort_date");setTimeline((tl||[]) as unknown as TimelineEntry[])}
   setLoading(false);
  },[]);
@@ -56,7 +58,7 @@ export function Dashboard(){
  async function switchTier(next:string){const client=getSupabaseBrowserClient(),session=(await client!.auth.getSession()).data.session,response=await fetch("/api/admin/tier",{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${session?.access_token}`},body:JSON.stringify({tier:next})}),result=await response.json().catch(()=>null);if(!response.ok){setError(result?.error||`Plan preview could not be changed (${response.status}).`);return}await client!.auth.refreshSession();setError("");setTier(next);if(next==="timeline-plus"&&!timeline.length){const{data:tl}=await client!.from("timeline_entries").select("*,destination:destinations(id,location_name,latitude,longitude)").eq("wedding_id",wedding?.id||"").order("sort_date");setTimeline((tl||[]) as unknown as TimelineEntry[])}if(next==="map"&&["Our Story","Travel Journal","Keepsake","Timeline Plus"].includes(section))setSection("Overview")}
  async function testPurchase(next:"map"|"plus"|"timeline-plus"){const client=getSupabaseBrowserClient(),session=(await client!.auth.getSession()).data.session,response=await fetch("/api/admin/test-purchase",{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${session?.access_token}`},body:JSON.stringify({product:"map",tier:next})}),result=await response.json().catch(()=>null);if(response.ok){await client!.auth.refreshSession();location.href=result?.redirect||"/order/test-success"}else setError(result?.error||`Admin test could not be started (${response.status}).`)}
  if(loading)return <main className="auth authLoading"><div><span className="eyebrow">Memento House</span><h1>Preparing your wedding workspace…</h1></div></main>;
- if(!wedding)return <AccountOrders email={email} orders={accountOrders} error={error}/>;
+ if(!wedding)return <><AccountOrders email={email} orders={accountOrders} error={error}/><CustomerAccountActions/></>;
  const names=`${wedding.partner_one_name} & ${wedding.partner_two_name}`, initials=`${wedding.partner_one_name[0]||""}${wedding.partner_two_name[0]||""}`.toUpperCase();
  const items=tier==="timeline-plus"?[...baseItems.slice(0,4),"Timeline Plus",...baseItems.slice(4)]:baseItems;
  const mapPath=`/map/${wedding.slug}`, mapUrl=`https://mementohouse.com${mapPath}`;
