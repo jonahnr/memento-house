@@ -40,7 +40,7 @@ export default function Account() {
   const plan = human(forcedTier || mapOrder?.tier || "Map");
   const eventUrl = data.wedding?.slug ? `https://mementohouse.com/map/${data.wedding.slug}` : "Not published yet";
 
-  return <AccountShell email={data.email}>
+  return <AccountShell email={data.email} mapEnabled={mapEnabled}>
     <section className="accountPanel" id="overview">
       <div className="eyebrow">Your Memento House account</div>
       <h1>Welcome back.</h1>
