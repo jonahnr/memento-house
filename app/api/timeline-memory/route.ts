@@ -1,4 +1,8 @@
 import {createClient} from "@supabase/supabase-js";
+import {supabaseServerConfig} from "../../../lib/server-config";
+const configuredSupabase=supabaseServerConfig();
+process.env.NEXT_PUBLIC_SUPABASE_URL ||= configuredSupabase.url;
+process.env.SUPABASE_SERVICE_ROLE_KEY ||= configuredSupabase.serviceRoleKey;
 const clean=(value:unknown,max:number)=>String(value||"").trim().slice(0,max);
 const normalize=(value:string)=>value.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g," ").trim();
 const digest=async(value:string)=>Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(value)))).map(v=>v.toString(16).padStart(2,"0")).join("");
