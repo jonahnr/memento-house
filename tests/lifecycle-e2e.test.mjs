@@ -24,7 +24,7 @@ test("every permanent catalog product has a complete post-purchase lifecycle",()
 
 test("proactive production health is scheduled, persisted, and visible to administrators",async()=>{
  const [config,route,migration,admin]=await Promise.all([readFile(new URL("../vercel.json",import.meta.url),"utf8"),readFile(new URL("../app/api/system-health/route.ts",import.meta.url),"utf8"),readFile(new URL("../supabase/migrations/010_proactive_system_health.sql",import.meta.url),"utf8"),readFile(new URL("../app/admin/orders/page.tsx",import.meta.url),"utf8")]);
- assert.match(config,/0 \*\/6 \* \* \*/);assert.match(route,/CRON_SECRET/);assert.match(migration,/system_health_runs/);for(const label of ["Stripe API","Resend API","Order lifecycle integrity","Latest automated lifecycle checks"])assert.match(`${await readFile(new URL("../lib/system-health.ts",import.meta.url),"utf8")} ${admin}`,new RegExp(label));
+ assert.match(config,/0 12 \* \* \*/);assert.match(route,/CRON_SECRET/);assert.match(migration,/system_health_runs/);for(const label of ["Stripe API","Resend API","Order lifecycle integrity","Latest automated lifecycle checks"])assert.match(`${await readFile(new URL("../lib/system-health.ts",import.meta.url),"utf8")} ${admin}`,new RegExp(label));
 });
 
 test("map title and active Timeline marker use the authoritative record identity",async()=>{
