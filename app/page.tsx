@@ -1,5 +1,5 @@
 import {AccountLink} from "./account-link";
-export const metadata={title:"Memento House — Meaningful celebrations, beautifully kept",description:"Interactive celebration keepsakes made for the moment and kept for a lifetime."};
+export const metadata={title:"Memento House — Made for the moment. Kept for a lifetime.",description:"Interactive celebration keepsakes created with the people you love—made for the moment and kept for a lifetime."};
 const Logo=()=> <a href="/" className="houseBrand"><img src="/brand/memento-house-logo.webp" alt="Memento House"/><div>Memento House<small>Made for the moment. Kept for a lifetime.</small></div></a>;
 export default function Home(){return <main className="housePage">
  <nav className="houseNav"><Logo/><div><a href="#celebrations">Shop by celebration</a><a href="#keepsakes">Our keepsakes</a><a href="/our-story">Our story</a><AccountLink/><a href="#keepsakes" className="button small">Choose a keepsake</a></div><details className="mobileMenu"><summary>Menu</summary><div><a href="#celebrations">Shop by celebration</a><a href="#keepsakes">Our keepsakes</a><a href="/our-story">Our story</a><AccountLink/></div></details></nav>
