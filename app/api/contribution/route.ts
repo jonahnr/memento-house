@@ -1,11 +1,12 @@
 import {createClient} from "@supabase/supabase-js";
+import {supabaseServerConfig} from "../../../lib/server-config";
 
 const clean=(value:unknown,max:number)=>String(value||"").trim().slice(0,max);
 const normalize=(s:string)=>s.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g," ").trim();
 const digest=async(value:string)=>Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(value)))).map(v=>v.toString(16).padStart(2,"0")).join("");
 
 export async function POST(request:Request){
- const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!url||!key)return Response.json({error:"Contribution service is unavailable."},{status:503});
+ const{url,serviceRoleKey:key}=supabaseServerConfig();if(!key)return Response.json({error:"Contribution service is unavailable."},{status:503});
  const body=await request.json().catch(()=>null) as any;if(!body)return Response.json({error:"Invalid request."},{status:400});
  if(clean(body.website,200))return Response.json({ok:true});
  const anonymousId=clean(body.anonymousId,100),ip=clean(request.headers.get("cf-connecting-ip")||request.headers.get("x-forwarded-for")?.split(",")[0]||"unknown",80),now=Date.now(),startedAt=Number(body.startedAt||0);
