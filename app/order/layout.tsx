@@ -1,3 +1,3 @@
 import type {Metadata} from "next";
-export const metadata:Metadata={robots:{index:false,follow:false},title:"Secure checkout — Memento House"};
+export const metadata:Metadata={robots:{index:false,follow:false},title:"Secure checkout"};
 export default function OrderLayout({children}:{children:React.ReactNode}){return children}

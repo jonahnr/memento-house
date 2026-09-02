@@ -3,7 +3,7 @@ export type ProductTier={id:string;name:string;price:number;subtitle:string;cta:
 export const mapTiers:ProductTier[]=[
  {id:"map",name:"Memento Map",price:99,subtitle:"Create your wedding map together.",cta:"Choose Memento Map",features:["Personalized interactive map and QR code","Couple story places, guest recommendations, and guest hometowns","Coordinated category colors and layer legend","Guest messages, couple dashboard, and permanent digital access"]},
  {id:"plus",name:"Memento Map Plus",price:129,subtitle:"Turn your wedding map into a map of your life together.",cta:"Choose Map Plus",popular:true,features:["Everything in Memento Map","Want to Go → Planning → Visited tracking","Voting, grouped recommendations, and advanced statistics","Visit dates, photos, memories, and print-ready PNG export"]}
- ,{id:"timeline-plus",name:"Timeline Plus",price:179,subtitle:"Your map becomes a living, chronological story",cta:"Choose Timeline Plus",features:["Everything in Map Plus","A synchronized map and chronological relationship timeline","Guest memories with couple approval","Shareable story view and combined keepsake export"]}
+ ,{id:"timeline-plus",name:"Timeline Plus",price:179,subtitle:"Your map becomes a living, chronological story",cta:"Choose Timeline Plus",features:["Everything in Map Plus","A synchronized map and chronological relationship timeline","Guest memories automatically update into your timeline","Shareable story view and combined keepsake export"]}
 ];
 
 export const deckTiers:ProductTier[]=[
