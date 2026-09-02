@@ -3,10 +3,11 @@ import {fulfillPurchase} from "../../../lib/fulfillment";
 import {resolveCatalog} from "../../../lib/product-catalog";
 import {deliverOrderConfirmation} from "../../../lib/order-notifications";
 import {revokeRefundedOrder} from "../../../lib/refund-lifecycle";
+import {supabaseServerConfig} from "../../../lib/server-config";
 const hex=(bytes:ArrayBuffer)=>Array.from(new Uint8Array(bytes)).map(b=>b.toString(16).padStart(2,"0")).join("");
 const safeEqual=(a:string,b:string)=>{if(a.length!==b.length)return false;let mismatch=0;for(let i=0;i<a.length;i++)mismatch|=a.charCodeAt(i)^b.charCodeAt(i);return mismatch===0};
 export async function POST(request:Request){
- const secrets=[process.env.STRIPE_WEBHOOK_SECRET,process.env.STRIPE_TEST_WEBHOOK_SECRET].filter(Boolean) as string[],serviceKey=process.env.SUPABASE_SERVICE_ROLE_KEY,url=process.env.NEXT_PUBLIC_SUPABASE_URL;if(!secrets.length||!serviceKey||!url)return new Response("Webhook is not configured",{status:503});
+ const secrets=[process.env.STRIPE_WEBHOOK_SECRET,process.env.STRIPE_TEST_WEBHOOK_SECRET].filter(Boolean) as string[],{url,serviceRoleKey:serviceKey}=supabaseServerConfig();if(!secrets.length||!serviceKey||!url){console.error("Stripe webhook is missing server configuration",{webhookSecrets:Boolean(secrets.length),supabaseServiceRole:Boolean(serviceKey),supabaseUrl:Boolean(url)});return new Response("Webhook is not configured",{status:503})}
  const body=await request.text(),signature=request.headers.get("stripe-signature")||"",pairs=signature.split(",").map(v=>v.split("=")),timestamp=pairs.find(x=>x[0]==="t")?.[1],signatures=pairs.filter(x=>x[0]==="v1").map(x=>x[1]);if(!timestamp||Math.abs(Date.now()/1000-Number(timestamp))>300)return new Response("Expired signature",{status:400});
  let signatureValid=false;for(const secret of secrets){const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(secret),{name:"HMAC",hash:"SHA-256"},false,["sign"]),expected=hex(await crypto.subtle.sign("HMAC",key,new TextEncoder().encode(`${timestamp}.${body}`)));if(signatures.some(v=>safeEqual(expected,v))){signatureValid=true;break}}if(!signatureValid)return new Response("Invalid signature",{status:400});
  const event=JSON.parse(body),admin=createClient(url,serviceKey,{auth:{persistSession:false,autoRefreshToken:false}}),existing=await admin.from("stripe_events").select("status,attempts").eq("event_id",event.id).maybeSingle();if(existing.data?.status==="processed")return new Response("ok");
