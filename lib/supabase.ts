@@ -11,6 +11,9 @@ export function getSupabaseBrowserClient(){
   const url=process.env.NEXT_PUBLIC_SUPABASE_URL||"https://kdcymeoldvwlmfwemfgq.supabase.co";
   const key=process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY||"sb_publishable_8lGHImYLdfKdAGEXYStzfA_kge3WeK4";
   if(!url||!key)return null;
-  if(!browserClient)browserClient=createClient(url,key,{auth:{flowType:"pkce",persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+  // Email confirmation links are commonly opened from an iPhone mail app into
+  // Safari or an embedded browser. The implicit browser flow does not depend on
+  // a PKCE verifier stored in the browser where signup originally started.
+  if(!browserClient)browserClient=createClient(url,key,{auth:{flowType:"implicit",persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
   return browserClient;
 }
