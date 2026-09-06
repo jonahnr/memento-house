@@ -1,0 +1,50 @@
+{
+  "mode": "built-in image_gen",
+  "icons": [
+    {
+      "name": "overview",
+      "path": "C:\\Users\\700001256\\.codex\\generated_images\\01a07859-ce94-7e92-b56c-893fbe4f927f\\exec-7025c1a1-5c0a-48c9-b6f5-9edf8da7396e.png",
+      "prompt": "Use case: logo-brand. Generate one miniature navigation icon for Memento House: a tiny elegant house with a welcoming arched doorway. Refined warm antique gold ink illustration, bold clean recognizable silhouette, minimal fine detail, centered square composition, generous 15% padding. Transparent background, no lettering, no words, no shadow, no border around the canvas. Must remain legible at 24px. Single icon only."
+    },
+    {
+      "name": "our-story",
+      "path": "C:\\Users\\700001256\\.codex\\generated_images\\01a07859-ce94-7e92-b56c-893fbe4f927f\\exec-dcf56372-6a91-4b0f-aeb5-5ebbeba3c9e9.png",
+      "prompt": "Use case: logo-brand. Generate one miniature navigation icon for Memento House: two interlocking hearts. Refined warm antique gold ink illustration, bold clean recognizable silhouette, minimal fine detail, centered square composition, generous 15% padding. Transparent background, no lettering, no words, no shadow, no border around the canvas. Must remain legible at 24px. Single icon only."
+    },
+    {
+      "name": "recommendations",
+      "path": "C:\\Users\\700001256\\.codex\\generated_images\\01a07859-ce94-7e92-b56c-893fbe4f927f\\exec-8eb423eb-52a7-4f6a-aa16-b052676de7bd.png",
+      "prompt": "Use case: logo-brand. Generate one miniature navigation icon for Memento House: a compass rose. Refined warm antique gold ink illustration, bold clean recognizable silhouette, minimal fine detail, centered square composition, generous 15% padding. Transparent background, no lettering, no words, no shadow, no border around the canvas. Must remain legible at 24px. Single icon only."
+    },
+    {
+      "name": "travel-journal",
+      "path": "C:\\Users\\700001256\\.codex\\generated_images\\01a07859-ce94-7e92-b56c-893fbe4f927f\\exec-1a4c0b82-33d0-433b-ad8b-b1cf10cd7477.png",
+      "prompt": "Use case: logo-brand. Generate one miniature navigation icon for Memento House: an open travel journal with a small bookmark. Refined warm antique gold ink illustration, bold clean recognizable silhouette, minimal fine detail, centered square composition, generous 15% padding. Transparent background, no lettering, no words, no shadow, no border around the canvas. Must remain legible at 24px. Single icon only."
+    },
+    {
+      "name": "timeline-plus",
+      "path": "C:\\Users\\700001256\\.codex\\generated_images\\01a07859-ce94-7e92-b56c-893fbe4f927f\\exec-8d154eba-fa04-4b6e-8b2d-5fcc98d52c20.png",
+      "prompt": "Use case: logo-brand. Generate one miniature navigation icon for Memento House: a clock face with a delicate circular arrow. Refined warm antique gold ink illustration, bold clean recognizable silhouette, minimal fine detail, centered square composition, generous 15% padding. Transparent background, no lettering, no words, no shadow, no border around the canvas. Must remain legible at 24px. Single icon only."
+    },
+    {
+      "name": "qr-code",
+      "path": "C:\\Users\\700001256\\.codex\\generated_images\\01a07859-ce94-7e92-b56c-893fbe4f927f\\exec-5da60ac5-3457-4817-8b26-703daee07a89.png",
+      "prompt": "Use case: logo-brand. Generate one miniature navigation icon for Memento House: a stylized QR scan symbol with four corner brackets, decorative not scannable. Refined warm antique gold ink illustration, bold clean recognizable silhouette, minimal fine detail, centered square composition, generous 15% padding. Transparent background, no lettering, no words, no shadow, no border around the canvas. Must remain legible at 24px. Single icon only."
+    },
+    {
+      "name": "keepsake",
+      "path": "C:\\Users\\700001256\\.codex\\generated_images\\01a07859-ce94-7e92-b56c-893fbe4f927f\\exec-0840b86d-51a1-41a7-8dc5-906da84c7061.png",
+      "prompt": "Use case: logo-brand. Generate one miniature navigation icon for Memento House: a small framed heart artwork. Refined warm antique gold ink illustration, bold clean recognizable silhouette, minimal fine detail, centered square composition, generous 15% padding. Transparent background, no lettering, no words, no shadow, no border around the canvas. Must remain legible at 24px. Single icon only."
+    },
+    {
+      "name": "event-details",
+      "path": "C:\\Users\\700001256\\.codex\\generated_images\\01a07859-ce94-7e92-b56c-893fbe4f927f\\exec-5046f60f-7636-489f-818c-4a3f513a4921.png",
+      "prompt": "Use case: logo-brand. Generate one miniature navigation icon for Memento House: a small calendar with a heart on one date. Refined warm antique gold ink illustration, bold clean recognizable silhouette, minimal fine detail, centered square composition, generous 15% padding. Transparent background, no lettering, no words, no shadow, no border around the canvas. Must remain legible at 24px. Single icon only."
+    },
+    {
+      "name": "my-account",
+      "path": "C:\\Users\\700001256\\.codex\\generated_images\\01a07859-ce94-7e92-b56c-893fbe4f927f\\exec-6621e2b9-1297-43a4-8f44-f8147387e5f0.png",
+      "prompt": "Use case: logo-brand. Generate one miniature navigation icon for Memento House: a simple person silhouette in a circle. Refined warm antique gold ink illustration, bold clean recognizable silhouette, minimal fine detail, centered square composition, generous 15% padding. Transparent background, no lettering, no words, no shadow, no border around the canvas. Must remain legible at 24px. Single icon only."
+    }
+  ]
+}

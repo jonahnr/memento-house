@@ -1,0 +1,31 @@
+.accountBar{background:transparent;border:0;box-shadow:none;padding:0;color:var(--muted)}
+.dash aside nav i img{display:block;width:28px;height:28px;object-fit:contain}
+.dash aside nav button{display:flex;align-items:center;gap:10px}
+.dash aside nav i{display:grid;place-items:center;flex:0 0 28px;background:transparent!important;border:0!important;padding:0!important}
+.qrPrintSheet{min-width:0}
+.qrTools select{display:block;width:100%;padding:12px;margin-top:8px;background:white;border:1px solid var(--line);color:var(--ink)}
+.qr-double .qrPrintSheet{display:grid;gap:12px}
+.qr-double .qrCard{display:grid;grid-template-columns:1fr 130px;column-gap:14px;padding:20px;align-items:center}
+.qr-double .qrCard>*{grid-column:1}
+.qr-double .qrCard h2{font-size:25px;margin:8px 0}
+.qr-double .qrCard p{font-size:12px}
+.qr-double .qrCard .realQr{grid-column:2;grid-row:1/6;width:130px;height:130px;margin:0}
+.qrCard>b{overflow-wrap:anywhere}
+.qrCard .realQr{object-fit:contain}
+.cartItems article{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:22px 0;border-bottom:1px solid var(--line)}
+.cartItems h2{font:25px Georgia;margin:0 0 8px}
+.cartItems p{font-size:13px;margin:6px 0}
+.cartItems .button{flex-shrink:0}
+.cartTotal{display:flex;justify-content:space-between;font-size:20px;margin:24px 0}
+.checkoutButton+.checkoutButton{margin-top:12px}
+@media print{
+ body:has(.qrLayout) .qrPrintSheet{visibility:visible!important;position:fixed!important;inset:0!important;width:8in!important;height:10.5in!important;margin:0!important;display:block!important}
+ body:has(.qrLayout) .qrPrintSheet .qrCard{position:relative!important;inset:auto!important;margin:0!important;width:8in!important;height:10.5in!important;max-width:none!important;padding:.45in!important;box-sizing:border-box!important;break-inside:avoid!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+ body:has(.qr-double) .qrPrintSheet{display:grid!important;grid-template-rows:1fr 1fr!important;gap:0!important}
+ body:has(.qr-double) .qrPrintSheet .qrCard{height:5.25in!important;width:8in!important;display:grid!important;grid-template-columns:1fr 2.7in!important;grid-template-rows:auto auto auto auto auto!important;column-gap:.25in!important;padding:.35in!important;align-content:center!important;justify-content:normal!important}
+ body:has(.qr-double) .qrCard h2{font-size:32px!important;margin:8px 0!important}
+ body:has(.qr-double) .qrCard p{font-size:15px!important;margin:8px 0!important}
+ body:has(.qr-double) .qrCard .realQr{width:2.7in!important;height:2.7in!important;grid-column:2!important;grid-row:1/6!important;margin:0!important}
+ body:has(.qr-double) .qrCard>b{font-size:10px!important}
+ body:has(.qr-double) .qrCard>small{font-size:8px!important;margin-top:12px!important}
+}

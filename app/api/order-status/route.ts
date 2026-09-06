@@ -1,8 +1,10 @@
+import {fulfillCartCheckout} from "../../../lib/cart-fulfillment";
 import {createClient} from "@supabase/supabase-js";
 import {deliverOrderConfirmation} from "../../../lib/order-notifications";
 import {fulfillPurchase} from "../../../lib/fulfillment";
 import {resolveCatalog} from "../../../lib/product-catalog";
 import {stripeServerConfig,supabaseServerConfig} from "../../../lib/server-config";
+export const maxDuration=60;
 
 async function recoverPaidCheckout(admin:any,sessionId:string){
  const stripe=stripeServerConfig(),key=sessionId.startsWith("cs_test_")?stripe.testSecretKey:stripe.liveSecretKey;
@@ -11,6 +13,7 @@ async function recoverPaidCheckout(admin:any,sessionId:string){
  if(!response.ok){console.error("Order recovery could not retrieve Stripe Checkout Session",{sessionId,status:response.status,requestId:response.headers.get("request-id")});return null}
  const session=await response.json();
  if(session.payment_status!=="paid")return null;
+ if(session.metadata?.cart_count){const results=await fulfillCartCheckout(admin,session);return{cart:true,results};}
  const email=String(session.customer_details?.email||session.customer_email||"").toLowerCase(),product=String(session.metadata?.product||""),tier=String(session.metadata?.tier||""),addons=String(session.metadata?.addons||"").split(",").filter(Boolean),item=resolveCatalog(product,tier,addons);
  if(!email||session.metadata?.catalog_key!==item.key)throw new Error("Paid Checkout Session has invalid fulfillment metadata");
  console.info("Recovering paid Checkout Session from order status",{sessionId,catalogKey:item.key});
@@ -26,6 +29,7 @@ export async function GET(request:Request){
  const{url,serviceRoleKey:key}=supabaseServerConfig();
  if(!url||!key){console.error("Order status is missing Supabase server configuration");return Response.json({status:"unavailable"},{status:503})}
  const admin=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
+ try{const recovered=await recoverPaidCheckout(admin,sessionId);if(recovered?.cart){const orders=recovered.results.map((result:any)=>({orderId:result.order.id,orderNumber:result.order.id.slice(0,8).toUpperCase(),name:result.item.displayName,product:result.item.productName,nextSteps:result.item.nextSteps,hasQuestionnaire:result.item.questionnaire.length>0,cartItemId:result.cartItemId}));return Response.json({status:"ready",name:"Your keepsakes",orders,nextSteps:["Each keepsake has its own order in your account.","Open your orders to complete any questionnaire or review your proofs."]});}}catch(error){console.error("Checkout recovery failed",error);return Response.json({status:"processing"});}
  let result=await admin.from("orders").select("id,product,tier,order_status,questionnaire_status,customer_email").eq("stripe_session_id",sessionId).maybeSingle();
  if(result.error){console.error("Order status database lookup failed",{sessionId,error:result.error.message});return Response.json({status:"error"},{status:500})}
  if(!result.data){try{await recoverPaidCheckout(admin,sessionId);result=await admin.from("orders").select("id,product,tier,order_status,questionnaire_status,customer_email").eq("stripe_session_id",sessionId).maybeSingle()}catch(error){console.error("Paid order recovery failed",{sessionId,error:error instanceof Error?error.message:String(error)});return Response.json({status:"processing"})}}

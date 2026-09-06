@@ -1,0 +1,16 @@
+import {chromium} from '@playwright/test';
+import assert from 'node:assert/strict';
+const browser=await chromium.launch({headless:true}),page=await browser.newPage({viewport:{width:1440,height:1100}});
+const wedding={id:'22222222-2222-4222-8222-222222222222',partner_one_name:'Alice',partner_two_name:'Sam',wedding_date:'2026-10-01',title:'Our Adventure Map',slug:'alice-sam',welcome_message:'Our shared adventures'};
+const entries=[0,1,2].map(i=>({id:`chapter-${i}`,date_value:`202${i}-01-01`,sort_date:`202${i}-01-01`,title:`Chapter fixture ${i+1}`,category:'Our Story',story:'A shared memory',contributor_name:'Alice & Sam',destination:{location_name:`Place ${i+1}`,latitude:39+i,longitude:-84+i}}));
+await page.route('**/*.supabase.co/**',async route=>{const url=new URL(route.request().url());let data=[];if(url.pathname.includes('/weddings'))data=wedding;if(url.pathname.includes('/recommendations'))data=[0,1,2].map(i=>({id:`bucket-${i}`,destination_id:`destination-${i}`,category:'Couple Bucket List',guest_name:'Alice & Sam',message:'A dream adventure',destination:{location_name:`Bucket ${i}`,latitude:35+i,longitude:-90+i}}));if(url.pathname.includes('/couple_destination_status'))data=[{destination_id:'destination-1',status:'planning'},{destination_id:'destination-2',status:'visited'}];await route.fulfill({json:data})});
+await page.route('**/api/map-plan?**',route=>route.fulfill({json:{tier:'timeline-plus',access:true}}));
+await page.route('**/api/map-timeline?**',route=>route.fulfill({json:{entries}}));
+await page.goto('http://127.0.0.1:3000/map/alice-sam');
+await page.locator('.geoMarker.storyGeo').first().waitFor();
+const original=await page.locator('.geoMarker.storyGeo').evaluateAll(els=>Object.fromEntries(els.map(el=>[el.title,el.textContent])));
+for(const number of [1,2,3,1]){await page.locator('.timelineChapterCard').nth(number-1).click();await page.waitForFunction(expected=>document.querySelector('.timelineMarkerActive')?.textContent===String(expected),number);const now=await page.locator('.geoMarker.storyGeo').evaluateAll(els=>Object.fromEntries(els.map(el=>[el.title,el.textContent])));assert.deepEqual(now,original);}
+const colors=await page.locator('.recCard:has-text("Couple Bucket List")').evaluateAll(els=>els.map(el=>({border:getComputedStyle(el).borderTopColor,background:getComputedStyle(el).backgroundColor})));
+assert.equal(colors.length,3);assert.equal(new Set(colors.map(x=>x.border)).size,1);assert.equal(new Set(colors.map(x=>x.background)).size,1);
+await page.locator('.adventures').screenshot({path:'tools/verification-cart-map/bucket-lists.png'});
+console.log(JSON.stringify({markerNumbersStable:original,bucketColors:colors},null,2));await browser.close();
