@@ -1,0 +1,8 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {withWeddingStory} from '../lib/wedding-story.ts';
+const wedding={id:'couple',wedding_date:'2026-10-01'};
+const venue={id:'venue',title:'Wedding Venue',description:'The gathering point used to calculate guest travel distance.',story_type:'Wedding Venue',event_date:'2026-09-01',image_url:'https://example.com/wedding.webp',location_name:'Our venue',latitude:39,longitude:-84,sort_order:-1};
+test('wedding chapter uses the existing venue and photo with the current wedding date',()=>{const[chapter]=withWeddingStory(wedding,[venue]);assert.equal(chapter.id,'venue');assert.equal(chapter.title,'Our wedding');assert.equal(chapter.event_date,wedding.wedding_date);assert.equal(chapter.image_url,venue.image_url);assert.equal(chapter.latitude,39);assert.notEqual(chapter.description,venue.description)});
+test('edited wedding story survives event detail updates and repeated projection',()=>{const edited={...venue,title:'We said yes',description:'Our favorite day'};const projected=withWeddingStory(wedding,[edited]);assert.deepEqual(withWeddingStory(wedding,projected),projected);assert.equal(projected[0].title,edited.title);assert.equal(projected[0].description,edited.description)});
+test('wedding appears before a venue is saved without inventing coordinates',()=>{const[chapter]=withWeddingStory(wedding,[]);assert.equal(chapter.id,'wedding-couple');assert.equal(chapter.event_date,wedding.wedding_date);assert.ok(Number.isNaN(chapter.latitude));assert.deepEqual(withWeddingStory({...wedding,wedding_date:null},[]),[])});

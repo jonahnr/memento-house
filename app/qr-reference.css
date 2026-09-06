@@ -1,0 +1,49 @@
+.cartShortcut{position:relative;display:inline-flex!important;align-items:center;justify-content:center;gap:10px;min-width:40px;min-height:40px;text-decoration:none}
+.cartShortcut>img{width:28px!important;height:28px!important;object-fit:contain}
+.cartCount{min-width:17px;height:17px;border-radius:50%;background:#9d7335;color:white;font:10px/17px Arial;text-align:center}
+.cartShortcut:not(:has(>span)) .cartCount{position:absolute;top:0;right:-4px}
+.dash aside nav .cartShortcut{justify-content:flex-start;padding:11px 12px;color:inherit;font-size:12px}
+.qrCard{position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:10px;padding:26px 24px;background:#fffdf8;border:1px solid #a77b3f}
+.qrCard::before{content:"";position:absolute;z-index:-1;inset:45% 0 0;background:url('/brand/memento-house-logo.webp') center/110% auto no-repeat;opacity:.065;pointer-events:none}
+.qrCard .qrNames{letter-spacing:4px;font-size:10px;font-weight:600}
+.qrCard .qrBrandLogo{display:block;width:172px;height:172px;object-fit:contain;mix-blend-mode:multiply;filter:brightness(1.06);margin:-7px auto -8px}
+.storyShare article>img{display:block;max-width:100%;max-height:420px;object-fit:contain;margin-bottom:20px}
+.qrCard h2{font:38px/1.05 Georgia,serif;margin:0!important;font-weight:500}
+.qrCard h2 i{display:inline-block;font-weight:400;color:#9e7135}
+.qrDivider{width:36%;display:flex;align-items:center;gap:9px;color:#9e7135;height:9px;flex-shrink:0}
+.qrDivider::before,.qrDivider::after{content:"";height:1px;background:#b18b56;flex:1}
+.qrDivider span{width:5px;height:5px;border-radius:50%;background:#9e7135}
+.qrCard .qrInvitation{font:15px/1.35 Georgia,serif;color:#514d47;margin:0;max-width:96%}
+.qrCodeFrame{border:1px solid #ab8349;background:#fff;padding:2px;line-height:0;flex-shrink:0}
+.qrCard .qrCodeFrame .realQr{display:block;width:180px;height:180px;margin:0!important;border:0!important;padding:0!important}
+.qrCard .qrAddress{font:10px/1.3 Arial,sans-serif;margin:2px 0 4px;max-width:100%;overflow-wrap:anywhere}
+.qrCard>small{font-size:7px;line-height:1.4;letter-spacing:2px;margin:0!important}
+.qr-double .qrCard{display:grid;grid-template-columns:1fr 130px;gap:7px 12px;padding:20px;justify-items:center}
+.qr-double .qrCard>*{grid-column:1}
+.qr-double .qrCard .qrNames{grid-column:1/-1;font-size:9px}
+.qr-double .qrCard .qrBrandLogo{width:94px;height:94px;grid-row:2;margin:-8px 0}
+.qr-double .qrCard h2{font-size:24px;grid-row:3}
+.qr-double .qrCard .qrDivider:not(.qrFooterDivider){grid-row:4}
+.qr-double .qrCard .qrInvitation{font-size:12px;grid-row:5}
+.qr-double .qrCard .qrCodeFrame{grid-column:2;grid-row:2/6;align-self:center}
+.qr-double .qrCard .qrCodeFrame .realQr{width:124px;height:124px;grid-column:auto;grid-row:auto}
+.qr-double .qrCard .qrAddress,.qr-double .qrCard .qrFooterDivider,.qr-double .qrCard>small{grid-column:1/-1}
+@media print{
+ body:has(.qrLayout),body:has(.qrLayout) .dash,body:has(.qrLayout) .dashMain,body:has(.qrLayout) .qrLayout{height:10.5in!important;min-height:0!important;max-height:10.5in!important;margin:0!important;overflow:hidden!important}
+ body:has(.qrLayout) .qrPrintSheet .qrCard{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:.11in!important;padding:.28in .4in!important}
+ body:has(.qrLayout) .qrCard .qrNames{font-size:14px!important;letter-spacing:5px!important}
+ body:has(.qrLayout) .qrCard .qrBrandLogo{width:2.6in!important;height:2.6in!important;margin:-.15in auto!important;flex-shrink:0}
+ body:has(.qrLayout) .qrCard h2{font-size:43px!important;line-height:1.08!important;margin:0!important}
+ body:has(.qrLayout) .qrCard .qrInvitation{font-size:19px!important;line-height:1.25!important;margin:0!important}
+ body:has(.qrLayout) .qrCard .qrCodeFrame .realQr{width:2.7in!important;height:2.7in!important;margin:0!important;padding:0!important}
+ body:has(.qrLayout) .qrCard .qrAddress{font-size:13px!important;margin:.02in 0!important}
+ body:has(.qrLayout) .qrCard>small{font-size:9px!important;letter-spacing:3px!important;margin:0!important}
+ body:has(.qr-double) .qrPrintSheet .qrCard{display:grid!important;grid-template-columns:1fr 2.6in!important;grid-template-rows:auto!important;gap:.06in .2in!important;align-content:center!important;justify-items:center!important;padding:.22in .35in!important}
+ body:has(.qr-double) .qrCard .qrNames{font-size:12px!important}
+ body:has(.qr-double) .qrCard .qrBrandLogo{width:1.35in!important;height:1.35in!important;margin:-.13in auto!important}
+ body:has(.qr-double) .qrCard h2{font-size:29px!important}
+ body:has(.qr-double) .qrCard .qrInvitation{font-size:15px!important}
+ body:has(.qr-double) .qrCard .qrCodeFrame .realQr{width:2.5in!important;height:2.5in!important;grid-column:auto!important;grid-row:auto!important}
+ body:has(.qr-double) .qrCard .qrAddress{font-size:12px!important}
+ body:has(.qr-double) .qrCard>small{font-size:8px!important}
+}

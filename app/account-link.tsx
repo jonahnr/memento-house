@@ -1,5 +1,6 @@
 "use client";
 import {useEffect,useState} from "react";
+import {CartLink} from "./cart-link";
 import type {Session} from "@supabase/supabase-js";
 import {getSupabaseBrowserClient} from "../lib/supabase";
 
@@ -27,5 +28,5 @@ export function AccountLink(){
   return()=>{active=false;data.subscription.unsubscribe()};
  },[]);
  if(!state.signedIn)return <a href="/login">Sign in</a>;
- return <details className="globalAccountMenu"><summary>My account</summary><div><a href="/account">Account overview</a><a href="/cart">Shopping cart</a>{state.hasMap&&<a href="/dashboard">Open Memento Map</a>}</div></details>;
+ return <><CartLink/><details className="globalAccountMenu"><summary>My account</summary><div><a href="/account">Account overview</a>{state.hasMap&&<a href="/dashboard">Open Memento Map</a>}</div></details></>;
 }

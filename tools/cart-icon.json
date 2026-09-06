@@ -1,0 +1,6 @@
+{
+  "mode": "built-in image_gen",
+  "prompt": "Use case: logo-brand. Generate one miniature navigation icon for Memento House: an elegant recognizable shopping cart with two wheels and a tiny heart inside the basket. Refined warm antique gold ink illustration, bold clean recognizable silhouette, minimal fine detail, centered square composition, generous 15% padding. Transparent background, no lettering, no words, no shadow, no border around canvas. Legible at 24px. Single icon only. Match a refined gold wedding keepsake navigation icon collection.",
+  "source": "C:\\Users\\700001256\\.codex\\generated_images\\01a07859-ce94-7e92-b56c-893fbe4f927f\\exec-c90cdca8-b739-46c7-a5a5-2327da2a8bee.png",
+  "output": "public/brand/navigation/shopping-cart.webp"
+}

@@ -12,3 +12,11 @@ Implemented all seven requested changes locally. No deployment or real payment w
 Validation: production build, TypeScript, lint (no errors), 31 unit/regression tests, local browser checks using intercepted test account/map responses, and QR decoding at 960, 408, 259, 210, and 130 pixels. Live Stripe payment and production fulfillment were not exercised. Browser fixtures do not create real users or orders.
 
 Screenshots and one-page print PDFs in this folder are verification fixtures, not customer data.
+
+## Reference redesign and wedding chapter follow-up
+
+Both QR layouts now use the supplied reference's prominent house logo, serif heading, gold dividers, and faint watermark. A dedicated signed-in cart shortcut uses a generated 2,998-byte WebP icon; its source prompt is in `../cart-icon.json`.
+
+The wedding venue is projected into Timeline Plus automatically, with the current Event Details date and the photo/caption saved through Our Story. No duplicate venue record is created. A dated wedding also appears before its location is entered. The wedding is included in timeline exports and the shared story page.
+
+34 regression tests pass. Browser verification includes editing the wedding, uploading a fixture photo, saving, checking Timeline Plus, and reloading Our Story. Both PDF outputs remain one letter-size page. All account, venue, and upload requests in the browser verification are intercepted fixtures.
