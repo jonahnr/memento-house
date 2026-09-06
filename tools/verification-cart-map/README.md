@@ -20,3 +20,9 @@ Both QR layouts now use the supplied reference's prominent house logo, serif hea
 The wedding venue is projected into Timeline Plus automatically, with the current Event Details date and the photo/caption saved through Our Story. No duplicate venue record is created. A dated wedding also appears before its location is entered. The wedding is included in timeline exports and the shared story page.
 
 34 regression tests pass. Browser verification includes editing the wedding, uploading a fixture photo, saving, checking Timeline Plus, and reloading Our Story. Both PDF outputs remain one letter-size page. All account, venue, and upload requests in the browser verification are intercepted fixtures.
+
+## Regular map and clean QR correction
+
+The regular guest map now uses the same wedding story projection as Timeline Plus, including its saved coordinates, caption, and photo. Verified with a Map Plus fixture that has Timeline Plus disabled. Story rows share the same markup, and their text columns align when no photo is present. Map keepsake story layers also include the wedding.
+
+The QR matrix is now clean: no embedded logo and no central blank patch. The large logo above the QR remains. Pixel comparison against a fresh QR generation and decoding at five sizes pass. Both print PDFs contain one page; the production build, lint, and all 35 regression tests pass.

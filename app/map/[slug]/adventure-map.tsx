@@ -2,7 +2,7 @@
 import {useEffect,useRef,useState} from "react";
 import {MAP_COLOR_TOKENS,mapMarkerColor} from "../../../lib/map-color-tokens";
 export type GeoPin={id:string|number;place:string;guest:string;message:string;category:string;likes:number;lng:number;lat:number;status?:string};
-export type StoryPin={id?:string|number;label:string;place:string;lng:number;lat:number;kind?:"story"|"venue";order?:number};
+export type StoryPin={id?:string|number;label:string;place:string;lng:number;lat:number;kind?:"story"|"venue";order?:number;description?:string;image_url?:string|null;category?:string;date?:string|null};
 const rasterStyle:any={version:8,sources:{osm:{type:"raster",tiles:["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],tileSize:256,maxzoom:19,attribution:'© OpenStreetMap contributors'}},layers:[{id:"osm",type:"raster",source:"osm",paint:{"raster-saturation":-.45,"raster-brightness-min":.18,"raster-brightness-max":.98,"raster-contrast":-.04}}]};
 export function AdventureMap({recommendations,stories,tab,selected,onSelect,onSnapshotReady,activeLayers}:{recommendations:GeoPin[];stories:StoryPin[];tab:string;selected:GeoPin|StoryPin|null;onSelect:(pin:GeoPin|StoryPin|null)=>void;onSnapshotReady?:(capture:()=>Promise<string>)=>void;activeLayers?:string[]}){
  const container=useRef<HTMLDivElement>(null),mapRef=useRef<any>(null),markersRef=useRef<any[]>([]),hasInitialFit=useRef(false),[ready,setReady]=useState(false),[zoom,setZoom]=useState(1.2),[routeMiles,setRouteMiles]=useState<number|null>(null);

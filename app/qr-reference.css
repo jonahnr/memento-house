@@ -8,6 +8,7 @@
 .qrCard .qrNames{letter-spacing:4px;font-size:10px;font-weight:600}
 .qrCard .qrBrandLogo{display:block;width:172px;height:172px;object-fit:contain;mix-blend-mode:multiply;filter:brightness(1.06);margin:-7px auto -8px}
 .storyShare article>img{display:block;max-width:100%;max-height:420px;object-fit:contain;margin-bottom:20px}
+.storyPinPhoto{display:block;width:100%;max-height:200px;object-fit:cover;margin-top:12px}
 .qrCard h2{font:38px/1.05 Georgia,serif;margin:0!important;font-weight:500}
 .qrCard h2 i{display:inline-block;font-weight:400;color:#9e7135}
 .qrDivider{width:36%;display:flex;align-items:center;gap:9px;color:#9e7135;height:9px;flex-shrink:0}
