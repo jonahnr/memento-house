@@ -1,0 +1,1319 @@
+[
+  {
+    "layout": "single",
+    "design": "classic",
+    "cards": [
+      {
+        "x": 0,
+        "y": 0,
+        "width": 768,
+        "height": 1008,
+        "scrollHeight": 1006,
+        "scrollWidth": 766,
+        "children": [
+          {
+            "name": "eyebrow qrNames",
+            "top": 100.46875,
+            "bottom": 121.46875,
+            "left": 314.515625,
+            "right": 453.46875
+          },
+          {
+            "name": "qrBrandLogo",
+            "top": 141.625,
+            "bottom": 391.21875,
+            "left": 259.203125,
+            "right": 508.796875
+          },
+          {
+            "name": "",
+            "top": 387.375,
+            "bottom": 480.25,
+            "left": 189.875,
+            "right": 578.125
+          },
+          {
+            "name": "qrDivider",
+            "top": 490.796875,
+            "bottom": 499.796875,
+            "left": 259.9375,
+            "right": 508.046875
+          },
+          {
+            "name": "qrInvitation",
+            "top": 510.34375,
+            "bottom": 557.84375,
+            "left": 53.171875,
+            "right": 714.8125
+          },
+          {
+            "name": "qrCodeFrame",
+            "top": 568.390625,
+            "bottom": 833.578125,
+            "left": 251.40625,
+            "right": 516.59375
+          },
+          {
+            "name": "qrAddress",
+            "top": 846.03125,
+            "bottom": 862.921875,
+            "left": 281.03125,
+            "right": 486.953125
+          },
+          {
+            "name": "qrDivider qrFooterDivider",
+            "top": 875.375,
+            "bottom": 884.375,
+            "left": 259.9375,
+            "right": 508.046875
+          },
+          {
+            "name": "",
+            "top": 894.921875,
+            "bottom": 907.515625,
+            "left": 238.09375,
+            "right": 529.890625
+          }
+        ],
+        "images": [
+          {
+            "name": "qrBrandLogo",
+            "ppi": 482.31976962564164
+          },
+          {
+            "name": "realQr",
+            "ppi": 355.5727031589101
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "layout": "single",
+    "design": "garden",
+    "cards": [
+      {
+        "x": 0,
+        "y": 0,
+        "width": 768,
+        "height": 1008,
+        "scrollHeight": 1006,
+        "scrollWidth": 766,
+        "children": [
+          {
+            "name": "eyebrow qrNames",
+            "top": 100.46875,
+            "bottom": 121.46875,
+            "left": 314.515625,
+            "right": 453.46875
+          },
+          {
+            "name": "qrBrandLogo",
+            "top": 141.625,
+            "bottom": 391.21875,
+            "left": 259.203125,
+            "right": 508.796875
+          },
+          {
+            "name": "",
+            "top": 387.375,
+            "bottom": 480.25,
+            "left": 189.875,
+            "right": 578.125
+          },
+          {
+            "name": "qrDivider",
+            "top": 490.796875,
+            "bottom": 499.796875,
+            "left": 259.9375,
+            "right": 508.046875
+          },
+          {
+            "name": "qrInvitation",
+            "top": 510.34375,
+            "bottom": 557.84375,
+            "left": 53.171875,
+            "right": 714.8125
+          },
+          {
+            "name": "qrCodeFrame",
+            "top": 568.390625,
+            "bottom": 833.578125,
+            "left": 251.40625,
+            "right": 516.59375
+          },
+          {
+            "name": "qrAddress",
+            "top": 846.03125,
+            "bottom": 862.921875,
+            "left": 281.03125,
+            "right": 486.953125
+          },
+          {
+            "name": "qrDivider qrFooterDivider",
+            "top": 875.375,
+            "bottom": 884.375,
+            "left": 259.9375,
+            "right": 508.046875
+          },
+          {
+            "name": "",
+            "top": 894.921875,
+            "bottom": 907.515625,
+            "left": 238.09375,
+            "right": 529.890625
+          }
+        ],
+        "images": [
+          {
+            "name": "qrBrandLogo",
+            "ppi": 482.31976962564164
+          },
+          {
+            "name": "realQr",
+            "ppi": 355.5727031589101
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "layout": "single",
+    "design": "editorial",
+    "cards": [
+      {
+        "x": 0,
+        "y": 0,
+        "width": 768,
+        "height": 1008,
+        "scrollHeight": 996,
+        "scrollWidth": 768,
+        "children": [
+          {
+            "name": "eyebrow qrNames",
+            "top": 100.46875,
+            "bottom": 121.46875,
+            "left": 314.515625,
+            "right": 453.46875
+          },
+          {
+            "name": "qrBrandLogo",
+            "top": 141.625,
+            "bottom": 391.21875,
+            "left": 259.203125,
+            "right": 508.796875
+          },
+          {
+            "name": "",
+            "top": 387.375,
+            "bottom": 480.25,
+            "left": 194.125,
+            "right": 573.875
+          },
+          {
+            "name": "qrDivider",
+            "top": 490.796875,
+            "bottom": 499.796875,
+            "left": 259.578125,
+            "right": 508.40625
+          },
+          {
+            "name": "qrInvitation",
+            "top": 510.34375,
+            "bottom": 557.84375,
+            "left": 52.21875,
+            "right": 715.78125
+          },
+          {
+            "name": "qrCodeFrame",
+            "top": 568.390625,
+            "bottom": 833.578125,
+            "left": 251.40625,
+            "right": 516.59375
+          },
+          {
+            "name": "qrAddress",
+            "top": 846.03125,
+            "bottom": 862.921875,
+            "left": 281.03125,
+            "right": 486.953125
+          },
+          {
+            "name": "qrDivider qrFooterDivider",
+            "top": 875.375,
+            "bottom": 884.375,
+            "left": 259.578125,
+            "right": 508.40625
+          },
+          {
+            "name": "",
+            "top": 894.921875,
+            "bottom": 907.515625,
+            "left": 238.09375,
+            "right": 529.890625
+          }
+        ],
+        "images": [
+          {
+            "name": "qrBrandLogo",
+            "ppi": 482.31976962564164
+          },
+          {
+            "name": "realQr",
+            "ppi": 355.5727031589101
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "layout": "double",
+    "design": "classic",
+    "cards": [
+      {
+        "x": 0,
+        "y": 0,
+        "width": 768,
+        "height": 504,
+        "scrollHeight": 502,
+        "scrollWidth": 766,
+        "children": [
+          {
+            "name": "eyebrow qrNames",
+            "top": 76.703125,
+            "bottom": 94.703125,
+            "left": 320.515625,
+            "right": 447.46875
+          },
+          {
+            "name": "qrBrandLogo",
+            "top": 113.84375,
+            "bottom": 243.4375,
+            "left": 184.8125,
+            "right": 314.40625
+          },
+          {
+            "name": "",
+            "top": 240.453125,
+            "bottom": 303.078125,
+            "left": 118.6875,
+            "right": 380.53125
+          },
+          {
+            "name": "qrDivider",
+            "top": 312.578125,
+            "bottom": 321.578125,
+            "left": 172.203125,
+            "right": 327
+          },
+          {
+            "name": "qrInvitation",
+            "top": 331.078125,
+            "bottom": 368.578125,
+            "left": 43.1875,
+            "right": 456.015625
+          },
+          {
+            "name": "qrCodeFrame",
+            "top": 124.453125,
+            "bottom": 370.453125,
+            "left": 485.609375,
+            "right": 731.609375
+          },
+          {
+            "name": "qrAddress",
+            "top": 378.109375,
+            "bottom": 393.703125,
+            "left": 288.953125,
+            "right": 479.03125
+          },
+          {
+            "name": "qrDivider qrFooterDivider",
+            "top": 401.359375,
+            "bottom": 410.359375,
+            "left": 258.21875,
+            "right": 509.78125
+          },
+          {
+            "name": "",
+            "top": 416.109375,
+            "bottom": 427.296875,
+            "left": 248.140625,
+            "right": 519.859375
+          }
+        ],
+        "images": [
+          {
+            "name": "qrBrandLogo",
+            "ppi": 928.9336870026526
+          },
+          {
+            "name": "realQr",
+            "ppi": 384
+          }
+        ]
+      },
+      {
+        "x": 0,
+        "y": 504,
+        "width": 768,
+        "height": 504,
+        "scrollHeight": 502,
+        "scrollWidth": 766,
+        "children": [
+          {
+            "name": "eyebrow qrNames",
+            "top": 580.703125,
+            "bottom": 598.703125,
+            "left": 320.515625,
+            "right": 447.46875
+          },
+          {
+            "name": "qrBrandLogo",
+            "top": 617.84375,
+            "bottom": 747.4375,
+            "left": 184.8125,
+            "right": 314.40625
+          },
+          {
+            "name": "",
+            "top": 744.453125,
+            "bottom": 807.078125,
+            "left": 118.6875,
+            "right": 380.53125
+          },
+          {
+            "name": "qrDivider",
+            "top": 816.578125,
+            "bottom": 825.578125,
+            "left": 172.203125,
+            "right": 327
+          },
+          {
+            "name": "qrInvitation",
+            "top": 835.078125,
+            "bottom": 872.578125,
+            "left": 43.1875,
+            "right": 456.015625
+          },
+          {
+            "name": "qrCodeFrame",
+            "top": 628.453125,
+            "bottom": 874.453125,
+            "left": 485.609375,
+            "right": 731.609375
+          },
+          {
+            "name": "qrAddress",
+            "top": 882.109375,
+            "bottom": 897.703125,
+            "left": 288.953125,
+            "right": 479.03125
+          },
+          {
+            "name": "qrDivider qrFooterDivider",
+            "top": 905.359375,
+            "bottom": 914.359375,
+            "left": 258.21875,
+            "right": 509.78125
+          },
+          {
+            "name": "",
+            "top": 920.109375,
+            "bottom": 931.296875,
+            "left": 248.140625,
+            "right": 519.859375
+          }
+        ],
+        "images": [
+          {
+            "name": "qrBrandLogo",
+            "ppi": 928.9336870026526
+          },
+          {
+            "name": "realQr",
+            "ppi": 384
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "layout": "double",
+    "design": "garden",
+    "cards": [
+      {
+        "x": 0,
+        "y": 0,
+        "width": 768,
+        "height": 504,
+        "scrollHeight": 502,
+        "scrollWidth": 766,
+        "children": [
+          {
+            "name": "eyebrow qrNames",
+            "top": 76.703125,
+            "bottom": 94.703125,
+            "left": 320.515625,
+            "right": 447.46875
+          },
+          {
+            "name": "qrBrandLogo",
+            "top": 113.84375,
+            "bottom": 243.4375,
+            "left": 184.8125,
+            "right": 314.40625
+          },
+          {
+            "name": "",
+            "top": 240.453125,
+            "bottom": 303.078125,
+            "left": 118.6875,
+            "right": 380.53125
+          },
+          {
+            "name": "qrDivider",
+            "top": 312.578125,
+            "bottom": 321.578125,
+            "left": 172.203125,
+            "right": 327
+          },
+          {
+            "name": "qrInvitation",
+            "top": 331.078125,
+            "bottom": 368.578125,
+            "left": 43.1875,
+            "right": 456.015625
+          },
+          {
+            "name": "qrCodeFrame",
+            "top": 124.453125,
+            "bottom": 370.453125,
+            "left": 485.609375,
+            "right": 731.609375
+          },
+          {
+            "name": "qrAddress",
+            "top": 378.109375,
+            "bottom": 393.703125,
+            "left": 288.953125,
+            "right": 479.03125
+          },
+          {
+            "name": "qrDivider qrFooterDivider",
+            "top": 401.359375,
+            "bottom": 410.359375,
+            "left": 258.21875,
+            "right": 509.78125
+          },
+          {
+            "name": "",
+            "top": 416.109375,
+            "bottom": 427.296875,
+            "left": 248.140625,
+            "right": 519.859375
+          }
+        ],
+        "images": [
+          {
+            "name": "qrBrandLogo",
+            "ppi": 928.9336870026526
+          },
+          {
+            "name": "realQr",
+            "ppi": 384
+          }
+        ]
+      },
+      {
+        "x": 0,
+        "y": 504,
+        "width": 768,
+        "height": 504,
+        "scrollHeight": 502,
+        "scrollWidth": 766,
+        "children": [
+          {
+            "name": "eyebrow qrNames",
+            "top": 580.703125,
+            "bottom": 598.703125,
+            "left": 320.515625,
+            "right": 447.46875
+          },
+          {
+            "name": "qrBrandLogo",
+            "top": 617.84375,
+            "bottom": 747.4375,
+            "left": 184.8125,
+            "right": 314.40625
+          },
+          {
+            "name": "",
+            "top": 744.453125,
+            "bottom": 807.078125,
+            "left": 118.6875,
+            "right": 380.53125
+          },
+          {
+            "name": "qrDivider",
+            "top": 816.578125,
+            "bottom": 825.578125,
+            "left": 172.203125,
+            "right": 327
+          },
+          {
+            "name": "qrInvitation",
+            "top": 835.078125,
+            "bottom": 872.578125,
+            "left": 43.1875,
+            "right": 456.015625
+          },
+          {
+            "name": "qrCodeFrame",
+            "top": 628.453125,
+            "bottom": 874.453125,
+            "left": 485.609375,
+            "right": 731.609375
+          },
+          {
+            "name": "qrAddress",
+            "top": 882.109375,
+            "bottom": 897.703125,
+            "left": 288.953125,
+            "right": 479.03125
+          },
+          {
+            "name": "qrDivider qrFooterDivider",
+            "top": 905.359375,
+            "bottom": 914.359375,
+            "left": 258.21875,
+            "right": 509.78125
+          },
+          {
+            "name": "",
+            "top": 920.109375,
+            "bottom": 931.296875,
+            "left": 248.140625,
+            "right": 519.859375
+          }
+        ],
+        "images": [
+          {
+            "name": "qrBrandLogo",
+            "ppi": 928.9336870026526
+          },
+          {
+            "name": "realQr",
+            "ppi": 384
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "layout": "double",
+    "design": "editorial",
+    "cards": [
+      {
+        "x": 0,
+        "y": 0,
+        "width": 768,
+        "height": 504,
+        "scrollHeight": 492,
+        "scrollWidth": 768,
+        "children": [
+          {
+            "name": "eyebrow qrNames",
+            "top": 76.703125,
+            "bottom": 94.703125,
+            "left": 320.515625,
+            "right": 447.46875
+          },
+          {
+            "name": "qrBrandLogo",
+            "top": 113.71875,
+            "bottom": 243.3125,
+            "left": 184.8125,
+            "right": 314.40625
+          },
+          {
+            "name": "",
+            "top": 240.078125,
+            "bottom": 303.703125,
+            "left": 122.9375,
+            "right": 376.28125
+          },
+          {
+            "name": "qrDivider",
+            "top": 312.953125,
+            "bottom": 321.953125,
+            "left": 171.84375,
+            "right": 327.375
+          },
+          {
+            "name": "qrInvitation",
+            "top": 331.203125,
+            "bottom": 368.703125,
+            "left": 42.234375,
+            "right": 456.984375
+          },
+          {
+            "name": "qrCodeFrame",
+            "top": 124.453125,
+            "bottom": 370.453125,
+            "left": 486.609375,
+            "right": 732.609375
+          },
+          {
+            "name": "qrAddress",
+            "top": 378.109375,
+            "bottom": 393.703125,
+            "left": 288.953125,
+            "right": 479.03125
+          },
+          {
+            "name": "qrDivider qrFooterDivider",
+            "top": 401.359375,
+            "bottom": 410.359375,
+            "left": 257.859375,
+            "right": 510.140625
+          },
+          {
+            "name": "",
+            "top": 416.109375,
+            "bottom": 427.296875,
+            "left": 248.140625,
+            "right": 519.859375
+          }
+        ],
+        "images": [
+          {
+            "name": "qrBrandLogo",
+            "ppi": 928.9336870026526
+          },
+          {
+            "name": "realQr",
+            "ppi": 384
+          }
+        ]
+      },
+      {
+        "x": 0,
+        "y": 504,
+        "width": 768,
+        "height": 504,
+        "scrollHeight": 492,
+        "scrollWidth": 768,
+        "children": [
+          {
+            "name": "eyebrow qrNames",
+            "top": 580.703125,
+            "bottom": 598.703125,
+            "left": 320.515625,
+            "right": 447.46875
+          },
+          {
+            "name": "qrBrandLogo",
+            "top": 617.71875,
+            "bottom": 747.3125,
+            "left": 184.8125,
+            "right": 314.40625
+          },
+          {
+            "name": "",
+            "top": 744.078125,
+            "bottom": 807.703125,
+            "left": 122.9375,
+            "right": 376.28125
+          },
+          {
+            "name": "qrDivider",
+            "top": 816.953125,
+            "bottom": 825.953125,
+            "left": 171.84375,
+            "right": 327.375
+          },
+          {
+            "name": "qrInvitation",
+            "top": 835.203125,
+            "bottom": 872.703125,
+            "left": 42.234375,
+            "right": 456.984375
+          },
+          {
+            "name": "qrCodeFrame",
+            "top": 628.453125,
+            "bottom": 874.453125,
+            "left": 486.609375,
+            "right": 732.609375
+          },
+          {
+            "name": "qrAddress",
+            "top": 882.109375,
+            "bottom": 897.703125,
+            "left": 288.953125,
+            "right": 479.03125
+          },
+          {
+            "name": "qrDivider qrFooterDivider",
+            "top": 905.359375,
+            "bottom": 914.359375,
+            "left": 257.859375,
+            "right": 510.140625
+          },
+          {
+            "name": "",
+            "top": 920.109375,
+            "bottom": 931.296875,
+            "left": 248.140625,
+            "right": 519.859375
+          }
+        ],
+        "images": [
+          {
+            "name": "qrBrandLogo",
+            "ppi": 928.9336870026526
+          },
+          {
+            "name": "realQr",
+            "ppi": 384
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "layout": "4x6",
+    "design": "classic",
+    "cards": [
+      {
+        "x": 0,
+        "y": 0,
+        "width": 336,
+        "height": 528,
+        "scrollHeight": 526,
+        "scrollWidth": 334,
+        "children": [
+          {
+            "name": "eyebrow qrNames",
+            "top": 48.890625,
+            "bottom": 60.890625,
+            "left": 133.015625,
+            "right": 202.984375
+          },
+          {
+            "name": "qrBrandLogo",
+            "top": 84.40625,
+            "bottom": 175.59375,
+            "left": 122.40625,
+            "right": 213.59375
+          },
+          {
+            "name": "",
+            "top": 175.109375,
+            "bottom": 226.921875,
+            "left": 59.640625,
+            "right": 276.34375
+          },
+          {
+            "name": "qrDivider",
+            "top": 232.1875,
+            "bottom": 241.1875,
+            "left": 114.09375,
+            "right": 221.890625
+          },
+          {
+            "name": "qrInvitation",
+            "top": 246.453125,
+            "bottom": 276.453125,
+            "left": 24.25,
+            "right": 311.734375
+          },
+          {
+            "name": "qrCodeFrame",
+            "top": 281.71875,
+            "bottom": 431.71875,
+            "left": 93,
+            "right": 243
+          },
+          {
+            "name": "qrAddress",
+            "top": 438.890625,
+            "bottom": 449.28125,
+            "left": 104.640625,
+            "right": 231.359375
+          },
+          {
+            "name": "qrDivider qrFooterDivider",
+            "top": 456.453125,
+            "bottom": 465.453125,
+            "left": 114.09375,
+            "right": 221.890625
+          },
+          {
+            "name": "",
+            "top": 470.71875,
+            "bottom": 479.109375,
+            "left": 79.984375,
+            "right": 256.015625
+          }
+        ],
+        "images": [
+          {
+            "name": "qrBrandLogo",
+            "ppi": 1320.1809458533241
+          },
+          {
+            "name": "realQr",
+            "ppi": 640
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "layout": "4x6",
+    "design": "garden",
+    "cards": [
+      {
+        "x": 0,
+        "y": 0,
+        "width": 336,
+        "height": 528,
+        "scrollHeight": 526,
+        "scrollWidth": 334,
+        "children": [
+          {
+            "name": "eyebrow qrNames",
+            "top": 48.890625,
+            "bottom": 60.890625,
+            "left": 133.015625,
+            "right": 202.984375
+          },
+          {
+            "name": "qrBrandLogo",
+            "top": 84.40625,
+            "bottom": 175.59375,
+            "left": 122.40625,
+            "right": 213.59375
+          },
+          {
+            "name": "",
+            "top": 175.109375,
+            "bottom": 226.921875,
+            "left": 59.640625,
+            "right": 276.34375
+          },
+          {
+            "name": "qrDivider",
+            "top": 232.1875,
+            "bottom": 241.1875,
+            "left": 114.09375,
+            "right": 221.890625
+          },
+          {
+            "name": "qrInvitation",
+            "top": 246.453125,
+            "bottom": 276.453125,
+            "left": 24.25,
+            "right": 311.734375
+          },
+          {
+            "name": "qrCodeFrame",
+            "top": 281.71875,
+            "bottom": 431.71875,
+            "left": 93,
+            "right": 243
+          },
+          {
+            "name": "qrAddress",
+            "top": 438.890625,
+            "bottom": 449.28125,
+            "left": 104.640625,
+            "right": 231.359375
+          },
+          {
+            "name": "qrDivider qrFooterDivider",
+            "top": 456.453125,
+            "bottom": 465.453125,
+            "left": 114.09375,
+            "right": 221.890625
+          },
+          {
+            "name": "",
+            "top": 470.71875,
+            "bottom": 479.109375,
+            "left": 79.984375,
+            "right": 256.015625
+          }
+        ],
+        "images": [
+          {
+            "name": "qrBrandLogo",
+            "ppi": 1320.1809458533241
+          },
+          {
+            "name": "realQr",
+            "ppi": 640
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "layout": "4x6",
+    "design": "editorial",
+    "cards": [
+      {
+        "x": 0,
+        "y": 0,
+        "width": 336,
+        "height": 528,
+        "scrollHeight": 516,
+        "scrollWidth": 336,
+        "children": [
+          {
+            "name": "eyebrow qrNames",
+            "top": 48.890625,
+            "bottom": 60.890625,
+            "left": 133.015625,
+            "right": 202.984375
+          },
+          {
+            "name": "qrBrandLogo",
+            "top": 84.40625,
+            "bottom": 175.59375,
+            "left": 122.40625,
+            "right": 213.59375
+          },
+          {
+            "name": "",
+            "top": 175.109375,
+            "bottom": 226.921875,
+            "left": 63.890625,
+            "right": 272.09375
+          },
+          {
+            "name": "qrDivider",
+            "top": 232.1875,
+            "bottom": 241.1875,
+            "left": 113.734375,
+            "right": 222.25
+          },
+          {
+            "name": "qrInvitation",
+            "top": 246.453125,
+            "bottom": 276.453125,
+            "left": 23.296875,
+            "right": 312.703125
+          },
+          {
+            "name": "qrCodeFrame",
+            "top": 281.71875,
+            "bottom": 431.71875,
+            "left": 93,
+            "right": 243
+          },
+          {
+            "name": "qrAddress",
+            "top": 438.890625,
+            "bottom": 449.28125,
+            "left": 104.640625,
+            "right": 231.359375
+          },
+          {
+            "name": "qrDivider qrFooterDivider",
+            "top": 456.453125,
+            "bottom": 465.453125,
+            "left": 113.734375,
+            "right": 222.25
+          },
+          {
+            "name": "",
+            "top": 470.71875,
+            "bottom": 479.109375,
+            "left": 79.984375,
+            "right": 256.015625
+          }
+        ],
+        "images": [
+          {
+            "name": "qrBrandLogo",
+            "ppi": 1320.1809458533241
+          },
+          {
+            "name": "realQr",
+            "ppi": 640
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "layout": "5x7",
+    "design": "classic",
+    "cards": [
+      {
+        "x": 0,
+        "y": 0,
+        "width": 432,
+        "height": 624,
+        "scrollHeight": 622,
+        "scrollWidth": 430,
+        "children": [
+          {
+            "name": "eyebrow qrNames",
+            "top": 52.3125,
+            "bottom": 67.3125,
+            "left": 169.515625,
+            "right": 262.484375
+          },
+          {
+            "name": "qrBrandLogo",
+            "top": 89.875,
+            "bottom": 209.875,
+            "left": 156,
+            "right": 276
+          },
+          {
+            "name": "",
+            "top": 208.4375,
+            "bottom": 271.0625,
+            "left": 85.078125,
+            "right": 346.921875
+          },
+          {
+            "name": "qrDivider",
+            "top": 277.296875,
+            "bottom": 286.296875,
+            "left": 146.203125,
+            "right": 285.796875
+          },
+          {
+            "name": "qrInvitation",
+            "top": 292.53125,
+            "bottom": 327.53125,
+            "left": 29.859375,
+            "right": 402.125
+          },
+          {
+            "name": "qrCodeFrame",
+            "top": 333.765625,
+            "bottom": 517.359375,
+            "left": 124.203125,
+            "right": 307.796875
+          },
+          {
+            "name": "qrAddress",
+            "top": 525.5,
+            "bottom": 538.5,
+            "left": 136.796875,
+            "right": 295.203125
+          },
+          {
+            "name": "qrDivider qrFooterDivider",
+            "top": 546.640625,
+            "bottom": 555.640625,
+            "left": 146.203125,
+            "right": 285.796875
+          },
+          {
+            "name": "",
+            "top": 561.875,
+            "bottom": 571.671875,
+            "left": 112.390625,
+            "right": 319.609375
+          }
+        ],
+        "images": [
+          {
+            "name": "qrBrandLogo",
+            "ppi": 1003.2
+          },
+          {
+            "name": "realQr",
+            "ppi": 518.9371810663382
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "layout": "5x7",
+    "design": "garden",
+    "cards": [
+      {
+        "x": 0,
+        "y": 0,
+        "width": 432,
+        "height": 624,
+        "scrollHeight": 622,
+        "scrollWidth": 430,
+        "children": [
+          {
+            "name": "eyebrow qrNames",
+            "top": 52.3125,
+            "bottom": 67.3125,
+            "left": 169.515625,
+            "right": 262.484375
+          },
+          {
+            "name": "qrBrandLogo",
+            "top": 89.875,
+            "bottom": 209.875,
+            "left": 156,
+            "right": 276
+          },
+          {
+            "name": "",
+            "top": 208.4375,
+            "bottom": 271.0625,
+            "left": 85.078125,
+            "right": 346.921875
+          },
+          {
+            "name": "qrDivider",
+            "top": 277.296875,
+            "bottom": 286.296875,
+            "left": 146.203125,
+            "right": 285.796875
+          },
+          {
+            "name": "qrInvitation",
+            "top": 292.53125,
+            "bottom": 327.53125,
+            "left": 29.859375,
+            "right": 402.125
+          },
+          {
+            "name": "qrCodeFrame",
+            "top": 333.765625,
+            "bottom": 517.359375,
+            "left": 124.203125,
+            "right": 307.796875
+          },
+          {
+            "name": "qrAddress",
+            "top": 525.5,
+            "bottom": 538.5,
+            "left": 136.796875,
+            "right": 295.203125
+          },
+          {
+            "name": "qrDivider qrFooterDivider",
+            "top": 546.640625,
+            "bottom": 555.640625,
+            "left": 146.203125,
+            "right": 285.796875
+          },
+          {
+            "name": "",
+            "top": 561.875,
+            "bottom": 571.671875,
+            "left": 112.390625,
+            "right": 319.609375
+          }
+        ],
+        "images": [
+          {
+            "name": "qrBrandLogo",
+            "ppi": 1003.2
+          },
+          {
+            "name": "realQr",
+            "ppi": 518.9371810663382
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "layout": "5x7",
+    "design": "editorial",
+    "cards": [
+      {
+        "x": 0,
+        "y": 0,
+        "width": 432,
+        "height": 624,
+        "scrollHeight": 612,
+        "scrollWidth": 432,
+        "children": [
+          {
+            "name": "eyebrow qrNames",
+            "top": 51.8125,
+            "bottom": 66.8125,
+            "left": 169.515625,
+            "right": 262.484375
+          },
+          {
+            "name": "qrBrandLogo",
+            "top": 89.375,
+            "bottom": 209.375,
+            "left": 156,
+            "right": 276
+          },
+          {
+            "name": "",
+            "top": 207.9375,
+            "bottom": 271.5625,
+            "left": 89.328125,
+            "right": 342.671875
+          },
+          {
+            "name": "qrDivider",
+            "top": 277.796875,
+            "bottom": 286.796875,
+            "left": 145.84375,
+            "right": 286.15625
+          },
+          {
+            "name": "qrInvitation",
+            "top": 293.03125,
+            "bottom": 328.03125,
+            "left": 28.90625,
+            "right": 403.09375
+          },
+          {
+            "name": "qrCodeFrame",
+            "top": 334.265625,
+            "bottom": 517.859375,
+            "left": 124.203125,
+            "right": 307.796875
+          },
+          {
+            "name": "qrAddress",
+            "top": 526,
+            "bottom": 539,
+            "left": 136.796875,
+            "right": 295.203125
+          },
+          {
+            "name": "qrDivider qrFooterDivider",
+            "top": 547.140625,
+            "bottom": 556.140625,
+            "left": 145.84375,
+            "right": 286.15625
+          },
+          {
+            "name": "",
+            "top": 562.375,
+            "bottom": 572.171875,
+            "left": 112.390625,
+            "right": 319.609375
+          }
+        ],
+        "images": [
+          {
+            "name": "qrBrandLogo",
+            "ppi": 1003.2
+          },
+          {
+            "name": "realQr",
+            "ppi": 518.9371810663382
+          }
+        ]
+      }
+    ]
+  }
+]

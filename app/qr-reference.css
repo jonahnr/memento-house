@@ -48,3 +48,49 @@
  body:has(.qr-double) .qrCard .qrAddress{font-size:12px!important}
  body:has(.qr-double) .qrCard>small{font-size:8px!important}
 }
+/* Print decoration uses CSS geometry, avoiding enlarged raster watermarks. */
+.qrCard::before{inset:46% 9% 7%;background:none;border:1px solid #b18b56;border-radius:50% 50% 0 0;opacity:.12}
+.qrCard .qrNames,.qrCard h2{max-width:100%;overflow-wrap:anywhere}
+.qr-design-garden .qrCard{background:#f4f6ef;border-color:#79856c;border-radius:48% 48% 0 0 / 16% 16% 0 0;padding-top:40px}
+.qr-design-garden .qrCard::before{inset:12px;border:1px solid #79856c;border-radius:inherit;opacity:.35}
+.qr-design-garden .qrCard h2 i{color:#52654c}
+.qr-design-garden .qrCard .qrNames,.qr-design-garden .qrCard>small{color:#52654c}
+.qr-design-garden .qrCodeFrame{border-color:#79856c}
+.qr-design-editorial .qrCard{background:#fffefb;border:0;border-top:8px solid #282621;border-bottom:8px solid #282621}
+.qr-design-editorial .qrCard::before{inset:10px;border:1px solid #282621;border-radius:0;opacity:.2}
+.qr-design-editorial .qrCard h2{font-family:Arial,sans-serif;font-weight:600;letter-spacing:-1.3px}
+.qr-design-editorial .qrCard h2 i{font-family:Georgia,serif;color:#282621;letter-spacing:-.5px}
+.qr-design-editorial .qrCard .qrNames{color:#282621;letter-spacing:3px}
+.qr-design-editorial .qrCodeFrame{border-color:#282621}
+.qr-4x6 .qrCard,.qr-5x7 .qrCard{max-width:360px;margin:auto;gap:7px;padding:20px}
+.qr-4x6 .qrCard .qrBrandLogo{width:95px;height:95px}
+.qr-5x7 .qrCard .qrBrandLogo{width:125px;height:125px}
+.qr-4x6 .qrCard h2{font-size:28px}
+.qr-5x7 .qrCard h2{font-size:32px}
+.qr-4x6 .qrCard .qrInvitation{font-size:13px}
+.qr-4x6 .qrCard .realQr{width:145px;height:145px}
+.qrPrintQuality{font-size:12px;line-height:1.6}
+@media print{
+ body:has(.qr-4x6),body:has(.qr-4x6) .dash,body:has(.qr-4x6) .dashMain,body:has(.qr-4x6) .qrLayout{height:5.5in!important;max-height:5.5in!important}
+ body:has(.qr-5x7),body:has(.qr-5x7) .dash,body:has(.qr-5x7) .dashMain,body:has(.qr-5x7) .qrLayout{height:6.5in!important;max-height:6.5in!important}
+ body:has(.qr-4x6) .qrPrintSheet,body:has(.qr-4x6) .qrPrintSheet .qrCard{width:3.5in!important;height:5.5in!important}
+ body:has(.qr-5x7) .qrPrintSheet,body:has(.qr-5x7) .qrPrintSheet .qrCard{width:4.5in!important;height:6.5in!important}
+ body:has(.qr-4x6) .qrPrintSheet .qrCard{padding:.16in .18in!important;gap:.055in!important}
+ body:has(.qr-4x6) .qrCard .qrNames{font-size:8px!important;letter-spacing:2px!important}
+ body:has(.qr-4x6) .qrCard .qrBrandLogo{width:.95in!important;height:.95in!important;margin:-.06in auto!important}
+ body:has(.qr-4x6) .qrCard h2{font-size:24px!important}
+ body:has(.qr-4x6) .qrCard .qrInvitation{font-size:12px!important}
+ body:has(.qr-4x6) .qrCard .qrCodeFrame .realQr{width:1.5in!important;height:1.5in!important}
+ body:has(.qr-4x6) .qrCard .qrAddress{font-size:8px!important}
+ body:has(.qr-4x6) .qrCard>small{font-size:6px!important;letter-spacing:1.5px!important}
+ body:has(.qr-5x7) .qrPrintSheet .qrCard{padding:.2in .22in!important;gap:.065in!important}
+ body:has(.qr-5x7) .qrCard .qrNames{font-size:10px!important;letter-spacing:3px!important}
+ body:has(.qr-5x7) .qrCard .qrBrandLogo{width:1.25in!important;height:1.25in!important;margin:-.08in auto!important}
+ body:has(.qr-5x7) .qrCard h2{font-size:29px!important}
+ body:has(.qr-5x7) .qrCard .qrInvitation{font-size:14px!important}
+ body:has(.qr-5x7) .qrCard .qrCodeFrame .realQr{width:1.85in!important;height:1.85in!important}
+ body:has(.qr-5x7) .qrCard .qrAddress{font-size:10px!important}
+ body:has(.qr-5x7) .qrCard>small{font-size:7px!important;letter-spacing:1.8px!important}
+ body:has(.qr-design-garden) .qrCard{border-radius:48% 48% 0 0 / 12% 12% 0 0!important}
+ body:has(.qr-design-editorial) .qrCard{border-top-width:.065in!important;border-bottom-width:.065in!important}
+}

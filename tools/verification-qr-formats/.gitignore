@@ -1,0 +1,7 @@
+# Reproducible local browser/PDF verification output
+*
+!README.md
+!checks.json
+!pdf-checks.json
+!address-check.json
+!.gitignore
