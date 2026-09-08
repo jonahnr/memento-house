@@ -2,9 +2,10 @@ export type Place={name:string;lat:number;lng:number;id:string;precision?:"stree
 type PhotonFeature={properties?:Record<string,string|number>;geometry?:{coordinates?:number[]}};
 type CensusMatch={matchedAddress:string;coordinates:{x:number;y:number};tigerLine?:{tigerLineId:string;side:string}};
 
-// Preserve global venue/city/landmark coverage. Census adds numbered US streets.
+// Census can match partial city names without a state/ZIP. Query it for numbered
+// streets worldwide; keep Photon results even when Census has no US match.
 export function isUSStreetQuery(query:string){
- return /^\d+[\w-]*\s+\S+/.test(query)&&(/\b\d{5}(?:-\d{4})?\b/.test(query)||/\b(?:AL|AK|AZ|AR|CA|CO|CT|DE|DC|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|PR|USA|United States)\s*$/i.test(query));
+ return /^\d+[\w-]*\s+\S{3,}/.test(query.trim());
 }
 export async function searchPlaces(query:string,fetcher:typeof fetch=fetch){
  const read=async(url:string)=>{
