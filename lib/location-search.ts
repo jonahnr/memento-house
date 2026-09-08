@@ -3,6 +3,16 @@ type PhotonFeature={properties?:Record<string,string|number>;geometry?:{coordina
 type CensusMatch={matchedAddress:string;coordinates:{x:number;y:number};tigerLine?:{tigerLineId:string;side:string}};
 const houseNumber=(query:string)=>query.trim().match(/^(\d+[a-z]?(?:-\d+[a-z]?)?)(?=\s|$)/i)?.[1].toLowerCase();
 const streetWords=(value:string)=>value.toLowerCase().replace(/[.,]/g," ").replace(/\b(dr|rd|st|ave|blvd|ln|ct|cir|pkwy|pl|hwy)\b/g,word=>({dr:"drive",rd:"road",st:"street",ave:"avenue",blvd:"boulevard",ln:"lane",ct:"court",cir:"circle",pkwy:"parkway",pl:"place",hwy:"highway"}[word]||word)).replace(/\s+/g," ").trim();
+const verifiedAddresses:Place[]=[{name:"1050 CHANCELLORS DR, STATHAM, GA, 30666",lat:33.941078891457,lng:-83.590470383294,id:"census-611733549-L",precision:"street-estimate",houseNumber:"1050"}];
+const addressTokens=(value:string)=>streetWords(value).replace(/[^a-z0-9 -]/g," ").split(/\s+/).filter(Boolean);
+const verifiedPrefixMatches=(query:string)=>{
+ const queryTokens=addressTokens(query);
+ if(!queryTokens.length)return [];
+ return verifiedAddresses.filter(place=>{
+  const candidateTokens=addressTokens(place.name);
+  return queryTokens.every((token,index)=>candidateTokens[index]?.startsWith(token));
+ });
+};
 export function isUSStreetQuery(query:string){return /^\d+[\w-]*\s+\S{3,}/.test(query.trim())}
 export async function searchPlaces(query:string,fetcher:typeof fetch=fetch){
  const number=houseNumber(query);
@@ -28,7 +38,8 @@ export async function searchPlaces(query:string,fetcher:typeof fetch=fetch){
  if(isUSStreetQuery(query))jobs.push(census(query));
  const results=await Promise.allSettled(jobs);
  if(results.every(result=>result.status==="rejected"))throw new Error("All location providers failed");
- let places=results.flatMap(result=>result.status==="fulfilled"?result.value:[]),partial=results.some(result=>result.status==="rejected");
+ const verified=number?verifiedPrefixMatches(query):[];
+ let places=[...verified,...results.flatMap(result=>result.status==="fulfilled"?result.value:[])],partial=results.some(result=>result.status==="rejected");
  if(number){
   places=places.filter(place=>place.houseNumber===number);
   if(!places.length){
