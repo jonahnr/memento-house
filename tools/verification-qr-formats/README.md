@@ -27,3 +27,9 @@ The follow-up screenshot showed `1050 chancellors dr statha`, without a state or
 The next screenshot showed `1050 chancellors dr, stat` with unrelated house numbers and road centers. Numbered queries now filter suggestions by the provider's actual house number (not any number appearing in the display label); non-numbered landmark/city searches retain their coverage. This affects suggestions only, not saved data.
 
 When the direct address search has no match, matching US street candidates from Photon supply street/state/ZIP context for bounded, deduplicated Census lookups. Only returned matches with the requested house number become suggestions. Road-center coordinates are never promoted to house coordinates. This resolves the shorter `stat` fragment, which Census alone does not recognize. Live providers returned exactly one result: 1050 CHANCELLORS DR, STATHAM, GA, 30666. The Our Story browser check asserted one suggestion and verified selection plus a simulated insert while preserving the existing milestone. All 43 regression tests, scoped lint, and production build passed.
+
+## Google Places replacement
+
+The address picker now uses Google Places Autocomplete (New) whenever `GOOGLE_MAPS_API_KEY` is configured on the server. Predictions appear from partial text and the selected Place ID is resolved through Place Details before any coordinates are saved. The previous hardcoded Chancellors address has been removed; Photon and Census remain only as a temporary fallback when no Google credential is configured.
+
+The browser verification exercised Dashboard → Our Story with `5331 Rex`, `8642 Yule`, and `1693 Alice`, confirmed Google suggestions and attribution, selected each result, and saved the final coordinates while preserving the existing Paris milestone. Provider requests were intercepted, so the verification did not write customer data or require a secret in the repository.

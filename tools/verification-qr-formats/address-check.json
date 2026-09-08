@@ -1,5 +1,9 @@
 {
-  "liveProviderMatch": true,
+  "googleAutocompleteExamples": [
+    "5331 Rexford Court, Montgomery, AL 36116, USA",
+    "8642 Yule Street, Arvada, CO 80007, USA",
+    "1693 Alice Court, Annapolis, MD 21401, USA"
+  ],
   "saved": {
     "id": "new-address",
     "title": "Our home",
@@ -7,9 +11,9 @@
     "story_type": "Milestone",
     "event_date": null,
     "image_url": null,
-    "location_name": "1050 CHANCELLORS DR, STATHAM, GA, 30666",
-    "latitude": 33.941078891457,
-    "longitude": -83.590470383294,
+    "location_name": "1693 Alice Court, Annapolis, MD 21401, USA",
+    "latitude": 38.994,
+    "longitude": -76.555,
     "wedding_id": "22222222-2222-4222-8222-222222222222",
     "sort_order": 1
   },
