@@ -21,3 +21,9 @@ Checks: 40 unit/regression tests passed; production build passed; scoped ESLint 
 ## Partial-address correction
 
 The follow-up screenshot showed `1050 chancellors dr statha`, without a state or ZIP. The previous Census gate excluded this input even though a direct live Census request matches it correctly. Removed the state/ZIP requirement for numbered street queries. Existing Photon suggestions remain in their original order, with Census matches appended. Updated regression coverage to use the exact screenshot fragment and preserve international results. Unit tests: 42 passed; production build passed.
+
+## House-number relevance and street completion
+
+The next screenshot showed `1050 chancellors dr, stat` with unrelated house numbers and road centers. Numbered queries now filter suggestions by the provider's actual house number (not any number appearing in the display label); non-numbered landmark/city searches retain their coverage. This affects suggestions only, not saved data.
+
+When the direct address search has no match, matching US street candidates from Photon supply street/state/ZIP context for bounded, deduplicated Census lookups. Only returned matches with the requested house number become suggestions. Road-center coordinates are never promoted to house coordinates. This resolves the shorter `stat` fragment, which Census alone does not recognize. Live providers returned exactly one result: 1050 CHANCELLORS DR, STATHAM, GA, 30666. The Our Story browser check asserted one suggestion and verified selection plus a simulated insert while preserving the existing milestone. All 43 regression tests, scoped lint, and production build passed.

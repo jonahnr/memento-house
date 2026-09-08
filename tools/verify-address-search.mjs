@@ -12,8 +12,8 @@ await context.route('**/api/account/orders',route=>route.fulfill({json:{orders:[
 await context.addInitScript(user=>localStorage.setItem('sb-kdcymeoldvwlmfwemfgq-auth-token',JSON.stringify({access_token:'fixture-token',refresh_token:'fixture-refresh',expires_at:Math.floor(Date.now()/1000)+3600,expires_in:3600,token_type:'bearer',user})),user);
 await page.goto('http://127.0.0.1:3000/dashboard');await page.getByRole('button',{name:'Our Story',exact:true}).click();
 await page.getByLabel('Milestone title').fill('Our home');await page.getByLabel('Your story',{exact:true}).fill('A place in our story.');
-await page.getByRole('textbox',{name:'Search for a real address or location'}).fill('1050 chancellors dr statha');
-const option=page.getByRole('button',{name:/1050 CHANCELLORS DR, STATHAM, GA, 30666/});await option.waitFor({timeout:20000});assert.match(await option.innerText(),/Estimated street position/);await option.click();
+await page.getByRole('textbox',{name:'Search for a real address or location'}).fill('1050 chancellors dr, stat');
+const option=page.getByRole('button',{name:/1050 CHANCELLORS DR, STATHAM, GA, 30666/});await option.waitFor({timeout:20000});assert.match(await option.innerText(),/Estimated street position/);assert.equal(await page.locator('.locationSearch li').count(),1);await option.click();
 await page.getByRole('button',{name:'Add milestone',exact:true}).click();await page.locator('.storyList').getByText('Our home',{exact:true}).waitFor();
 assert.equal(saved.latitude,33.941078891457);assert.equal(saved.longitude,-83.590470383294);await page.locator('.storyList').getByText('Paris, France',{exact:true}).waitFor();
 await page.screenshot({path:'tools/verification-qr-formats/address-selected.png',fullPage:true});

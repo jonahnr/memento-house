@@ -1,39 +1,44 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {searchPlaces,isUSStreetQuery} from '../lib/location-search.ts';
-const query='1050 Chancellors Dr, Statham, GA 30666';
-const census={result:{addressMatches:[{matchedAddress:'1050 CHANCELLORS DR, STATHAM, GA, 30666',coordinates:{x:-83.590470383294,y:33.941078891457},tigerLine:{tigerLineId:'611733549',side:'L'}}]}};
-const photon={features:Array.from({length:7},(_,i)=>({properties:{name:`Original result ${i}`,osm_type:'N',osm_id:i+1},geometry:{coordinates:[-84+i,34]}}))};
+import {searchPlaces} from '../lib/location-search.ts';
+const query='1050 chancellors dr, stat';
+const match={matchedAddress:'1050 CHANCELLORS DR, STATHAM, GA, 30666',coordinates:{x:-83.590470383294,y:33.941078891457},tigerLine:{tigerLineId:'611733549',side:'L'}};
+const census={result:{addressMatches:[match]}},empty={result:{addressMatches:[]}};
+const feature=(id,properties)=>({properties:{osm_type:'W',osm_id:id,...properties},geometry:{coordinates:[-83.58946,33.94133]}});
+const photon={features:[feature(1,{name:'Unrelated street'}),feature(2,{housenumber:'236',street:'Kilarney Drive'}),feature(3,{type:'street',name:'Chancellors Drive',state:'Georgia',postcode:'30666',countrycode:'US'})]};
 const fetcher=(p,c)=>async url=>{const value=url.includes('photon')?p:c;if(value instanceof Error)throw value;return Response.json(value)};
-test('reported address receives Census match when Photon has no results',async()=>{
- const {places}=await searchPlaces(query,fetcher({features:[]},census));assert.equal(places.length,1);assert.equal(places[0].lat,33.941078891457);assert.equal(places[0].lng,-83.590470383294);assert.equal(places[0].precision,'street-estimate');
+test('numbered search excludes road centers and other house numbers',async()=>{
+ const result=await searchPlaces(query,fetcher(photon,census));assert.equal(result.places.length,1);assert.equal(result.places[0].name,match.matchedAddress);
 });
-test('additional address coverage preserves all seven original results and their order',async()=>{
- const old=await searchPlaces('Statham',fetcher(photon,census));const added=await searchPlaces(query,fetcher(photon,census));assert.deepEqual(added.places.slice(0,7),old.places);assert.equal(added.places.length,8);
+test('exact screenshot fragment completes a provider street with a verified house-number match',async()=>{
+ const calls=[];const result=await searchPlaces(query,async url=>{
+  if(url.includes('photon'))return Response.json(photon);
+  const address=new URL(url).searchParams.get('address');calls.push(address);
+  return Response.json(address==='1050 Chancellors Drive, Georgia, 30666'?census:empty);
+ });
+ assert.deepEqual(calls,[query,'1050 Chancellors Drive, Georgia, 30666']);
+ assert.equal(result.places.length,1);assert.equal(result.places[0].lat,33.941078891457);assert.equal(result.places[0].precision,'street-estimate');
 });
-test('either provider failure preserves the other provider results',async()=>{
- const p=await searchPlaces(query,fetcher(photon,new Error('offline')));assert.equal(p.places.length,7);assert.equal(p.partial,true);
- const c=await searchPlaces(query,fetcher(new Error('offline'),census));assert.equal(c.places.length,1);assert.equal(c.partial,true);
+test('matching Photon addresses survive Census outages and number prefixes do not match',async()=>{
+ const p={features:[feature(1,{housenumber:'1050',street:'Chancellors Drive'}),feature(2,{housenumber:'10500',street:'Chancellors Drive'}),feature(3,{name:'1050 Road'})]};
+ const result=await searchPlaces(query,fetcher(p,new Error('offline')));assert.equal(result.places.length,1);assert.equal(result.places[0].houseNumber,'1050');assert.equal(result.partial,true);
+});
+test('Census preserves useful house matches when Photon is unavailable',async()=>{
+ const result=await searchPlaces(query,fetcher(new Error('offline'),census));assert.equal(result.places.length,1);assert.equal(result.partial,true);
  await assert.rejects(searchPlaces(query,fetcher(new Error('offline'),new Error('offline'))));
 });
-test('landmarks and international city searches retain original provider coverage',async()=>{
- for(const q of ['Eiffel Tower','London','Statham']){assert.equal(isUSStreetQuery(q),false);const result=await searchPlaces(q,async url=>{assert.ok(url.includes('photon'));return Response.json(photon)});assert.equal(result.places.length,7)}
- for(const q of [query,'1050 Chancellors Drive, Statham GA','4600 Silver Hill Rd, Washington DC'])assert.equal(isUSStreetQuery(q),true);
-});
-test('unmatched and invalid supplementary addresses never invent coordinates',async()=>{
- const result=await searchPlaces(query,fetcher(photon,{result:{addressMatches:[{matchedAddress:'Broken',coordinates:{}}]}}));assert.equal(result.places.length,7);
-});
-
-test('screenshot partial address adds the Georgia match without removing existing suggestions',async()=>{
- for(const q of ['1050 chancellors dr statha','1050 chancellors dr statham','1050 Chancellors Dr']){
-  assert.equal(isUSStreetQuery(q),true);
-  const result=await searchPlaces(q,fetcher(photon,census));
-  assert.equal(result.places.length,8);
-  assert.equal(result.places[7].name,'1050 CHANCELLORS DR, STATHAM, GA, 30666');
+test('non-numbered city and landmark searches retain all existing results',async()=>{
+ for(const q of ['London','Statham','Chancellors Drive','Eiffel Tower']){
+  const result=await searchPlaces(q,async url=>{assert.ok(url.includes('photon'));return Response.json(photon)});assert.equal(result.places.length,3);
  }
 });
-test('numbered international addresses keep all Photon matches when Census finds nothing',async()=>{
- const result=await searchPlaces('10 Downing Street, London SW1A 2AA',fetcher(photon,{result:{addressMatches:[]}}));
- assert.equal(result.places.length,7);
- assert.deepEqual(result.places.map(p=>p.name),photon.features.map(f=>f.properties.name));
+test('numbered international searches retain matching Photon house numbers',async()=>{
+ const result=await searchPlaces('10 Downing Street, London',fetcher({features:[feature(1,{housenumber:'10',street:'Downing Street',countrycode:'GB'}),feature(2,{housenumber:'11',street:'Downing Street'})]},empty));
+ assert.equal(result.places.length,1);assert.equal(result.places[0].houseNumber,'10');
+});
+test('no address match never manufactures a pin from a road or wrong Census house number',async()=>{
+ const result=await searchPlaces(query,fetcher(photon,{result:{addressMatches:[{...match,matchedAddress:'1052 CHANCELLORS DR, STATHAM, GA, 30666'}]}}));assert.deepEqual(result.places,[]);
+});
+test('number-only input hides roads while preserving exact house numbers',async()=>{
+ const result=await searchPlaces('1050',fetcher({features:[...photon.features,feature(4,{housenumber:'1050',street:'Chancellors Drive'})]},empty));assert.equal(result.places.length,1);
 });
