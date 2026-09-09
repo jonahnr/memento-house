@@ -1,0 +1,5 @@
+export async function uploadTusFile(file:File,uploadUrl:string,onProgress:(percent:number)=>void,signal?:AbortSignal){
+ const chunkSize=5*1024*1024;let offset=0;
+ for(let attempt=0;attempt<3;attempt++){try{const head=await fetch(uploadUrl,{method:"HEAD",headers:{"Tus-Resumable":"1.0.0"},signal});if(head.ok)offset=Number(head.headers.get("upload-offset")||0);break}catch{if(attempt===2)throw new Error("The resumable upload could not be reached.")}}
+ while(offset<file.size){const end=Math.min(file.size,offset+chunkSize),chunk=file.slice(offset,end);let response:Response|null=null;for(let attempt=0;attempt<4;attempt++){try{response=await fetch(uploadUrl,{method:"PATCH",headers:{"Tus-Resumable":"1.0.0","Upload-Offset":String(offset),"Content-Type":"application/offset+octet-stream"},body:chunk,signal});if(response.ok)break}catch{response=null}await new Promise(resolve=>setTimeout(resolve,500*2**attempt))}if(!response?.ok)throw new Error("Video upload was interrupted. Please try again.");offset=Number(response.headers.get("upload-offset")||end);onProgress(Math.min(100,Math.round(offset/file.size*100)))}
+}

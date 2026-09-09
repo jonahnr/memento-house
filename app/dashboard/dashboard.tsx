@@ -8,6 +8,7 @@ import {AdventureMap,type GeoPin,type StoryPin} from "../map/[slug]/adventure-ma
 import {LocationSearch} from "../map/[slug]/location-search";
 import {DashboardSidebar} from "./components/dashboard-sidebar";
 import {normalizeTimelineOrder,numberTimelineLocations} from "../../lib/timeline-normalization";
+import {MediaLibrary} from "../media-components";
 
 type Wedding={id:string;partner_one_name:string;partner_two_name:string;wedding_date:string|null;title:string;slug:string;welcome_message:string;accent_color:string;keepsake_settings?:any;contribution_status?:"open"|"paused"|"closed";contribution_closes_at?:string|null};
 type Recommendation={id:string;guest_name:string;message:string;category:string|null;status:"active"|"hidden"|"deleted";destination:{id:string;location_name:string;latitude:number;longitude:number}|null};
@@ -74,7 +75,7 @@ export function Dashboard(){
    {section==="QR Code"&&<QR wedding={wedding} mapUrl={mapUrl} tier={tier}/>}
    {section==="Keepsake"&&tier!=="map"&&<KeepsakeV2 wedding={wedding} recommendations={data} stories={stories} timeline={timeline} onWeddingChange={setWedding}/>}
    {section==="Event Details"&&<><VenueSetup wedding={wedding} values={stories} onChange={setStories}/><Settings wedding={wedding} onSaved={setWedding}/></>}
-   {section==="My Account"&&<><PlanGuide tier={tier}/><AccountPanel email={email} orders={accountOrders}/></>}
+   {section==="My Account"&&<><PlanGuide tier={tier}/><MediaLibrary weddingId={wedding.id}/><AccountPanel email={email} orders={accountOrders}/></>}
   </section>
  </main>
 }
