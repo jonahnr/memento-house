@@ -14,7 +14,7 @@ async function createCheckoutSession(key:string,body:URLSearchParams){
 }
 export async function POST(request:Request){
  const origin=requestOrigin(request);
- const identity=await requireUser(request);if(!identity)return Response.json({error:"Sign in or create your Memento House account before checkout."},{status:401});
+ const identity=await requireUser(request);if(!identity){console.warn("[checkout] Account authorization rejected",{hasAuthorization:Boolean(request.headers.get("authorization"))});return Response.json({error:"Sign in or create your Memento House account before checkout."},{status:401})}
  const form=await request.formData(),product=String(form.get("product")||""),tier=String(form.get("tier")||""),addon=String(form.get("addon")||"none"),addons=addon==="none"?[]:[addon];let item;
  try{item=resolveCatalog(product,tier,addons)}catch(error){return new Response(error instanceof Error?error.message:"Invalid product selection",{status:400})}
  const raw=String(form.get("customization")||"");
@@ -33,5 +33,6 @@ export async function POST(request:Request){
  if(!attempt.response)return Response.json({error:"Stripe did not respond in time. Please try again; no charge was created."},{status:504});
  if(!attempt.response.ok){console.error("Stripe checkout session failed",{catalogKey:item.key,status:attempt.response.status,code:attempt.payload?.error?.code,type:attempt.payload?.error?.type,message:attempt.payload?.error?.message,requestId:attempt.response.headers.get("request-id")});return Response.json({error:attempt.payload?.error?.message||"Secure checkout could not be started. No charge was created."},{status:502})}
  if(!attempt.payload?.url)return Response.json({error:"Stripe created a session without a checkout address. Please try again."},{status:502});
+ console.info("[checkout] Stripe session created",{catalogKey:item.key,requestId:attempt.response.headers.get("request-id")});
  return Response.json({url:attempt.payload.url},{headers:{"Cache-Control":"no-store"}})
 }
