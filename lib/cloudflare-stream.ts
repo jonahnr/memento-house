@@ -4,11 +4,13 @@ const clean=(value:string|undefined)=>value?.trim()||"";
 export function cloudflareStreamConfig(){return{accountId:clean(process.env.CLOUDFLARE_ACCOUNT_ID),apiToken:clean(process.env.CLOUDFLARE_STREAM_API_TOKEN),webhookSecret:clean(process.env.CLOUDFLARE_STREAM_WEBHOOK_SECRET)}}
 const encoded=(value:string)=>Buffer.from(value).toString("base64");
 
+export class CloudflareStreamError extends Error{readonly status:number;constructor(message:string,status:number){super(message);this.name="CloudflareStreamError";this.status=status}}
+
 export async function createStreamTusUpload(input:{fileSize:number;maxDurationSeconds:number;expiry:string;creator:string;mediaId:string;fileName:string}){
  const{accountId,apiToken}=cloudflareStreamConfig();if(!accountId||!apiToken)throw new Error("Cloudflare Stream is not configured.");
  const metadata=[`name ${encoded(input.fileName)}`,`creator ${encoded(input.creator)}`,`mementoMediaId ${encoded(input.mediaId)}`,`maxDurationSeconds ${encoded(String(input.maxDurationSeconds))}`,`expiry ${encoded(input.expiry)}`].join(",");
  const response=await fetch(`https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/stream?direct_user=true`,{method:"POST",headers:{Authorization:`Bearer ${apiToken}`,"Tus-Resumable":"1.0.0","Upload-Length":String(input.fileSize),"Upload-Metadata":metadata},signal:AbortSignal.timeout(12000)});
- if(!response.ok)throw new Error(`Cloudflare Stream upload authorization failed (${response.status}).`);
+ if(!response.ok){const raw=await response.text(),payload=await Promise.resolve().then(()=>JSON.parse(raw)).catch(()=>null) as {errors?:Array<{code?:number;message?:string}>}|null,provider=payload?.errors?.map(error=>[error.code,error.message].filter(Boolean).join(": ")).filter(Boolean).join("; ")||raw.slice(0,300)||response.statusText;throw new CloudflareStreamError(`Cloudflare Stream upload authorization failed: ${provider}`,response.status)}
  const uploadUrl=response.headers.get("location"),uid=response.headers.get("stream-media-id")||uploadUrl?.split("/").filter(Boolean).pop();
  if(!uploadUrl||!uid)throw new Error("Cloudflare Stream omitted the upload location.");
  return{uploadUrl,uid};
