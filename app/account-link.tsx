@@ -28,5 +28,5 @@ export function AccountLink(){
   return()=>{active=false;data.subscription.unsubscribe()};
  },[]);
  if(!state.signedIn)return <a href="/login">Sign in</a>;
- return <><CartLink/><details className="globalAccountMenu"><summary>My account</summary><div><a href="/account">Account overview</a>{state.hasMap&&<a href="/dashboard">Open Memento Map</a>}</div></details></>;
+ return <><details className="globalAccountMenu"><summary>My account</summary><div><a href="/account">Account overview</a>{state.hasMap&&<a href="/dashboard">Open Memento Map</a>}</div></details><CartLink/></>;
 }
