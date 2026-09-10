@@ -71,3 +71,19 @@ test("dashboard, QR, story editor, and public map use type-specific experience l
  assert.doesNotMatch(story,/YOUR RELATIONSHIP, MAPPED/);
  assert.doesNotMatch(qr,/>Help Build<br/);
 });
+
+test("umbrella marketing explains the complete Memento Map journey without Wedding-only positioning",()=>{
+ const home=read("app/page.tsx"),umbrella=read("app/memento-map/page.tsx"),journey=read("app/memento-map/map-journey.tsx");
+ assert.doesNotMatch(home,/Our first collection is built around weddings/i);
+ assert.doesNotMatch(home,/Places and adventures/);
+ assert.doesNotMatch(umbrella,/Choose a type before selecting a package/);
+ for(const phrase of ["Share one QR code","Explore the map and timeline","Bring the story home"])assert.match(journey,new RegExp(phrase));
+ for(const asset of ["memento-map-scan-qr.webp","memento-map-digital-story.webp","memento-map-framed-keepsake.webp"])assert.ok(fs.existsSync(new URL(`../public/brand/${asset}`,import.meta.url)));
+});
+
+test("every printable QR layout brands the crest with the Memento House name",()=>{
+ const qr=read("app/dashboard/components/qr-card.tsx"),styles=read("app/qr-reference.css");
+ assert.match(qr,/className="qrBrand"/);
+ assert.match(qr,/<span>Memento House<\/span>/);
+ for(const layout of ["qr-double","qr-4x6","qr-5x7"])assert.match(styles,new RegExp(layout));
+});
