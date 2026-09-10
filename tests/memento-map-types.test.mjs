@@ -54,6 +54,8 @@ test("map access and dashboard selection are scoped to the individual map",()=>{
 test("onboarding resolves event locations and persists wedding venue coordinates",()=>{
  const setup=read("app/memento-map/create/page.tsx"),route=read("app/api/maps/type/route.ts");
  assert.match(setup,/LocationSearch/);
+ assert.match(setup,/onQueryChange=\{\(\)=>setForm/);
+ assert.match(setup,/eventLocation:"",eventLat:NaN,eventLng:NaN/);
  assert.match(setup,/eventLat:place\.lat,eventLng:place\.lng/);
  assert.match(route,/hasCoordinates/);
  assert.match(route,/from\("story_locations"\)/);
