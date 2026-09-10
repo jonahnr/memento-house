@@ -2,7 +2,7 @@
 import {useEffect,useRef,useState} from "react";
 import type {Place,ResolvedPlace} from "../../../lib/location-search";
 
-export function LocationSearch({value,onSelect}:{value:string;onSelect:(place:ResolvedPlace)=>void}){
+export function LocationSearch({value,onSelect,onQueryChange}:{value:string;onSelect:(place:ResolvedPlace)=>void;onQueryChange?:(value:string)=>void}){
  const[query,setQuery]=useState(value),[results,setResults]=useState<Place[]>([]),[loading,setLoading]=useState(false),[error,setError]=useState(""),[provider,setProvider]=useState("");
  const session=useRef("");
  useEffect(()=>setQuery(value),[value]);
@@ -44,7 +44,7 @@ export function LocationSearch({value,onSelect}:{value:string;onSelect:(place:Re
   finally{setLoading(false)}
  }
  return <div className="locationSearch" aria-busy={loading}>
-  <input required aria-label="Search for a real address or location" placeholder="Start with a city, venue, address, or landmark…" value={query} onChange={e=>setQuery(e.target.value)} autoComplete="street-address"/>
+  <input required aria-label="Search for a real address or location" placeholder="Start with a city, venue, address, or landmark…" value={query} onChange={e=>{setQuery(e.target.value);onQueryChange?.(e.target.value)}} autoComplete="street-address"/>
   {loading&&<span className="searchStatus" role="status">Searching real places…</span>}
   {error&&<span className="searchError" role="status">{error}</span>}
   {results.length>0&&<ul>{results.map(place=><li key={place.id+place.name}><button type="button" onClick={()=>select(place)}><b>{place.name}</b><small>{place.provider==="google"?"Google Maps address":place.precision==="street-estimate"?"Estimated street position · U.S. Census":`Map location: ${place.lat?.toFixed(5)}, ${place.lng?.toFixed(5)}`}</small></button></li>)}{provider==="google"&&<li className="googleAttribution" aria-label="Results provided by Google Maps">Google Maps</li>}</ul>}

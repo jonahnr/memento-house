@@ -46,5 +46,16 @@ test("map access and dashboard selection are scoped to the individual map",()=>{
  assert.match(read("lib/map-entitlement.ts"),/eq\("map_id",mapId\)/);
  const dashboard=read("app/dashboard/dashboard.tsx");
  assert.match(dashboard,/URLSearchParams\(location\.search\)\.get\("map"\)/);
+ assert.match(dashboard,/className="mapSwitcher"/);
+ assert.match(dashboard,/maps\.map\(map=>/);
  assert.doesNotMatch(dashboard,/eq\("owner_user_id",user\.id\)\.single\(\)/);
+});
+
+test("onboarding resolves event locations and persists wedding venue coordinates",()=>{
+ const setup=read("app/memento-map/create/page.tsx"),route=read("app/api/maps/type/route.ts");
+ assert.match(setup,/LocationSearch/);
+ assert.match(setup,/eventLat:place\.lat,eventLng:place\.lng/);
+ assert.match(route,/hasCoordinates/);
+ assert.match(route,/from\("story_locations"\)/);
+ assert.match(route,/story_type:"Wedding Venue"/);
 });

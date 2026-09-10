@@ -25,7 +25,7 @@ const prettyDate=(value:string|null,short=false)=>{
 };
 
 export function Dashboard(){
- const[section,setSection]=useState("Overview"),[wedding,setWedding]=useState<Wedding|null>(null),[data,setData]=useState<Recommendation[]>([]);
+ const[section,setSection]=useState("Overview"),[wedding,setWedding]=useState<Wedding|null>(null),[maps,setMaps]=useState<Wedding[]>([]),[data,setData]=useState<Recommendation[]>([]);
  const[tier,setTier]=useState("map"),[travel,setTravel]=useState<TravelStatus[]>([]),[stories,setStories]=useState<Story[]>([]),[timeline,setTimeline]=useState<TimelineEntry[]>([]),[email,setEmail]=useState("");
  const[accountOrders,setAccountOrders]=useState<any[]>([]);
  const[loading,setLoading]=useState(true),[error,setError]=useState("");
@@ -37,6 +37,7 @@ export function Dashboard(){
   const{data:ownedOrders,error:ordersError}=await client.from("orders").select("id,catalog_key,product,tier,amount_total,currency,order_status,questionnaire_status,tracking_number,shipping_carrier,tracking_url,created_at").eq("customer_user_id",user.id).order("created_at",{ascending:false});if(ordersError)setError(ordersError.message);setAccountOrders(ownedOrders||[]);
   const requestedMap=new URLSearchParams(location.search).get("map");
   const ownedMaps=await client.from("weddings").select("id,partner_one_name,partner_two_name,wedding_date,title,slug,welcome_message,accent_color,map_type,map_type_locked,map_tier,configured_at,keepsake_settings,contribution_status,contribution_closes_at").eq("owner_user_id",user.id).order("created_at",{ascending:false});
+  setMaps((ownedMaps.data||[]) as Wedding[]);
   const wError=ownedMaps.error as {code?:string;message:string}|null,w=(ownedMaps.data||[]).find(map=>map.id===requestedMap)||(ownedMaps.data||[])[0] as Wedding|undefined;
   if(wError||!w){if((ownedOrders||[]).length){setLoading(false);return}setError(wError?.message||"Your account is ready, but it does not have an order yet.");setLoading(false);return}
   if(!w.configured_at&&w.map_type_locked!==undefined){location.assign(`/memento-map/create?map=${w.id}`);return}setWedding(w as Wedding);
@@ -68,7 +69,7 @@ export function Dashboard(){
  const mapPath=`/map/${wedding.slug}`, mapUrl=`https://mementohouse.com${mapPath}`;
  return <main className="dash">
   <DashboardSidebar section={section} setSection={setSection} items={items} tier={tier} email={email} initials={initials} names={names} date={prettyDate(wedding.wedding_date,true)} mapPath={mapPath} switchTier={switchTier} testPurchase={testPurchase} displayLabels={mapDashboardLabels(wedding.map_type)}/>
-   <section className="dashMain"><header><div><small>{wedding.map_type&&wedding.map_type!=="wedding"?`${mapConfig.name.toUpperCase()} MEMENTO MAP`:`${names.toUpperCase()}’S WEDDING`}</small><h1>{section}</h1></div></header>
+   <section className="dashMain"><header><div><small>{wedding.map_type&&wedding.map_type!=="wedding"?`${mapConfig.name.toUpperCase()} MEMENTO MAP`:`${names.toUpperCase()}’S WEDDING`}</small><h1>{section}</h1></div>{maps.length>1&&<label className="mapSwitcher"><span>Viewing map</span><select aria-label="Choose a Memento Map" value={wedding.id} onChange={event=>location.assign(`/dashboard?map=${encodeURIComponent(event.target.value)}`)}>{maps.map(map=><option key={map.id} value={map.id}>{map.title||`${map.partner_one_name} & ${map.partner_two_name}`} · {mapTypeConfig(map.map_type).name}</option>)}</select></label>}</header>
    {error&&<div className="authError">{error}</div>}
    {section==="Overview"&&<Overview wedding={wedding} recommendations={data} stories={stories} mapPath={mapPath} tier={tier} onSection={setSection}/>}
    {section==="Recommendations"&&<Recommendations rows={data} onStatus={setStatus} onRemove={remove}/>}

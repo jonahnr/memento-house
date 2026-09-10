@@ -202,3 +202,8 @@
 
 /* Center the complete sign-in introduction on narrow screens. */
 @media(max-width:600px){.auth{padding-top:110px}.auth>.brand{top:28px;left:50%;justify-content:center;transform:translateX(-50%);white-space:nowrap}.auth form{text-align:center}.auth form label,.auth .authHelp{text-align:left}}
+
+/* Let owners move between every Memento Map attached to their account. */
+.mapSwitcher{display:grid;gap:5px;min-width:min(320px,40vw);font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}
+.mapSwitcher select{width:100%;padding:10px 34px 10px 12px;border:1px solid var(--line);background:#fff;color:var(--ink);font:14px Georgia;text-transform:none;letter-spacing:0}
+@media(max-width:600px){.mapSwitcher{width:100%;min-width:0}.mapSwitcher select{font-size:16px}}
