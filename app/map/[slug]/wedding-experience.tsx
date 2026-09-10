@@ -52,7 +52,8 @@ export function WeddingExperience(){
  useEffect(()=>{if(wedding?.id!=="demo"||demoTracked.current)return;demoTracked.current=true;sendGAEvent("event","demo_use",{demo_name:"Memento Map",demo_slug:slug})},[wedding,slug]);
  const load=useCallback(async()=>{
   const client=getSupabaseBrowserClient();if(!client){setError("The map service is unavailable.");setLoading(false);return}
-  const{data:w,error:wError}=await client.from("weddings").select("id,partner_one_name,partner_two_name,wedding_date,title,slug,welcome_message,map_type").eq("slug",slug).eq("status","active").single();
+  let{data:w,error:wError}=await client.from("weddings").select("id,partner_one_name,partner_two_name,wedding_date,title,slug,welcome_message,map_type").eq("slug",slug).eq("status","active").single() as unknown as {data:Wedding|null;error:{code?:string;message:string}|null};
+  if(wError?.code==="42703")({data:w,error:wError}=await client.from("weddings").select("id,partner_one_name,partner_two_name,wedding_date,title,slug,welcome_message").eq("slug",slug).eq("status","active").single() as unknown as {data:Wedding|null;error:{code?:string;message:string}|null});
   if(wError||!w){if(slug==="jonah-kate"){setWedding(demoWedding);setRecs(demoPins);setStories([...demoStories,{label:"Our wedding venue",place:"Cincinnati, Ohio",latitude:39.1031,longitude:-84.512,lat:39.1031,lng:-84.512,kind:"venue"} as any]);setTimeline(demoTimeline);setVenue({location_name:"Cincinnati, Ohio",latitude:39.1031,longitude:-84.512});setSelected(null);setLoading(false);return}setError("This wedding map could not be found.");setLoading(false);return}
   setWedding(w as Wedding);
   const[{data:r,error:rError},{data:likes},{data:storyRows},{data:statusRows}]=await Promise.all([
