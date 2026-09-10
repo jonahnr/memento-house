@@ -15,7 +15,7 @@ export async function fulfillCartCheckout(admin:SupabaseClient,session:any){
  for(const[index,item]of items.entries()){
   const addons=item.addon==="none"?[]:[item.addon];resolveCatalog(item.product,item.tier,addons);
   const sourceId=index===0?session.id:`${session.id}:${index}`;
-  const result=await fulfillPurchase(admin,{source:"stripe",sourceId,stripeSessionId:index===0?session.id:null,email,userId,name:session.customer_details?.name||"",product:item.product,tier:item.tier,addons,amount:item.amount,currency:session.currency,customizationId:item.customizationId||null,paymentIntentId:session.payment_intent,isTest:session.livemode===false});
+  const result=await fulfillPurchase(admin,{source:"stripe",sourceId,stripeSessionId:index===0?session.id:null,email,userId,name:session.customer_details?.name||"",product:item.product,tier:item.tier,mapType:item.mapType,addons,amount:item.amount,currency:session.currency,customizationId:item.customizationId||null,paymentIntentId:session.payment_intent,isTest:session.livemode===false});
   await deliverOrderConfirmation(admin,result.order,result.item.displayName,"stripe_cart");results.push({...result,cartItemId:item.id});
  }
  return results;

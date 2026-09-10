@@ -4,6 +4,7 @@ import {deliverOrderConfirmation} from "../../../lib/order-notifications";
 import {fulfillPurchase} from "../../../lib/fulfillment";
 import {resolveCatalog} from "../../../lib/product-catalog";
 import {stripeServerConfig,supabaseServerConfig} from "../../../lib/server-config";
+import {parseMementoMapType} from "../../../lib/memento-map-types";
 export const maxDuration=60;
 
 async function recoverPaidCheckout(admin:any,sessionId:string){
@@ -17,7 +18,7 @@ async function recoverPaidCheckout(admin:any,sessionId:string){
  const email=String(session.customer_details?.email||session.customer_email||"").toLowerCase(),product=String(session.metadata?.product||""),tier=String(session.metadata?.tier||""),addons=String(session.metadata?.addons||"").split(",").filter(Boolean),item=resolveCatalog(product,tier,addons);
  if(!email||session.metadata?.catalog_key!==item.key)throw new Error("Paid Checkout Session has invalid fulfillment metadata");
  console.info("Recovering paid Checkout Session from order status",{sessionId,catalogKey:item.key});
- const result=await fulfillPurchase(admin,{source:"stripe",sourceId:sessionId,email,name:String(session.customer_details?.name||""),userId:String(session.metadata?.customer_user_id||session.client_reference_id||"")||null,product,tier,addons,amount:Number(session.amount_total||0),currency:String(session.currency||"usd"),customizationId:String(session.metadata?.customization_id||"")||null,paymentIntentId:String(session.payment_intent||"")||null,isTest:session.metadata?.test_checkout==="true"});
+ const result=await fulfillPurchase(admin,{source:"stripe",sourceId:sessionId,email,name:String(session.customer_details?.name||""),userId:String(session.metadata?.customer_user_id||session.client_reference_id||"")||null,product,tier,mapType:parseMementoMapType(session.metadata?.map_type),addons,amount:Number(session.amount_total||0),currency:String(session.currency||"usd"),customizationId:String(session.metadata?.customization_id||"")||null,paymentIntentId:String(session.payment_intent||"")||null,isTest:session.metadata?.test_checkout==="true"});
  const delivery=await deliverOrderConfirmation(admin,result.order,result.item.displayName,"order_recovery");
  if(!delivery.sent)console.error("Recovered order confirmation email failed",{orderId:result.order.id,error:"error" in delivery?delivery.error:"Unknown delivery error"});
  return result.order;

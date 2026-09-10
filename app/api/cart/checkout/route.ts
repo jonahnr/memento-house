@@ -15,7 +15,7 @@ export async function POST(request:Request){
    let customizationId="";if(item.customization){const saved=await identity.admin.from("checkout_customizations").insert({product:item.product,tier:item.tier,customer_user_id:identity.user.id,payload:JSON.parse(item.customization)}).select("id").single();if(saved.error)throw new Error("Your design could not be saved. Please try again.");customizationId=saved.data.id;}
    const catalog=resolveCatalog(item.product,item.tier),prefix=`line_items[${index}]`;
    body.set(`${prefix}[price_data][product_data][metadata][cart_item_id]`,item.id);body.set(`${prefix}[quantity]`,"1");body.set(`${prefix}[price_data][currency]`,"usd");body.set(`${prefix}[price_data][unit_amount]`,String(cartPrice(item)));body.set(`${prefix}[price_data][product_data][name]`,catalog.displayName+(item.addon!=="none"?` + ${item.addon==="open-5"?"5":"10"} Open When cards`:""));
-   body.set(`metadata[cart_item_${index}]`,JSON.stringify({id:item.id,product:item.product,tier:item.tier,addon:item.addon,customizationId}));
+   body.set(`metadata[cart_item_${index}]`,JSON.stringify({id:item.id,product:item.product,tier:item.tier,mapType:item.mapType,addon:item.addon,customizationId}));
   }
   const response=await fetch("https://api.stripe.com/v1/checkout/sessions",{method:"POST",headers:{Authorization:`Bearer ${key}`,"Content-Type":"application/x-www-form-urlencoded"},body,signal:AbortSignal.timeout(12000)}),session=await response.json();if(!response.ok||!session.url)throw new Error(session.error?.message||"Secure checkout could not be opened.");
   return Response.json({url:session.url},{headers:{"Cache-Control":"no-store"}});

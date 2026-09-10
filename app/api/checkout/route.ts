@@ -3,6 +3,7 @@ import {ADDONS,resolveCatalog} from "../../../lib/product-catalog";
 import {requireUser} from "../../../lib/request-user";
 import {requestOrigin} from "../../../lib/site-url";
 import {stripeServerConfig,supabaseServerConfig} from "../../../lib/server-config";
+import {parseMementoMapType} from "../../../lib/memento-map-types";
 export const maxDuration=30;
 type StripeFailure={error?:{code?:string;message?:string;type?:string}};
 async function createCheckoutSession(key:string,body:URLSearchParams){
@@ -15,7 +16,8 @@ async function createCheckoutSession(key:string,body:URLSearchParams){
 export async function POST(request:Request){
  const origin=requestOrigin(request);
  const identity=await requireUser(request);if(!identity){console.warn("[checkout] Account authorization rejected",{hasAuthorization:Boolean(request.headers.get("authorization"))});return Response.json({error:"Sign in or create your Memento House account before checkout."},{status:401})}
- const form=await request.formData(),product=String(form.get("product")||""),tier=String(form.get("tier")||""),addon=String(form.get("addon")||"none"),addons=addon==="none"?[]:[addon];let item;
+ const form=await request.formData(),product=String(form.get("product")||""),tier=String(form.get("tier")||""),rawMapType=String(form.get("mapType")||""),mapType=product==="map"?parseMementoMapType(rawMapType):undefined,addon=String(form.get("addon")||"none"),addons=addon==="none"?[]:[addon];let item;
+ if(product==="map"&&!mapType)return Response.json({error:"Choose a valid Memento Map type before checkout."},{status:400});
  try{item=resolveCatalog(product,tier,addons)}catch(error){return new Response(error instanceof Error?error.message:"Invalid product selection",{status:400})}
  const raw=String(form.get("customization")||"");
  if(product==="unity"&&!raw)return new Response("Complete and save the Unity Tile builder before checkout.",{status:400});
@@ -23,7 +25,7 @@ export async function POST(request:Request){
  let customizationId="";
  const server=supabaseServerConfig();if(raw&&raw.length<=250_000&&server.serviceRoleKey){try{const payload=JSON.parse(raw),admin=createClient(server.url,server.serviceRoleKey,{auth:{persistSession:false,autoRefreshToken:false}}),saved=await Promise.race([admin.from("checkout_customizations").insert({product,tier,payload}).select("id").single(),new Promise<never>((_,reject)=>setTimeout(()=>reject(new Error("Customization save timed out")),3000))]);if(!saved.error)customizationId=saved.data.id}catch(error){console.error("Checkout customization could not be persisted before Stripe",error)}}
  const addonTotal=addons.reduce((sum,id)=>sum+((ADDONS as Record<string,{price:number}>)[id]?.price||0),0),priceId=process.env[item.stripePriceEnv];
- const body=new URLSearchParams({mode:"payment",success_url:`${origin}/order/success?session_id={CHECKOUT_SESSION_ID}`,cancel_url:`${origin}/order?product=${encodeURIComponent(product)}&tier=${encodeURIComponent(tier)}`,customer_creation:"always",customer_email:identity.user.email||"","client_reference_id":identity.user.id,"line_items[0][quantity]":"1","billing_address_collection":"required",allow_promotion_codes:"true","metadata[catalog_key]":item.key,"metadata[product]":item.productId,"metadata[tier]":item.tierId,"metadata[addons]":addons.join(","),"metadata[customization_id]":customizationId,"metadata[customer_user_id]":identity.user.id});
+ const body=new URLSearchParams({mode:"payment",success_url:`${origin}/order/success?session_id={CHECKOUT_SESSION_ID}`,cancel_url:`${origin}/order?product=${encodeURIComponent(product)}&tier=${encodeURIComponent(tier)}${mapType?`&type=${encodeURIComponent(mapType)}`:""}`,customer_creation:"always",customer_email:identity.user.email||"","client_reference_id":identity.user.id,"line_items[0][quantity]":"1","billing_address_collection":"required",allow_promotion_codes:"true","metadata[catalog_key]":item.key,"metadata[product]":item.productId,"metadata[tier]":item.tierId,"metadata[map_type]":mapType||"","metadata[addons]":addons.join(","),"metadata[customization_id]":customizationId,"metadata[customer_user_id]":identity.user.id});
  if(process.env.STRIPE_AUTOMATIC_TAX_ENABLED==="true")body.set("automatic_tax[enabled]","true");
  const setInlinePrice=()=>{body.delete("line_items[0][price]");body.set("line_items[0][price_data][currency]","usd");body.set("line_items[0][price_data][unit_amount]",String(item.price+addonTotal));body.set("line_items[0][price_data][product_data][name]",item.displayName+(addons.length?` + ${addons.map(id=>(ADDONS as any)[id].name).join(", ")}`:""))};
  if(priceId&&!addonTotal)body.set("line_items[0][price]",priceId);else setInlinePrice();
