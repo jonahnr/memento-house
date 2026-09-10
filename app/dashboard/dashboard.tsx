@@ -12,7 +12,7 @@ import {MediaLibrary} from "../media-components";
 import {StoryEditorWithMedia} from "./components/story-editor-with-media";
 import {mapDashboardLabels,mapTypeConfig,type MementoMapType} from "../../lib/memento-map-types";
 
-type Wedding={id:string;partner_one_name:string;partner_two_name:string;wedding_date:string|null;title:string;slug:string;welcome_message:string;accent_color:string;map_type?:MementoMapType;map_type_locked?:boolean;keepsake_settings?:any;contribution_status?:"open"|"paused"|"closed";contribution_closes_at?:string|null};
+type Wedding={id:string;partner_one_name:string;partner_two_name:string;wedding_date:string|null;title:string;slug:string;welcome_message:string;accent_color:string;map_type?:MementoMapType;map_type_locked?:boolean;map_tier?:string;configured_at?:string|null;keepsake_settings?:any;contribution_status?:"open"|"paused"|"closed";contribution_closes_at?:string|null};
 type Recommendation={id:string;guest_name:string;message:string;category:string|null;status:"active"|"hidden"|"deleted";destination:{id:string;location_name:string;latitude:number;longitude:number}|null};
 type TravelStatus={destination_id:string;status:"want_to_go"|"planning"|"visited";planned_date:string|null;visited_date:string|null;couple_note:string|null;image_url:string|null;priority_rank:number|null};
 type Story={id:string;location_name:string;latitude:number;longitude:number;story_type:string;title:string;description:string;event_date:string|null;image_url:string|null;sort_order:number};
@@ -35,13 +35,14 @@ export function Dashboard(){
   if(!user){setLoading(false);return}
   setEmail(user.email||"");
   const{data:ownedOrders,error:ordersError}=await client.from("orders").select("id,catalog_key,product,tier,amount_total,currency,order_status,questionnaire_status,tracking_number,shipping_carrier,tracking_url,created_at").eq("customer_user_id",user.id).order("created_at",{ascending:false});if(ordersError)setError(ordersError.message);setAccountOrders(ownedOrders||[]);
-  let{data:w,error:wError}=await client.from("weddings").select("id,partner_one_name,partner_two_name,wedding_date,title,slug,welcome_message,accent_color,map_type,map_type_locked,keepsake_settings,contribution_status,contribution_closes_at").eq("owner_user_id",user.id).single() as unknown as {data:Wedding|null;error:{code?:string;message:string}|null};
-  if(wError?.code==="42703")({data:w,error:wError}=await client.from("weddings").select("id,partner_one_name,partner_two_name,wedding_date,title,slug,welcome_message,accent_color").eq("owner_user_id",user.id).single() as unknown as {data:Wedding|null;error:{code?:string;message:string}|null});
+  const requestedMap=new URLSearchParams(location.search).get("map");
+  const ownedMaps=await client.from("weddings").select("id,partner_one_name,partner_two_name,wedding_date,title,slug,welcome_message,accent_color,map_type,map_type_locked,map_tier,configured_at,keepsake_settings,contribution_status,contribution_closes_at").eq("owner_user_id",user.id).order("created_at",{ascending:false});
+  const wError=ownedMaps.error as {code?:string;message:string}|null,w=(ownedMaps.data||[]).find(map=>map.id===requestedMap)||(ownedMaps.data||[])[0] as Wedding|undefined;
   if(wError||!w){if((ownedOrders||[]).length){setLoading(false);return}setError(wError?.message||"Your account is ready, but it does not have an order yet.");setLoading(false);return}
-  if(w.map_type_locked===false){location.assign("/memento-map/create");return}setWedding(w as Wedding);
+  if(!w.configured_at&&w.map_type_locked!==undefined){location.assign(`/memento-map/create?map=${w.id}`);return}setWedding(w as Wedding);
   const plan=await fetch(`/api/map-plan?slug=${encodeURIComponent(w.slug)}`,{cache:"no-store"}).then(response=>response.ok?response.json():null).catch(()=>null);
   if(plan?.access===false){setWedding(null);setError("Memento Map access is currently paused for this account. Contact Memento House if you believe this is a mistake.");setLoading(false);return}
-  const resolvedTier=String(plan?.tier||user.user_metadata?.product_tier||"map");setTier(resolvedTier);
+  const resolvedTier=String(w.map_tier||plan?.tier||"map");setTier(resolvedTier);
   const{data:r,error:rError}=await client.from("recommendations").select("id,guest_name,message,category,status,destination:destinations(id,location_name,latitude,longitude)").eq("wedding_id",w.id).neq("status","deleted").order("created_at",{ascending:false});
   if(rError)setError(rError.message); else setData((r||[]) as unknown as Recommendation[]);
   const{data:t}=await client.from("couple_destination_status").select("destination_id,status,planned_date,visited_date,couple_note,image_url,priority_rank").eq("wedding_id",w.id);setTravel((t||[]) as TravelStatus[]);

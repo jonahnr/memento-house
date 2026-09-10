@@ -33,12 +33,11 @@ export default function Account() {
     window.location.assign(`/account/proof?id=${encodeURIComponent(id)}`);
   }
 
-  const mapOrder = data.orders?.find((order: any) => order.product === "map" && order.entitlement_status === "active");
+  const mapOrder = data.orders?.find((order: any) => order.product === "map" && order.entitlement_status === "active"), maps = data.maps || [];
   const forcedTier = ["map", "plus", "timeline-plus"].includes(data.mapAccessOverride) ? data.mapAccessOverride : null;
   const mapEnabled = data.mapAccessOverride !== "off" && (Boolean(mapOrder) || Boolean(forcedTier));
   const showMapAccess = Boolean(mapOrder) || Boolean(forcedTier) || data.mapAccessOverride === "off";
   const plan = human(forcedTier || mapOrder?.tier || "Map");
-  const eventUrl = data.wedding?.slug ? `https://mementohouse.com/map/${data.wedding.slug}` : "Not published yet";
 
   return <AccountShell email={data.email} mapEnabled={mapEnabled}>
     <section className="accountPanel" id="overview">
@@ -51,18 +50,18 @@ export default function Account() {
 
     <section className="accountPanel" id="digital">
       <div className="eyebrow">My digital experiences</div>
-      {showMapAccess ? <article className={`digitalExperienceCard ${mapEnabled ? "active" : "paused"}`}>
+      {showMapAccess ? maps.map((map:any)=>{const eventUrl=`https://mementohouse.com/map/${map.slug}`;return <article key={map.id} className={`digitalExperienceCard ${mapEnabled ? "active" : "paused"}`}>
         <header>
-          <div><small>MEMENTO MAP</small><h2>{mapEnabled ? "Your map experience is ready." : "Your map access is paused."}</h2></div>
-          {mapEnabled && <a className="button gold" href="/dashboard">Open Memento Map →</a>}
+          <div><small>{human(map.map_type||"wedding")} MEMENTO MAP</small><h2>{map.title||"Your map experience"}</h2></div>
+          {mapEnabled && <a className="button gold" href={map.configured_at?`/dashboard?map=${map.id}`:`/memento-map/create?map=${map.id}`}>{map.configured_at?"Open Memento Map →":"Set up Memento Map →"}</a>}
         </header>
         <dl>
-          <div><dt>Plan level</dt><dd>{plan}</dd></div>
+          <div><dt>Plan level</dt><dd>{human(map.map_tier||plan)}</dd></div>
           <div><dt>Map status</dt><dd>{mapEnabled ? "Active" : "Paused"}</dd></div>
-          <div><dt>Wedding / event link</dt><dd>{data.wedding?.slug ? <a href={`/map/${data.wedding.slug}`}>{eventUrl}</a> : eventUrl}</dd></div>
-          <div><dt>QR code</dt><dd>{data.wedding?.slug ? <img className="accountQr" src={`/api/qr?url=${encodeURIComponent(eventUrl)}`} alt={`QR code for ${data.wedding.slug}`}/> : "Available after your event link is published"}</dd></div>
+          <div><dt>Public contribution link</dt><dd><a href={`/map/${map.slug}`}>{eventUrl}</a></dd></div>
+          <div><dt>QR code</dt><dd><img className="accountQr" src={`/api/qr?url=${encodeURIComponent(eventUrl)}`} alt={`QR code for ${map.slug}`}/></dd></div>
         </dl>
-      </article> : <div className="emptyAccount"><h2>No digital experiences yet</h2><p>A Memento Map purchase will appear here with its plan, status, event link, and QR code.</p></div>}
+      </article>}) : <div className="emptyAccount"><h2>No digital experiences yet</h2><p>A Memento Map purchase will appear here with its plan, status, event link, and QR code.</p></div>}
     </section>
 
     <section className="accountPanel" id="orders">
@@ -74,7 +73,7 @@ export default function Account() {
           const active = digital && mapEnabled;
           return <article id={`order-${order.id}`} className={`customerOrder ${digital ? "digitalOrder" : ""}`} key={order.id}>
             <header><div><small>ORDER {order.id.slice(0, 8).toUpperCase()}</small><h2>{human(order.catalog_key || `${order.product} ${order.tier}`)}</h2><time>{new Date(order.created_at).toLocaleDateString()}</time></div><strong>{digital ? (active ? "Delivered · Access active" : "Access paused") : human(order.order_status)}</strong></header>
-            {digital ? <div className="customerOrderActions">{active && <a className="button gold" href="/dashboard">Open Memento Map →</a>}<span>Digital delivery requires no questionnaire, proof, production, or shipping.</span></div> : <>
+            {digital ? <div className="customerOrderActions">{active && <a className="button gold" href={order.map_id?`/dashboard?map=${order.map_id}`:"/dashboard"}>Open Memento Map →</a>}<span>Digital delivery requires no questionnaire, proof, production, or shipping.</span></div> : <>
               <div className="orderProgress"><span className="complete">Payment received</span><span className={proof ? "complete" : ""}>Design & proof</span><span className={["approved", "in_production", "ready_to_ship", "shipped", "delivered", "completed", "active"].includes(order.order_status) ? "complete" : ""}>Production</span><span className={["shipped", "delivered", "completed", "active"].includes(order.order_status) ? "complete" : ""}>Delivery</span></div>
               <div className="customerOrderActions">{order.questionnaire_status === "not_started" && <a className="button light" href={`/account/questionnaire?order=${order.id}`}>Complete questionnaire →</a>}{proof && <button className="button gold" onClick={() => reviewProof(proof.id)}>Review proof v{proof.version} →</button>}{order.tracking_url && <a className="button gold" href={order.tracking_url} target="_blank" rel="noreferrer">Track shipment →</a>}</div>
             </>}

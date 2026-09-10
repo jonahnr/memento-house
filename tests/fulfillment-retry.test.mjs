@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import ts from 'typescript';
 let source=await readFile(new URL('../lib/fulfillment.ts',import.meta.url),'utf8');
-for(const name of ['order-domain','product-catalog'])source=source.replace(`"./${name}"`,JSON.stringify(new URL(`../lib/${name}.ts`,import.meta.url).href));
+for(const name of ['order-domain','product-catalog','memento-map-types'])source=source.replace(new RegExp(`"\\./${name}(?:\\.ts)?"`),JSON.stringify(new URL(`../lib/${name}.ts`,import.meta.url).href));
 const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;
 const{fulfillPurchase}=await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
 function database(){

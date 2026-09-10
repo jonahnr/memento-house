@@ -1,5 +1,5 @@
 export type ProductTier={id:string;name:string;price:number;subtitle:string;cta:string;popular?:boolean;features:string[]};
-import {mapTypeConfig,type MapTierId,type MementoMapType} from "./memento-map-types";
+import {mapTypeConfig,type MapTierId,type MementoMapType} from "./memento-map-types.ts";
 
 export const mapTiers:ProductTier[]=[
  {id:"map",name:"Memento Map",price:99,subtitle:"Create an interactive map around your moment.",cta:"Choose Memento Map",features:["Personalized interactive map and QR code","Shared places, participant contributions, and real locations","Coordinated category colors and layer legend","Messages, owner dashboard, and permanent digital access"]},

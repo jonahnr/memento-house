@@ -1,5 +1,5 @@
 import {ADDONS,resolveCatalog} from "./product-catalog.ts";
-import {parseMementoMapType,type MementoMapType} from "./memento-map-types";
+import {parseMementoMapType,type MementoMapType} from "./memento-map-types.ts";
 export type CartItem={id:string;product:string;tier:string;addon:string;customization:string;mapType?:MementoMapType};
 export function validateCart(value:unknown):CartItem[]{
  if(!Array.isArray(value)||!value.length||value.length>12)throw new Error("Choose between 1 and 12 items for your cart.");

@@ -10,23 +10,41 @@ test("all five Memento Map experiences are defined with unique public routes",()
  for(const route of ["wedding","family-reunion","celebration-of-life","next-chapter","events"])assert.ok(source.includes(`route:"${route}"`));
 });
 
-test("migration preserves existing weddings and locks their type",()=>{
- const migration=read("supabase/migrations/012_memento_map_types.sql");
- assert.match(migration,/update public\.weddings set map_type='wedding',map_type_locked=true/i);
+test("migration preserves legacy maps as Wedding and enables several maps per owner",()=>{
+ const migration=read("supabase/migrations/013_map_owned_product_lifecycle.sql");
+ assert.match(migration,/set map_type='wedding', map_type_locked=true/i);
  assert.match(migration,/map_type set default 'wedding'/i);
- assert.match(migration,/map_type_locked boolean not null default false/i);
+ assert.match(migration,/drop constraint if exists weddings_owner_user_id_key/i);
+ assert.match(migration,/drop trigger if exists on_auth_user_created/i);
 });
 
-test("type selection is authenticated, validated, and immutable after setup",()=>{
+test("paid fulfillment creates one typed map and seeds real categories",()=>{
+ const fulfillment=read("lib/fulfillment.ts"),migration=read("supabase/migrations/013_map_owned_product_lifecycle.sql");
+ assert.match(fulfillment,/provision_paid_memento_map/);
+ assert.match(fulfillment,/defaultMapCategories/);
+ assert.match(migration,/source_order_id/);
+ assert.match(migration,/create table if not exists public\.map_categories/);
+ assert.match(migration,/pg_advisory_xact_lock/);
+});
+
+test("map setup is authenticated, map-scoped, and cannot change its type",()=>{
  const route=read("app/api/maps/type/route.ts");
  assert.match(route,/requireUser/);
- assert.match(route,/isMementoMapType/);
- assert.ok(route.includes('eq("map_type_locked",false)'));
- assert.match(route,/map_type_locked:true/);
+ assert.ok(route.includes('eq("id",mapId)'));
+ assert.ok(route.includes('eq("owner_user_id",identity.user.id)'));
+ assert.doesNotMatch(route,/map_type:type/);
 });
 
-test("marketing and setup surfaces use the shared type configuration",()=>{
- assert.match(read("app/memento-map/create/page.tsx"),/MEMENTO_MAP_TYPE_IDS\.map/);
+test("marketing and map-scoped setup use the shared type configuration",()=>{
+ assert.match(read("app/memento-map/create/page.tsx"),/MEMENTO_MAP_TYPES/);
+ assert.match(read("app/memento-map/create/page.tsx"),/params\.get\("map"\)/);
  assert.match(read("app/memento-map/[type]/page.tsx"),/typeFromRoute/);
  assert.match(read("app/memento-map/type-landing.tsx"),/MEMENTO_MAP_TYPES/);
+});
+
+test("map access and dashboard selection are scoped to the individual map",()=>{
+ assert.match(read("lib/map-entitlement.ts"),/eq\("map_id",mapId\)/);
+ const dashboard=read("app/dashboard/dashboard.tsx");
+ assert.match(dashboard,/URLSearchParams\(location\.search\)\.get\("map"\)/);
+ assert.doesNotMatch(dashboard,/eq\("owner_user_id",user\.id\)\.single\(\)/);
 });

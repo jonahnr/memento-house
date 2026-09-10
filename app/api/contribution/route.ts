@@ -18,7 +18,7 @@ export async function POST(request:Request){
   if(weddingResult.error)weddingResult=await admin.from("weddings").select("id,wedding_date").eq("id",weddingId).eq("status","active").maybeSingle() as typeof weddingResult;
  const wedding=weddingResult.data;
  if(!wedding)return Response.json({error:"This map is not accepting contributions."},{status:404});
- const mapType=resolveMementoMapType(wedding.map_type),config=mapTypeConfig(mapType);
+ const mapType=resolveMementoMapType(wedding.map_type),config=mapTypeConfig(mapType),categoryResult=await admin.from("map_categories").select("label,category_kind").eq("map_id",weddingId).eq("is_active",true).order("sort_order"),categories=categoryResult.data||[];
  if(wedding.contribution_status==="paused")return Response.json({error:"Contributions are temporarily paused by the map owner."},{status:403});
  if(wedding.contribution_status==="closed")return Response.json({error:"This map is closed to new guest contributions."},{status:403});
  if(wedding.contribution_closes_at&&new Date(wedding.contribution_closes_at)<=new Date())return Response.json({error:"The contribution window for this map has closed."},{status:403});
@@ -27,7 +27,7 @@ export async function POST(request:Request){
  if(mapType==="wedding"&&wedding.wedding_date){const closes=new Date(`${wedding.wedding_date}T23:59:59Z`);closes.setUTCDate(closes.getUTCDate()+14);if(new Date()>closes)return Response.json({error:"This wedding map is now closed to new guest contributions."},{status:403})}
  let{data:destination}=await admin.from("destinations").select("id").eq("wedding_id",weddingId).eq("normalized_location_name",normalize(place)).maybeSingle();
  if(!destination){const created=await admin.from("destinations").insert({wedding_id:weddingId,location_name:place,normalized_location_name:normalize(place),latitude:lat,longitude:lng}).select("id").single();if(created.error)return Response.json({error:"That place could not be saved."},{status:500});destination=created.data}
- const finalMessage=message||(mapType==="wedding"?"Traveled from this place to celebrate with the couple.":config.originPrompt),finalCategory=type==="origin"?config.categories[0]:category||config.categories[1]||config.categories[0];
+ const originCategory=categories.find(item=>item.category_kind==="origin")?.label||config.categories[0],allowedCategories=new Set(categories.map(item=>item.label)),requestedCategory=allowedCategories.has(category)?category:"",finalMessage=message||(mapType==="wedding"?"Traveled from this place to celebrate with the couple.":config.originPrompt),finalCategory=type==="origin"?originCategory:requestedCategory||categories.find(item=>item.category_kind!=="origin")?.label||config.categories[1]||config.categories[0];
  const duplicate=await admin.from("recommendations").select("id").eq("wedding_id",weddingId).eq("destination_id",destination.id).eq("guest_name",guest).limit(1).maybeSingle();
  if(duplicate.data)return Response.json({error:"That contribution is already on the map."},{status:409});
  const prior=await admin.from("recommendations").select("id",{count:"exact",head:true}).eq("wedding_id",weddingId).ilike("guest_name",guest);

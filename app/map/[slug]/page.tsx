@@ -1,3 +1,3 @@
 import {WeddingExperience} from "./wedding-experience";
-export const metadata={title:"Wedding Adventure Map",description:"Recommend a real place for the couple’s next adventure.",robots:{index:false,follow:false}};
+export const metadata={title:"Memento Map",description:"Contribute a meaningful place, story, photo, or memory.",robots:{index:false,follow:false}};
 export default function WeddingMap(){return <WeddingExperience/>}

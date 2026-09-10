@@ -10,6 +10,6 @@ export async function GET(request:Request){
  if(weddingError)({data:wedding,error:weddingError}=await admin.from("weddings").select("id,owner_user_id").eq("slug",slug).eq("status","active").maybeSingle() as unknown as {data:{id:string;owner_user_id:string;map_type?:string}|null;error:unknown});
  if(!wedding)return Response.json({tier:"map"});
  const[{data:user},{data:venue}]=await Promise.all([admin.auth.admin.getUserById(wedding.owner_user_id),admin.from("story_locations").select("location_name,latitude,longitude").eq("wedding_id",wedding.id).eq("story_type","Wedding Venue").maybeSingle()]);
- const[tier,access]=await Promise.all([resolveMapTier(admin,wedding.owner_user_id,user.user?.user_metadata,user.user?.email),resolveMapAccess(admin,wedding.owner_user_id,user.user?.user_metadata,user.user?.email)]);
+ const[tier,access]=await Promise.all([resolveMapTier(admin,wedding.owner_user_id,user.user?.user_metadata,user.user?.email,wedding.id),resolveMapAccess(admin,wedding.owner_user_id,user.user?.user_metadata,user.user?.email,wedding.id)]);
  return Response.json({access,tier,mapType:wedding.map_type||"wedding",venue:venue||null},{headers:{"Cache-Control":"no-store"}});
 }
