@@ -111,7 +111,7 @@
 .timelineBridge{display:none!important}
 /* Celebration art sprite and Timeline Plus card interaction */
 .celebrationCard[style*="celebration-scenes-v1"]{background-size:300% 200%}
-.timelineMapCards .timelineChapterCard{min-height:430px;padding:0;border:0;background:transparent;perspective:1200px;overflow:visible}
+.timelineMapCards .timelineChapterCard{display:flex;flex:0 0 min(360px,84vw);width:min(360px,84vw);min-height:430px;padding:0;border:0;background:transparent;perspective:1200px;overflow:visible;scroll-snap-align:start;cursor:pointer}
 .timelineCardInner{position:relative;display:block;width:100%;min-height:430px;margin:0!important;transform-style:preserve-3d;transition:transform .5s ease}
 .timelineChapterCard:hover .timelineCardInner,.timelineChapterCard:focus-visible .timelineCardInner{transform:rotateY(180deg)}
 .timelineLogoFallback{display:grid;place-items:center;width:100%;height:100%;background:#f5efe5}.timelineLogoFallback img{width:min(54%,180px)!important;height:auto!important;max-height:62%;object-fit:contain;opacity:.8}.timelinePlane{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#fffdf8;color:#8f642e;border:2px solid #a77b3f;box-shadow:0 8px 20px #3f2e1b3d;font-size:23px;opacity:0;transform:translate(-70px,35px) rotate(-18deg) scale(.6);transition:opacity .25s ease,transform 1.05s cubic-bezier(.2,.8,.2,1)}.timelinePlane.arrived{opacity:1;transform:translate(0,0) rotate(-8deg) scale(1)}
