@@ -15,7 +15,7 @@ export async function POST(request:Request){
  const weddingId=clean(body.weddingId,50),place=clean(body.place,180),guest=clean(body.guest,100),message=clean(body.message,1000),category=clean(body.category,60),type=body.contributionType==="origin"?"origin":"recommendation",lat=Number(body.lat),lng=Number(body.lng);
  if(!weddingId||place.length<2||guest.length<1||!Number.isFinite(lat)||!Number.isFinite(lng)||lat<-90||lat>90||lng<-180||lng>180||type==="recommendation"&&message.length<5)return Response.json({error:"Please complete each required field."},{status:400});
  const admin=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});let weddingResult=await admin.from("weddings").select("id,wedding_date,map_type,contribution_status,contribution_closes_at").eq("id",weddingId).eq("status","active").maybeSingle();
- if(weddingResult.error?.code==="42703")weddingResult=await admin.from("weddings").select("id,wedding_date").eq("id",weddingId).eq("status","active").maybeSingle() as typeof weddingResult;
+  if(weddingResult.error)weddingResult=await admin.from("weddings").select("id,wedding_date").eq("id",weddingId).eq("status","active").maybeSingle() as typeof weddingResult;
  const wedding=weddingResult.data;
  if(!wedding)return Response.json({error:"This map is not accepting contributions."},{status:404});
  const mapType=resolveMementoMapType(wedding.map_type),config=mapTypeConfig(mapType);
