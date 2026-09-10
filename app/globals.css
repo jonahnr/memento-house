@@ -199,3 +199,6 @@
 .storyList article,.storyList article:not(:has(img)){grid-template-columns:72px minmax(0,1fr) auto}
 .storyList article>img,.storyList article>.streamPlayer,.storyList article>.mediaState,.storyMediaPlaceholder{width:72px;height:72px;min-height:72px;object-fit:cover}
 @media(max-width:760px){.storyList article,.storyList article:not(:has(img)){grid-template-columns:48px minmax(0,1fr)}.storyList article>img,.storyList article>.streamPlayer,.storyList article>.mediaState,.storyMediaPlaceholder{width:48px;height:48px;min-height:48px}.storyList .storyActions{grid-column:2}}
+
+/* Center the complete sign-in introduction on narrow screens. */
+@media(max-width:600px){.auth{padding-top:110px}.auth>.brand{top:28px;left:50%;justify-content:center;transform:translateX(-50%);white-space:nowrap}.auth form{text-align:center}.auth form label,.auth .authHelp{text-align:left}}
