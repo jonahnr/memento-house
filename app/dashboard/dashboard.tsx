@@ -10,8 +10,9 @@ import {DashboardSidebar} from "./components/dashboard-sidebar";
 import {normalizeTimelineOrder,numberTimelineLocations} from "../../lib/timeline-normalization";
 import {MediaLibrary} from "../media-components";
 import {StoryEditorWithMedia} from "./components/story-editor-with-media";
+import {mapTypeConfig,type MementoMapType} from "../../lib/memento-map-types";
 
-type Wedding={id:string;partner_one_name:string;partner_two_name:string;wedding_date:string|null;title:string;slug:string;welcome_message:string;accent_color:string;keepsake_settings?:any;contribution_status?:"open"|"paused"|"closed";contribution_closes_at?:string|null};
+type Wedding={id:string;partner_one_name:string;partner_two_name:string;wedding_date:string|null;title:string;slug:string;welcome_message:string;accent_color:string;map_type?:MementoMapType;map_type_locked?:boolean;keepsake_settings?:any;contribution_status?:"open"|"paused"|"closed";contribution_closes_at?:string|null};
 type Recommendation={id:string;guest_name:string;message:string;category:string|null;status:"active"|"hidden"|"deleted";destination:{id:string;location_name:string;latitude:number;longitude:number}|null};
 type TravelStatus={destination_id:string;status:"want_to_go"|"planning"|"visited";planned_date:string|null;visited_date:string|null;couple_note:string|null;image_url:string|null;priority_rank:number|null};
 type Story={id:string;location_name:string;latitude:number;longitude:number;story_type:string;title:string;description:string;event_date:string|null;image_url:string|null;sort_order:number};
@@ -34,10 +35,10 @@ export function Dashboard(){
   if(!user){setLoading(false);return}
   setEmail(user.email||"");
   const{data:ownedOrders,error:ordersError}=await client.from("orders").select("id,catalog_key,product,tier,amount_total,currency,order_status,questionnaire_status,tracking_number,shipping_carrier,tracking_url,created_at").eq("customer_user_id",user.id).order("created_at",{ascending:false});if(ordersError)setError(ordersError.message);setAccountOrders(ownedOrders||[]);
-  let{data:w,error:wError}=await client.from("weddings").select("id,partner_one_name,partner_two_name,wedding_date,title,slug,welcome_message,accent_color,keepsake_settings,contribution_status,contribution_closes_at").eq("owner_user_id",user.id).single() as unknown as {data:Wedding|null;error:{code?:string;message:string}|null};
+  let{data:w,error:wError}=await client.from("weddings").select("id,partner_one_name,partner_two_name,wedding_date,title,slug,welcome_message,accent_color,map_type,map_type_locked,keepsake_settings,contribution_status,contribution_closes_at").eq("owner_user_id",user.id).single() as unknown as {data:Wedding|null;error:{code?:string;message:string}|null};
   if(wError?.code==="42703")({data:w,error:wError}=await client.from("weddings").select("id,partner_one_name,partner_two_name,wedding_date,title,slug,welcome_message,accent_color").eq("owner_user_id",user.id).single() as unknown as {data:Wedding|null;error:{code?:string;message:string}|null});
   if(wError||!w){if((ownedOrders||[]).length){setLoading(false);return}setError(wError?.message||"Your account is ready, but it does not have an order yet.");setLoading(false);return}
-  setWedding(w as Wedding);
+  if(w.map_type_locked===false){location.assign("/memento-map/create");return}setWedding(w as Wedding);
   const plan=await fetch(`/api/map-plan?slug=${encodeURIComponent(w.slug)}`,{cache:"no-store"}).then(response=>response.ok?response.json():null).catch(()=>null);
   if(plan?.access===false){setWedding(null);setError("Memento Map access is currently paused for this account. Contact Memento House if you believe this is a mistake.");setLoading(false);return}
   const resolvedTier=String(plan?.tier||user.user_metadata?.product_tier||"map");setTier(resolvedTier);
@@ -59,19 +60,19 @@ export function Dashboard(){
  }
  async function switchTier(next:string){const client=getSupabaseBrowserClient(),session=(await client!.auth.getSession()).data.session,response=await fetch("/api/admin/tier",{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${session?.access_token}`},body:JSON.stringify({tier:next})}),result=await response.json().catch(()=>null);if(!response.ok){setError(result?.error||`Plan preview could not be changed (${response.status}).`);return}await client!.auth.refreshSession();setError("");setTier(next);if(next==="timeline-plus"&&!timeline.length){const{data:tl}=await client!.from("timeline_entries").select("*,destination:destinations(id,location_name,latitude,longitude)").eq("wedding_id",wedding?.id||"").order("sort_date");setTimeline((tl||[]) as unknown as TimelineEntry[])}if(next==="map"&&["Our Story","Travel Journal","Keepsake","Timeline Plus"].includes(section))setSection("Overview")}
  async function testPurchase(next:"map"|"plus"|"timeline-plus"){const client=getSupabaseBrowserClient(),session=(await client!.auth.getSession()).data.session,response=await fetch("/api/admin/test-purchase",{method:"POST",headers:{"Content-Type":"application/json",Authorization:`Bearer ${session?.access_token}`},body:JSON.stringify({product:"map",tier:next})}),result=await response.json().catch(()=>null);if(response.ok){await client!.auth.refreshSession();location.href=result?.redirect||"/order/test-success"}else setError(result?.error||`Admin test could not be started (${response.status}).`)}
- if(loading)return <main className="auth authLoading"><div><span className="eyebrow">Memento House</span><h1>Preparing your wedding workspace…</h1></div></main>;
+ if(loading)return <main className="auth authLoading"><div><span className="eyebrow">Memento House</span><h1>Preparing your Memento Map workspace…</h1></div></main>;
  if(!wedding)return <AccountOrders email={email} orders={accountOrders} error={error}/>;
- const names=`${wedding.partner_one_name} & ${wedding.partner_two_name}`, initials=`${wedding.partner_one_name[0]||""}${wedding.partner_two_name[0]||""}`.toUpperCase();
+ const mapConfig=mapTypeConfig(wedding.map_type),names=wedding.map_type&&wedding.map_type!=="wedding"?wedding.title:`${wedding.partner_one_name} & ${wedding.partner_two_name}`, initials=`${wedding.partner_one_name[0]||""}${wedding.partner_two_name[0]||""}`.toUpperCase();
  const items=tier==="timeline-plus"?[...baseItems.slice(0,4),"Timeline Plus",...baseItems.slice(4)]:baseItems;
  const mapPath=`/map/${wedding.slug}`, mapUrl=`https://mementohouse.com${mapPath}`;
  return <main className="dash">
-  <DashboardSidebar section={section} setSection={setSection} items={items} tier={tier} email={email} initials={initials} names={names} date={prettyDate(wedding.wedding_date,true)} mapPath={mapPath} switchTier={switchTier} testPurchase={testPurchase}/>
-  <section className="dashMain"><header><div><small>{names.toUpperCase()}’S WEDDING</small><h1>{section}</h1></div></header>
+  <DashboardSidebar section={section} setSection={setSection} items={items} tier={tier} email={email} initials={initials} names={names} date={prettyDate(wedding.wedding_date,true)} mapPath={mapPath} switchTier={switchTier} testPurchase={testPurchase} displayLabels={{Recommendations:mapConfig.dashboardContributionLabel}}/>
+   <section className="dashMain"><header><div><small>{wedding.map_type&&wedding.map_type!=="wedding"?`${mapConfig.name.toUpperCase()} MEMENTO MAP`:`${names.toUpperCase()}’S WEDDING`}</small><h1>{section}</h1></div></header>
    {error&&<div className="authError">{error}</div>}
    {section==="Overview"&&<Overview wedding={wedding} recommendations={data} stories={stories} mapPath={mapPath} tier={tier} onSection={setSection}/>}
    {section==="Recommendations"&&<Recommendations rows={data} onStatus={setStatus} onRemove={remove}/>}
    {section==="Travel Journal"&&tier!=="map"&&<><BucketListBuilder wedding={wedding} onAdded={row=>setData(v=>[row,...v])}/><GuestRecommendationInbox wedding={wedding} rows={data} values={travel} onChange={setTravel}/><TravelJournal wedding={wedding} rows={data} values={travel} onChange={setTravel}/></>}
-   {section==="Our Story"&&tier!=="map"&&<StoryEditorWithMedia wedding={wedding} values={stories} onChange={setStories}/>}
+   {section==="Our Story"&&tier!=="map"&&<><p className="mapTypeBadge">{mapConfig.name} Memento Map</p><StoryEditorWithMedia wedding={wedding} values={stories} onChange={setStories}/></>}
    {section==="Timeline Plus"&&tier==="timeline-plus"&&<ConnectedTimelinePlus wedding={wedding} stories={stories} values={timeline} onChange={setTimeline}/>}
    {section==="QR Code"&&<QR wedding={wedding} mapUrl={mapUrl} tier={tier}/>}
    {section==="Keepsake"&&tier!=="map"&&<KeepsakeV2 wedding={wedding} recommendations={data} stories={stories} timeline={timeline} onWeddingChange={setWedding}/>}
