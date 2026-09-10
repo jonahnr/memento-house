@@ -190,6 +190,10 @@
 .timelineVideoPreview{position:absolute;inset:0;display:block;margin:0!important;background:#191713}
 .timelineMapCards .timelineVideoPreview iframe,.timelineMapCards .timelineVideoPreview>img{position:absolute;inset:0;width:100%;height:100%;max-height:none;margin:0;border:0;object-fit:contain}.timelineMapCards .timelineVideoPreview>img{pointer-events:none}
 .timelineMapCards .timelineVideoBadge{position:absolute;top:12px;left:12px;padding:7px 10px;background:#191713d9;color:#fff;font-size:11px;border-radius:4px}
+.timelineChapterCard.hasVideo .timelineCardBack{display:none}
+.timelineChapterCard.hasVideo .timelineFrontLabel{top:0;right:0;bottom:auto;left:0;padding:52px 18px 34px;background:linear-gradient(rgba(12,9,6,.88),transparent);pointer-events:none}
+.timelineChapterCard.hasVideo .timelineVideoBadge{right:12px;left:auto;z-index:2;pointer-events:none}
+.timelineChapterCard.hasVideo .timelineVideoPreview iframe{z-index:1;pointer-events:auto}
 
 /* Keep photo, video, and venue milestones aligned in one predictable row. */
 .storyList article,.storyList article:not(:has(img)){grid-template-columns:72px minmax(0,1fr) auto}
