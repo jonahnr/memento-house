@@ -9,6 +9,7 @@ import {LocationSearch} from "../map/[slug]/location-search";
 import {DashboardSidebar} from "./components/dashboard-sidebar";
 import {normalizeTimelineOrder,numberTimelineLocations} from "../../lib/timeline-normalization";
 import {MediaLibrary} from "../media-components";
+import {StoryEditorWithMedia} from "./components/story-editor-with-media";
 
 type Wedding={id:string;partner_one_name:string;partner_two_name:string;wedding_date:string|null;title:string;slug:string;welcome_message:string;accent_color:string;keepsake_settings?:any;contribution_status?:"open"|"paused"|"closed";contribution_closes_at?:string|null};
 type Recommendation={id:string;guest_name:string;message:string;category:string|null;status:"active"|"hidden"|"deleted";destination:{id:string;location_name:string;latitude:number;longitude:number}|null};
@@ -70,7 +71,7 @@ export function Dashboard(){
    {section==="Overview"&&<Overview wedding={wedding} recommendations={data} stories={stories} mapPath={mapPath} tier={tier} onSection={setSection}/>}
    {section==="Recommendations"&&<Recommendations rows={data} onStatus={setStatus} onRemove={remove}/>}
    {section==="Travel Journal"&&tier!=="map"&&<><BucketListBuilder wedding={wedding} onAdded={row=>setData(v=>[row,...v])}/><GuestRecommendationInbox wedding={wedding} rows={data} values={travel} onChange={setTravel}/><TravelJournal wedding={wedding} rows={data} values={travel} onChange={setTravel}/></>}
-   {section==="Our Story"&&tier!=="map"&&<StoryEditor wedding={wedding} values={stories} onChange={setStories}/>}
+   {section==="Our Story"&&tier!=="map"&&<StoryEditorWithMedia wedding={wedding} values={stories} onChange={setStories}/>}
    {section==="Timeline Plus"&&tier==="timeline-plus"&&<ConnectedTimelinePlus wedding={wedding} stories={stories} values={timeline} onChange={setTimeline}/>}
    {section==="QR Code"&&<QR wedding={wedding} mapUrl={mapUrl} tier={tier}/>}
    {section==="Keepsake"&&tier!=="map"&&<KeepsakeV2 wedding={wedding} recommendations={data} stories={stories} timeline={timeline} onWeddingChange={setWedding}/>}
