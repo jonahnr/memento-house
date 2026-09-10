@@ -65,7 +65,9 @@ test("onboarding resolves event locations and persists wedding venue coordinates
 test("dashboard, QR, story editor, and public map use type-specific experience labels",()=>{
  const config=read("lib/memento-map-types.ts"),dashboard=read("app/dashboard/dashboard.tsx"),map=read("app/map/[slug]/wedding-experience.tsx"),story=read("app/dashboard/components/story-editor-with-media.tsx"),qr=read("app/dashboard/components/qr-card.tsx");
  for(const phrase of ["Family reunion location","Travel places in their honor","Opening the memorial map","THEIR LIFE STORY, MAPPED","Event and community details"])assert.match(config,new RegExp(phrase,"i"));
+ for(const phrase of ["Years remembered","Miles across their life story","Bring Our Family Together","Share a Memory of"])assert.match(config,new RegExp(phrase,"i"));
  for(const source of [dashboard,map,story,qr])assert.match(source,/mapExperienceLabels|mapCollectionLabels/);
  assert.doesNotMatch(map,/Opening the adventure map/);
  assert.doesNotMatch(story,/YOUR RELATIONSHIP, MAPPED/);
+ assert.doesNotMatch(qr,/>Help Build<br/);
 });
