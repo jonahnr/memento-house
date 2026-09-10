@@ -1,12 +1,12 @@
 "use client";
-import {mapTypeConfig,type MementoMapType} from "../../../lib/memento-map-types";
+import {mapExperienceLabels,mapTypeConfig,type MementoMapType} from "../../../lib/memento-map-types";
 import {useEffect,useState} from "react";
 import QRCode from "qrcode";
 
 const layouts={single:{label:"One full-page sign · 8.5 × 11 inches",page:"8.5in 11in"},double:{label:"Two landscape cards · one 8.5 × 11 sheet",page:"8.5in 11in"},"4x6":{label:"Small sign · 4 × 6 inches",page:"4in 6in"},"5x7":{label:"Table sign · 5 × 7 inches",page:"5in 7in"}};
 type Layout=keyof typeof layouts;
 export function QR({wedding,mapUrl,tier}:{wedding:{partner_one_name:string;partner_two_name:string;title:string;map_type?:MementoMapType};mapUrl:string;tier:string}){
- const config=mapTypeConfig(wedding.map_type),names=wedding.map_type&&wedding.map_type!=="wedding"?wedding.title:`${wedding.partner_one_name} & ${wedding.partner_two_name}`;
+ const config=mapTypeConfig(wedding.map_type),labels=mapExperienceLabels(wedding.map_type),names=wedding.map_type&&wedding.map_type!=="wedding"?wedding.title:`${wedding.partner_one_name} & ${wedding.partner_two_name}`;
  const[qr,setQr]=useState(""),[error,setError]=useState(""),[copied,setCopied]=useState(false),[layout,setLayout]=useState<Layout>("single"),[design,setDesign]=useState("classic"),[logoReady,setLogoReady]=useState(false);
  useEffect(()=>{let active=true;setQr("");setError("");(async()=>{
   const canvas=document.createElement("canvas");
@@ -18,11 +18,11 @@ export function QR({wedding,mapUrl,tier}:{wedding:{partner_one_name:string;partn
  return <div className={`qrLayout qr-${layout} qr-design-${design}`}>
   <style>{`@media print{@page{size:${layouts[layout].page};margin:.25in}}`}</style>
   <div className="qrPrintSheet">{card(0)}{layout==="double"&&card(1)}</div>
-  <div className="qrTools"><h2>Your Wedding QR Code</h2><p>Choose a sign for your welcome table, a small frame, or two cards to cut apart.</p>
+  <div className="qrTools"><h2>{labels.qrTitle}</h2><p>{labels.qrContext}</p>
    <label>Print layout<select value={layout} onChange={e=>setLayout(e.target.value as Layout)}>{Object.entries(layouts).map(([value,option])=><option key={value} value={value}>{option.label}</option>)}</select></label>
    <label>Sign design<select value={design} onChange={e=>setDesign(e.target.value)}><option value="classic">Classic Gold · original design</option><option value="garden">Garden Arch · soft sage</option><option value="editorial">Modern Editorial · ink & ivory</option></select></label>
    <p className="qrPrintQuality">Print-ready at 300+ PPI. Choose the matching paper size and 100% scale, with headers and footers off. You can also select “Save as PDF” in the print dialog.</p>
-   <label>Guest map link<input value={mapUrl} readOnly/></label><a href={mapUrl} className="button gold">Open adventure map ↗</a><button className="button light" onClick={async()=>{try{await navigator.clipboard.writeText(mapUrl);setCopied(true)}catch{setError("Copy the guest map link from the field above.")}}}>{copied?"Link copied ✓":"Copy link"}</button><button className="button light" disabled={!qr||!logoReady} onClick={()=>window.print()}>Print {layout==="double"?"two cards":layout==="single"?"full-page sign":`${layout.replace("x"," × ")} sign`} ↓</button>{error&&<p role="alert">{error}</p>}
+   <label>{labels.mapLinkLabel}<input value={mapUrl} readOnly/></label><a href={mapUrl} className="button gold">{labels.openMap} ↗</a><button className="button light" onClick={async()=>{try{await navigator.clipboard.writeText(mapUrl);setCopied(true)}catch{setError(`Copy the ${labels.mapLinkLabel.toLowerCase()} from the field above.`)}}}>{copied?"Link copied ✓":"Copy link"}</button><button className="button light" disabled={!qr||!logoReady} onClick={()=>window.print()}>Print {layout==="double"?"two cards":layout==="single"?"full-page sign":`${layout.replace("x"," × ")} sign`} ↓</button>{error&&<p role="alert">{error}</p>}
   </div>
  </div>;
 }
