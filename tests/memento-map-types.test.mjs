@@ -43,7 +43,10 @@ test("marketing and map-scoped setup use the shared type configuration",()=>{
 });
 
 test("map access and dashboard selection are scoped to the individual map",()=>{
- assert.match(read("lib/map-entitlement.ts"),/eq\("map_id",mapId\)/);
+ const entitlement=read("lib/map-entitlement.ts");
+ assert.match(entitlement,/eq\("map_id",mapId\)/);
+ assert.match(entitlement,/is\("source_order_id",null\)/);
+ assert.match(entitlement,/is\("map_id",null\)/);
  const dashboard=read("app/dashboard/dashboard.tsx");
  assert.match(dashboard,/URLSearchParams\(location\.search\)\.get\("map"\)/);
  assert.match(dashboard,/className="mapSwitcher"/);

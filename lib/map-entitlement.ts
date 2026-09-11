@@ -14,8 +14,13 @@ export async function resolveMapAccess(admin:SupabaseClient,userId:string,metada
  if(override==="off")return false;
  if(override!=="automatic")return true;
  if(email?.toLowerCase()==="jonahnr@gmail.com")return true;
- let query=admin.from("entitlements").select("id").eq("user_id",userId).eq("status","active").in("entitlement",["map_basic","map_plus","map_timeline_plus"]);if(mapId)query=query.eq("map_id",mapId);const result=await query.limit(1);
- return Boolean(result.data?.length);
+ const entitlements=["map_basic","map_plus","map_timeline_plus"];
+ let query=admin.from("entitlements").select("id").eq("user_id",userId).eq("status","active").in("entitlement",entitlements);if(mapId)query=query.eq("map_id",mapId);const result=await query.limit(1);
+ if(result.data?.length||!mapId)return Boolean(result.data?.length);
+ const legacyMap=await admin.from("weddings").select("id").eq("id",mapId).eq("owner_user_id",userId).is("source_order_id",null).maybeSingle();
+ if(!legacyMap.data)return false;
+ const legacyEntitlement=await admin.from("entitlements").select("id").eq("user_id",userId).eq("status","active").in("entitlement",entitlements).is("map_id",null).limit(1);
+ return Boolean(legacyEntitlement.data?.length);
 }
 
 export async function resolveMapTier(admin:SupabaseClient,userId:string,metadata?:Record<string,unknown>,email?:string|null,mapId?:string):Promise<MapTier>{
