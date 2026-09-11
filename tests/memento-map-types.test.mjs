@@ -42,6 +42,19 @@ test("marketing and map-scoped setup use the shared type configuration",()=>{
  assert.match(read("app/memento-map/type-landing.tsx"),/MEMENTO_MAP_TYPES/);
 });
 
+test("all five type pages share one visual template with distinct optimized assets",()=>{
+ const template=read("app/memento-map/type-landing.tsx"),visuals=read("app/memento-map/map-type-visuals.ts");
+ assert.match(template,/MEMENTO_MAP_TYPE_VISUALS\[type\]/);
+ for(const type of ["wedding","family-reunion","celebration-of-life","next-chapter","events"]){
+  for(const stage of ["hero","map","keepsake"]){
+   const asset=`map-${type}-${stage}.webp`;
+   assert.match(visuals,new RegExp(asset));
+   assert.ok(fs.existsSync(new URL(`../public/brand/${asset}`,import.meta.url)));
+  }
+ }
+ for(const section of ["typeHero","typeHow","typeProductView","typeCategories","typeKeepsake"])assert.match(template,new RegExp(section));
+});
+
 test("map access and dashboard selection are scoped to the individual map",()=>{
  const entitlement=read("lib/map-entitlement.ts");
  assert.match(entitlement,/eq\("map_id",mapId\)/);
