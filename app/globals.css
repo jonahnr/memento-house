@@ -216,6 +216,7 @@
 /* Center the complete sign-in introduction on narrow screens. */
 @media(max-width:600px){.auth{padding-top:110px}.auth>.brand{top:28px;left:50%;justify-content:center;transform:translateX(-50%);white-space:nowrap}.auth form{text-align:center}.auth form label,.auth .authHelp{text-align:left}}
 .authConfirmation{width:min(520px,100%);margin:auto;padding:52px 44px;text-align:center;background:var(--paper);box-shadow:0 25px 70px #4a38231c}.authConfirmation h1{font:48px/1.05 Georgia;margin:12px 0}.authConfirmation p{font:16px/1.65 Georgia;color:var(--muted)}.authConfirmation .button,.authConfirmation .textLink{display:block;margin:22px auto 0}@media(max-width:600px){.authConfirmation{padding:38px 22px}.authConfirmation h1{font-size:38px}}
+.authConfirmationNote{padding:12px;border:1px solid #d8c8ae;background:#faf5ec;color:#6f5b3d!important;font-size:13px!important}
 
 /* Let owners move between every Memento Map attached to their account. */
 .mapSwitcher{display:grid;gap:5px;min-width:min(320px,40vw);font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}

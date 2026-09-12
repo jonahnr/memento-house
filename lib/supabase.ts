@@ -17,3 +17,8 @@ export function getSupabaseBrowserClient(){
   if(!browserClient)browserClient=createClient(url,key,{auth:{flowType:"implicit",persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
   return browserClient;
 }
+
+export async function clearSupabaseBrowserSession(){
+  try{await browserClient?.auth.signOut({scope:"local"})}catch{/* A deleted server user can make sign-out fail before local storage is cleared. */}
+  if(typeof window!=="undefined")for(let index=localStorage.length-1;index>=0;index--){const key=localStorage.key(index);if(key&&/^sb-.*-auth-token$/.test(key))localStorage.removeItem(key)}
+}

@@ -25,8 +25,12 @@ export async function DELETE(request:Request){
  const body=await request.json().catch(()=>({})),id=String(body.id||""),email=String(body.email||"").trim().toLowerCase(),confirmation=String(body.confirmation||"").trim().toLowerCase();
  if(!id||!email||confirmation!==email)return Response.json({error:"Type the customer email exactly to confirm deletion."},{status:400});
  if(id===context.user.id)return Response.json({error:"You cannot delete the administrator account currently in use."},{status:400});
- const user=await context.admin.auth.admin.getUserById(id);if(user.error||user.data.user?.email?.toLowerCase()!==email)return Response.json({error:"Customer identity did not match."},{status:404});
- const deletion=await context.admin.auth.admin.deleteUser(id,false);if(deletion.error)return Response.json({error:deletion.error.message},{status:500});
+ const user=await context.admin.auth.admin.getUserById(id);if(user.error){if(user.error.status===404)return Response.json({ok:true,email,alreadyDeleted:true});return Response.json({error:"Customer identity could not be verified."},{status:500})}if(user.data.user?.email?.toLowerCase()!==email)return Response.json({error:"Customer identity did not match."},{status:404});
+ const cleanup=await Promise.all([
+  context.admin.from("weddings").delete().eq("owner_user_id",id),context.admin.from("entitlements").delete().eq("user_id",id),context.admin.from("questionnaires").delete().eq("user_id",id),context.admin.from("checkout_customizations").delete().eq("customer_user_id",id),context.admin.from("customer_support_notes").delete().eq("customer_user_id",id),context.admin.from("customer_notifications").update({customer_user_id:null}).eq("customer_user_id",id),context.admin.from("orders").update({customer_user_id:null}).eq("customer_user_id",id)
+ ]);
+ const cleanupError=cleanup.find(result=>result.error&&!(["42P01","PGRST205"].includes(result.error.code||"")))?.error;if(cleanupError){console.error(JSON.stringify({level:"error",message:"customer_cleanup_failed",userId:id,code:cleanupError.code||null,error:cleanupError.message}));return Response.json({error:"Customer records could not be cleared before account deletion."},{status:500})}
+ let deletion=await context.admin.auth.admin.deleteUser(id,false);if(deletion.error){console.warn(JSON.stringify({level:"warn",message:"customer_hard_delete_failed",userId:id,status:deletion.error.status||null,error:deletion.error.message}));deletion=await context.admin.auth.admin.deleteUser(id,true)}if(deletion.error){console.error(JSON.stringify({level:"error",message:"customer_delete_failed",userId:id,status:deletion.error.status||null,error:deletion.error.message}));return Response.json({error:"Supabase could not delete this customer account."},{status:500})}
  return Response.json({ok:true,email});
 }
 
