@@ -46,7 +46,7 @@ export async function POST(request:Request){
  if(!target)return Response.json({error:"No Memento House account was found for that email."},{status:404});
  if(action==="resend-confirmation"){
   if(target.email_confirmed_at||target.confirmed_at)return Response.json({error:"This customer email is already confirmed."},{status:400});
-  const site=(process.env.NEXT_PUBLIC_SITE_URL||"https://mementohouse.com").replace(/\/$/,""),link=await context.admin.auth.admin.generateLink({type:"magiclink",email,options:{redirectTo:`${site}/auth/callback?next=${encodeURIComponent("/account")}`}});
+  const site=(process.env.NEXT_PUBLIC_SITE_URL||"https://mementohouse.com").replace(/\/$/,""),link=await context.admin.auth.admin.generateLink({type:"magiclink",email,options:{redirectTo:`${site}/auth/callback?confirm=1&next=${encodeURIComponent("/account")}`}});
   if(link.error||!link.data.properties?.action_link)return Response.json({error:link.error?.message||"A confirmation link could not be created."},{status:500});
   const delivery=await sendAccountConfirmationEmail({recipient:email,confirmationUrl:link.data.properties.action_link});if(!delivery.sent)return Response.json({error:delivery.error||"Confirmation email could not be delivered."},{status:502});
   return Response.json({ok:true,email,action});

@@ -13,10 +13,10 @@ export async function POST(request:Request){
  if(!emailPattern.test(email)||(action==="signup"&&password.length<10))return Response.json({error:"Enter a valid email and a password of at least 10 characters."},{status:400});
  const {url,serviceRoleKey}=supabaseServerConfig();if(!serviceRoleKey)return Response.json({error:"Account confirmation is temporarily unavailable."},{status:503});
  const admin=createClient(url,serviceRoleKey,{auth:{persistSession:false,autoRefreshToken:false}}),site=(process.env.NEXT_PUBLIC_SITE_URL||"https://mementohouse.com").replace(/\/$/,""),next=returnTo.startsWith("/")&&!returnTo.startsWith("//")?returnTo:"/account";
- const redirectTo=`${site}/auth/callback?next=${encodeURIComponent(next)}`;
+ const redirectTo=`${site}/auth/callback?confirm=1&next=${encodeURIComponent(next)}`;
  const generated=action==="resend"
   ?await admin.auth.admin.generateLink({type:"magiclink",email,options:{redirectTo}})
-  :await admin.auth.admin.generateLink({type:"signup",email,password,options:{redirectTo,data:{account_type:"customer"}}});
+  :await admin.auth.admin.generateLink({type:"signup",email,password,options:{redirectTo,data:{account_type:"customer",memento_email_confirmation_required:true,memento_email_confirmed_at:null}}});
  if(generated.error){
   console.error(JSON.stringify({level:"error",message:"account_confirmation_link_failed",action,status:generated.error.status||null,code:generated.error.code||null}));
   if(action==="resend")return Response.json({ok:true,message:"If an unconfirmed account exists, a fresh confirmation email is on its way."});
