@@ -1,5 +1,6 @@
 import {createClient} from "@supabase/supabase-js";
 import {sendAccountConfirmationEmail} from "../../../../lib/customer-email";
+import {createConfirmationWatch} from "../../../../lib/confirmation-watch";
 import {supabaseServerConfig} from "../../../../lib/server-config";
 
 const attempts=new Map<string,{count:number;until:number}>();
@@ -27,5 +28,5 @@ export async function POST(request:Request){
  const delivery=await sendAccountConfirmationEmail({recipient:email,confirmationUrl:actionLink});
  if(!delivery.sent){console.error(JSON.stringify({level:"error",message:"account_confirmation_delivery_failed",action,error:delivery.error||"Unknown provider error"}));return Response.json({error:action==="signup"?"Your account was created, but the confirmation email could not be delivered. Request a fresh confirmation email below.":"A fresh confirmation link could not be delivered. Please try again shortly."},{status:502})}
  console.info(JSON.stringify({level:"info",message:"account_confirmation_sent",action,deliveryId:delivery.id||null}));
- return Response.json({ok:true,message:action==="resend"?"If an unconfirmed account exists, a fresh confirmation email is on its way.":undefined});
+ return Response.json({ok:true,confirmationToken:createConfirmationWatch(generated.data.user.id,serviceRoleKey),message:action==="resend"?"If an unconfirmed account exists, a fresh confirmation email is on its way.":undefined});
 }
