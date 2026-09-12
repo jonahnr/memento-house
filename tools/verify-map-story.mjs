@@ -21,22 +21,23 @@ const results=[];
 for(const [width,height] of [[1920,1080],[1440,900],[1280,800],[1024,768],[768,1024],[430,932],[390,844],[375,812],[844,390],[667,375]]){
 console.log(`Checking ${width}x${height}`);await page.setViewportSize({width,height});await page.waitForTimeout(350);
 if(width<960&&await page.locator('.storyToggle').getAttribute('aria-expanded')==='false')await page.locator('.storyToggle').click();
-await page.locator('.storyMemory').nth(3).click();await expect(page.locator('.storyMemory').nth(3)).toHaveAttribute('aria-pressed','true');
+await page.locator('.storyMemoryCard').nth(3).click();await expect(page.locator('.storyMemoryCard').nth(3)).toHaveAttribute('aria-pressed','true');
 await expect(page.locator('.timelineMarkerActive')).toHaveCount(1);
-await expect(page.locator('.storyTimeline li').nth(3)).toHaveClass(/photoExpanded/);
-await expect(page.locator('.storyTimeline li').nth(3).locator('.storyMemoryCopy')).toBeHidden();
-await page.getByRole('button',{name:'Show details ↙'}).click();
-await expect(page.locator('.storyTimeline li').nth(3).locator('.storyMemoryCopy')).toBeVisible();
-const size=await page.evaluate(()=>{const map=document.querySelector('.realMap'),canvas=map.querySelector('canvas'),pane=document.querySelector('.storyPaneScroll');return {overflow:document.documentElement.scrollWidth>innerWidth,mapWidth:map.clientWidth,canvasWidth:canvas.clientWidth,mapHeight:map.clientHeight,scrollable:pane.scrollHeight>pane.clientHeight}});
-expect(size.overflow).toBe(false);expect(Math.abs(size.mapWidth-size.canvasWidth)).toBeLessThan(2);expect(size.mapHeight).toBeGreaterThanOrEqual(300);expect(size.scrollable).toBe(true);
+await expect(page.locator('.storyTimeline li').nth(3)).toHaveClass(/storyFlipped/);
+await page.locator('.storyMemoryCard').nth(3).click();await expect(page.locator('.storyTimeline li').nth(3)).not.toHaveClass(/storyFlipped/);
+await page.locator('.storyPhotoButton').nth(3).click();await expect(page.locator('.storyTimeline li').nth(3)).toHaveClass(/photoExpanded/);
+await expect(page.locator('.storyTimeline li').nth(3).locator('.storyMemoryCard')).toBeHidden();
+await page.locator('.storyPhotoButton').nth(3).click();await expect(page.locator('.storyTimeline li').nth(3).locator('.storyMemoryCard')).toBeVisible();
+const size=await page.evaluate(()=>{const map=document.querySelector('.realMap'),canvas=map.querySelector('canvas'),pane=document.querySelector('.storyPaneScroll'),bounds=map.getBoundingClientRect(),controls=[...map.querySelectorAll('.maplibregl-ctrl')];return {overflow:document.documentElement.scrollWidth>innerWidth,mapWidth:map.clientWidth,canvasWidth:canvas.clientWidth,mapHeight:map.clientHeight,scrollable:pane.scrollHeight>pane.clientHeight,controlsContained:controls.every(control=>{const rect=control.getBoundingClientRect();return rect.top>=bounds.top-1&&rect.bottom<=bounds.bottom+1&&rect.left>=bounds.left-1&&rect.right<=bounds.right+1})}});
+expect(size.overflow).toBe(false);expect(Math.abs(size.mapWidth-size.canvasWidth)).toBeLessThan(2);expect(size.mapHeight).toBeGreaterThanOrEqual(300);expect(size.scrollable).toBe(true);expect(size.controlsContained).toBe(true);
 await page.getByRole('button',{name:'Fit all pins',exact:true}).click();await page.waitForTimeout(800);
-await page.locator('.geoMarker.storyGeo').last().click();await expect(page.locator('.storyMemory').last()).toHaveAttribute('aria-pressed','true');await page.waitForTimeout(500);
-const paneOnly=await page.evaluate(()=>{const pane=document.querySelector('.storyPaneScroll'),card=pane.querySelector('[aria-pressed="true"]');return {scroll:pane.scrollTop,visible:card.getBoundingClientRect().top>=pane.getBoundingClientRect().top-2}});expect(paneOnly.scroll).toBeGreaterThan(0);expect(paneOnly.visible).toBe(true);
+await page.locator('.geoMarker.storyGeo').last().click();await expect(page.locator('.storyMemoryCard').last()).toHaveAttribute('aria-pressed','true');await page.waitForTimeout(500);
+const paneOnly=await page.evaluate(()=>{const pane=document.querySelector('.storyPaneScroll'),card=pane.querySelector('[data-selected="true"]');return {scroll:pane.scrollTop,visible:card.getBoundingClientRect().top>=pane.getBoundingClientRect().top-2}});expect(paneOnly.scroll).toBeGreaterThan(0);expect(paneOnly.visible).toBe(true);
 await page.locator('.mapStoryLayout').screenshot({path:`outputs/map-story/${width}x${height}.png`});results.push({width,height,...size});
 }
 await page.getByRole('button',{name:'Clear',exact:true}).click();await expect(page.locator('.storyMemory')).toHaveCount(0);await expect(page.locator('.timelineMarkerActive')).toHaveCount(0);await page.getByRole('button',{name:'Select all',exact:true}).click();await expect(page.locator('.storyMemory')).toHaveCount(12);
-await page.getByRole('button',{name:'▶ Play our story',exact:true}).click();await expect(page.locator('.storyMemory').first()).toHaveAttribute('aria-pressed','true');await page.waitForTimeout(3700);await expect(page.locator('.storyMemory').nth(1)).toHaveAttribute('aria-pressed','true');const gap=await page.evaluate(()=>{const map=document.querySelector('.adventureMap').getBoundingClientRect(),pane=document.querySelector('.storyPane').getBoundingClientRect();return pane.top-map.bottom});expect(Math.abs(gap)).toBeLessThan(2);
-await page.locator('.storyMemory').nth(2).click();await expect(page.getByRole('button',{name:'▶ Play our story',exact:true})).toBeVisible();await expect(page.locator('.storyTimeline li').nth(2)).toHaveClass(/photoExpanded/);
+await page.getByRole('button',{name:'▶ Play our story',exact:true}).click();await expect(page.locator('.storyMemoryCard').first()).toHaveAttribute('aria-pressed','true');await page.waitForTimeout(3700);await expect(page.locator('.storyMemoryCard').nth(1)).toHaveAttribute('aria-pressed','true');const gap=await page.evaluate(()=>{const map=document.querySelector('.adventureMap').getBoundingClientRect(),pane=document.querySelector('.storyPane').getBoundingClientRect();return pane.top-map.bottom});expect(Math.abs(gap)).toBeLessThan(2);
+await page.locator('.storyMemoryCard').nth(2).click();await expect(page.getByRole('button',{name:'▶ Play our story',exact:true})).toBeVisible();await expect(page.locator('.storyTimeline li').nth(2)).toHaveClass(/storyFlipped/);
 await page.locator('.mapStoryLayout').screenshot({path:'outputs/map-story/mobile-refinements.png'});
 expect(errors).toEqual([]);console.log(JSON.stringify({passed:true,results,errors},null,2));
 } finally {await browser.close()}
