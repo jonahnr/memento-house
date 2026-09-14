@@ -7,7 +7,7 @@ export const mapTiers:ProductTier[]=[
  ,{id:"timeline-plus",name:"Timeline Plus",price:179,subtitle:"Your map becomes a living, chronological story",cta:"Choose Timeline Plus",features:["Everything in Map Plus","A synchronized map and chronological timeline","Participant memories automatically update into your timeline","Shareable story view and combined keepsake export"]}
 ];
 export const mapTierEntitlements:Record<MapTierId,string[]>={map:["map","contributions","categories"],plus:["map","contributions","categories","media","engagement","tracking","export"],"timeline-plus":["map","contributions","categories","media","engagement","tracking","export","timeline","review","story"]};
-export function mapTierPresentation(type:MementoMapType){const config=mapTypeConfig(type);return mapTiers.map(tier=>({...tier,subtitle:config.tiers[tier.id as MapTierId].subtitle,features:config.tiers[tier.id as MapTierId].benefits}))}
+export function mapTierPresentation(type:MementoMapType,occasion?:string){const config=mapTypeConfig(type,occasion);return mapTiers.map(tier=>({...tier,subtitle:config.tiers[tier.id as MapTierId].subtitle,features:config.tiers[tier.id as MapTierId].benefits}))}
 export function mapComparison(type:MementoMapType){const labels=mapTypeConfig(type).comparisonLabels,tiers:[MapTierId,string][]=[["map","Map"],["plus","Plus"],["timeline-plus","Timeline Plus"]];return Object.keys(labels).map(id=>({label:labels[id],values:tiers.map(([tier])=>mapTierEntitlements[tier].includes(id)?"Yes":"—")}))}
 
 export const deckTiers:ProductTier[]=[

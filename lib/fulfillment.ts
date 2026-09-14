@@ -1,8 +1,8 @@
 import type {SupabaseClient} from "@supabase/supabase-js";
 import {initialPaidState} from "./order-domain";
 import {resolveCatalog} from "./product-catalog";
-import {defaultMapCategories,isMementoMapType,type MementoMapType} from "./memento-map-types.ts";
-type Input={source:"stripe"|"admin";sourceId:string;stripeSessionId?:string|null;eventId?:string;email:string;name?:string;userId?:string|null;product:string;tier:string;mapType?:MementoMapType;addons:string[];amount:number;currency?:string;customizationId?:string|null;paymentIntentId?:string|null;isTest?:boolean};
+import {parseMapOccasion,defaultMapCategories,isMementoMapType,type MementoMapType} from "./memento-map-types.ts";
+type Input={source:"stripe"|"admin";sourceId:string;stripeSessionId?:string|null;eventId?:string;email:string;name?:string;userId?:string|null;product:string;tier:string;mapType?:MementoMapType;mapOccasion?:string;addons:string[];amount:number;currency?:string;customizationId?:string|null;paymentIntentId?:string|null;isTest?:boolean};
 async function findOrInvite(admin:SupabaseClient,email:string,item:ReturnType<typeof resolveCatalog>,existing?:string|null){if(existing)return existing;let page=1;while(page<20){const result=await admin.auth.admin.listUsers({page,perPage:100});if(result.error)throw result.error;const found=result.data.users.find(u=>u.email?.toLowerCase()===email);if(found)return found.id;if(result.data.users.length<100)break;page++}const invited=await admin.auth.admin.inviteUserByEmail(email,{redirectTo:"https://mementohouse.com/account/setup",data:{entitlement:item.entitlement,purchase_status:"paid"}});if(invited.error)throw invited.error;return invited.data.user.id}
 async function checked(operation:PromiseLike<{error:unknown}>){const result=await operation;if(result.error)throw result.error}
 export async function fulfillPurchase(admin:SupabaseClient,input:Input){const item=resolveCatalog(input.product,input.tier,input.addons),userId=await findOrInvite(admin,input.email,item,input.userId);const prior=await admin.from("orders").select("*").eq("external_reference",input.sourceId).maybeSingle();if(prior.error)throw prior.error;if(prior.data){const completed=await admin.from("order_events").select("id").eq("order_id",prior.data.id).eq("event_type","purchase_fulfilled").limit(1);if(completed.error)throw completed.error;if(completed.data?.length)return{order:prior.data,item,userId,mapId:prior.data.map_id||null,questionnaireType:item.questionnaireType,nextSteps:item.nextSteps};}const needsQuestionnaire=item.questionnaire.length>0,orderState=initialPaidState(item.fulfillmentWorkflow,needsQuestionnaire);
@@ -12,11 +12,12 @@ export async function fulfillPurchase(admin:SupabaseClient,input:Input){const it
  let mapId:string|null=null;
  if(item.productId==="map"){
   if(!isMementoMapType(input.mapType))throw new Error("A valid Memento Map type is required for fulfillment");
-  const provisioned=await admin.rpc("provision_paid_memento_map",{p_order_id:order.id,p_owner_user_id:userId,p_map_type:input.mapType,p_map_tier:item.tierId,p_categories:defaultMapCategories(input.mapType)});
+  const provisioned=await admin.rpc("provision_paid_memento_map",{p_order_id:order.id,p_owner_user_id:userId,p_map_type:input.mapType,p_map_tier:item.tierId,p_categories:defaultMapCategories(input.mapType,input.mapOccasion)});
   if(provisioned.error)throw provisioned.error;
   const map=Array.isArray(provisioned.data)?provisioned.data[0]:provisioned.data;
   mapId=map?.id||null;
   if(!mapId)throw new Error("Paid Memento Map provisioning did not return a map");
+  const occasion=parseMapOccasion(input.mapOccasion,input.mapType);if(occasion)await checked(admin.from("weddings").update({map_subtype:occasion}).eq("id",mapId).is("configured_at",null));
  }
  if(needsQuestionnaire)await checked(admin.from("questionnaires").upsert({order_id:order.id,user_id:userId,questionnaire_type:item.questionnaireType,schema_version:1,status:"not_started"},{onConflict:"order_id",ignoreDuplicates:true}));
  await checked(admin.from("fulfillment_jobs").upsert({order_id:order.id,workflow:item.fulfillmentWorkflow,status:orderState},{onConflict:"order_id",ignoreDuplicates:true}));

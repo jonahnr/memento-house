@@ -1,6 +1,6 @@
 import {resolveCatalog} from "./product-catalog.ts";
 import {parseMementoMapType,type MementoMapType} from "./memento-map-types.ts";
-export type PaidCartItem={id:string;product:string;tier:string;mapType?:MementoMapType;addon:string;customizationId:string;amount:number};
+export type PaidCartItem={id:string;product:string;tier:string;mapType?:MementoMapType;mapOccasion?:string;addon:string;customizationId:string;amount:number};
 export function paidCartItems(metadata:Record<string,string>,lines:{amount_total:number;quantity:number;currency:string;price?:{product?:{metadata?:{cart_item_id?:string}}}}[],currency:string,total:number):PaidCartItem[]{
  const count=Number(metadata.cart_count);if(!Number.isInteger(count)||count<1||count>12||lines.length!==count)throw new Error("Invalid paid cart size.");
  const used=new Set<string>();

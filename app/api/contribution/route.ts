@@ -14,11 +14,11 @@ export async function POST(request:Request){
  if(anonymousId.length<10||!startedAt||now-startedAt<1200)return Response.json({error:"Please take a moment and try again."},{status:400});
  const weddingId=clean(body.weddingId,50),place=clean(body.place,180),guest=clean(body.guest,100),message=clean(body.message,1000),category=clean(body.category,60),type=body.contributionType==="origin"?"origin":"recommendation",lat=Number(body.lat),lng=Number(body.lng);
  if(!weddingId||place.length<2||guest.length<1||!Number.isFinite(lat)||!Number.isFinite(lng)||lat<-90||lat>90||lng<-180||lng>180||type==="recommendation"&&message.length<5)return Response.json({error:"Please complete each required field."},{status:400});
- const admin=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});let weddingResult=await admin.from("weddings").select("id,wedding_date,map_type,contribution_status,contribution_closes_at").eq("id",weddingId).eq("status","active").maybeSingle();
+ const admin=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});let weddingResult=await admin.from("weddings").select("id,wedding_date,map_type,map_subtype,contribution_status,contribution_closes_at").eq("id",weddingId).eq("status","active").maybeSingle();
   if(weddingResult.error)weddingResult=await admin.from("weddings").select("id,wedding_date").eq("id",weddingId).eq("status","active").maybeSingle() as typeof weddingResult;
  const wedding=weddingResult.data;
  if(!wedding)return Response.json({error:"This map is not accepting contributions."},{status:404});
- const mapType=resolveMementoMapType(wedding.map_type),config=mapTypeConfig(mapType),categoryResult=await admin.from("map_categories").select("label,category_kind").eq("map_id",weddingId).eq("is_active",true).order("sort_order"),categories=categoryResult.data||[];
+ const mapType=resolveMementoMapType(wedding.map_type),config=mapTypeConfig(mapType,wedding.map_subtype),categoryResult=await admin.from("map_categories").select("label,category_kind").eq("map_id",weddingId).eq("is_active",true).order("sort_order"),categories=categoryResult.data||[];
  if(wedding.contribution_status==="paused")return Response.json({error:"Contributions are temporarily paused by the map owner."},{status:403});
  if(wedding.contribution_status==="closed")return Response.json({error:"This map is closed to new guest contributions."},{status:403});
  if(wedding.contribution_closes_at&&new Date(wedding.contribution_closes_at)<=new Date())return Response.json({error:"The contribution window for this map has closed."},{status:403});

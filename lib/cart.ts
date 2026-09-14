@@ -1,6 +1,6 @@
 import {ADDONS,resolveCatalog} from "./product-catalog.ts";
-import {parseMementoMapType,type MementoMapType} from "./memento-map-types.ts";
-export type CartItem={id:string;product:string;tier:string;addon:string;customization:string;mapType?:MementoMapType};
+import {parseMapOccasion,parseMementoMapType,type MementoMapType} from "./memento-map-types.ts";
+export type CartItem={id:string;product:string;tier:string;addon:string;customization:string;mapType?:MementoMapType;mapOccasion?:string};
 export function validateCart(value:unknown):CartItem[]{
  if(!Array.isArray(value)||!value.length||value.length>12)throw new Error("Choose between 1 and 12 items for your cart.");
  const ids=new Set<string>();let maps=0;
@@ -13,7 +13,7 @@ export function validateCart(value:unknown):CartItem[]{
   if(product==="map"&&!mapType)throw new Error("Choose a Memento Map type before adding it to the cart.");if(product==="map"&&++maps>1)throw new Error("Choose one Memento Map plan per cart.");
   if(product==="unity"&&!customization)throw new Error("Complete and save your Unity Tile design first.");
   if(customization){let parsed;try{parsed=JSON.parse(customization)}catch{throw new Error("Your saved design could not be read.")}if(!parsed||typeof parsed!=="object"||Array.isArray(parsed))throw new Error("Invalid saved design.");}
-  return{id,product,tier,addon,customization,mapType};
+  return{id,product,tier,addon,customization,mapType,mapOccasion:parseMapOccasion(raw.mapOccasion,mapType)};
  });
 }
 export function cartPrice(item:CartItem){return resolveCatalog(item.product,item.tier).price+(item.addon==="none"?0:ADDONS[item.addon as keyof typeof ADDONS]?.price||0)}
