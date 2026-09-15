@@ -12,16 +12,16 @@ const experiences=[
 ] as const;
 
 export function ExperienceSelector(){
- const [selected,setSelected]=useState(0),track=useRef<HTMLDivElement>(null),scrollFrame=useRef<number|null>(null);
- const center=(index:number,behavior:ScrollBehavior="smooth")=>{setSelected(index);track.current?.children[index]?.scrollIntoView({behavior,block:"nearest",inline:"center"})};
- useEffect(()=>{track.current?.children[0]?.scrollIntoView({behavior:"auto",block:"nearest",inline:"center"})},[]);
- const onScroll=()=>{if(scrollFrame.current!==null)cancelAnimationFrame(scrollFrame.current);scrollFrame.current=requestAnimationFrame(()=>{const root=track.current;if(!root)return;const middle=root.getBoundingClientRect().left+root.clientWidth/2;let closest=0,distance=Infinity;Array.from(root.children).forEach((child,index)=>{const rect=child.getBoundingClientRect(),next=Math.abs(rect.left+rect.width/2-middle);if(next<distance){closest=index;distance=next}});setSelected(closest)})};
+ const [selected,setSelected]=useState(0),track=useRef<HTMLDivElement>(null),scrollTimer=useRef<ReturnType<typeof setTimeout>|null>(null),manualScroll=useRef(false);
+ const center=(index:number)=>{manualScroll.current=false;if(scrollTimer.current)clearTimeout(scrollTimer.current);setSelected(index);const root=track.current,card=root?.children[index] as HTMLElement|undefined;if(root&&card){const left=card.offsetLeft-root.offsetLeft-(root.clientWidth-card.offsetWidth)/2;root.scrollTo({left:Math.max(0,left),behavior:"smooth"})}};
+ useEffect(()=>()=>{if(scrollTimer.current)clearTimeout(scrollTimer.current)},[]);
+ const onScroll=()=>{if(!manualScroll.current)return;if(scrollTimer.current)clearTimeout(scrollTimer.current);scrollTimer.current=setTimeout(()=>{const root=track.current;if(!root||!manualScroll.current)return;const middle=root.getBoundingClientRect().left+root.clientWidth/2;let closest=0,distance=Infinity;Array.from(root.children).forEach((child,index)=>{const rect=child.getBoundingClientRect(),next=Math.abs(rect.left+rect.width/2-middle);if(next<distance){closest=index;distance=next}});setSelected(closest)},150)};
  const item=experiences[selected];
  return <section className="experienceSelector" id="experiences" aria-labelledby="experience-selector-title">
   <header><div className="eyebrow">Start with the right experience</div><h2 id="experience-selector-title">What are you bringing together?</h2><p>Choose an experience to see the prompts, examples, and packages made for that moment.</p></header>
   <div className="experienceCarousel">
    <button type="button" className="experienceArrow previous" aria-label="Previous experience" disabled={selected===0} onClick={()=>center(Math.max(0,selected-1))}>←</button>
-   <div className="experienceTrack" ref={track} onScroll={onScroll} aria-label="Memento Map experiences">
+   <div className="experienceTrack" ref={track} onScroll={onScroll} onPointerDown={()=>{manualScroll.current=true}} onWheel={()=>{manualScroll.current=true}} aria-label="Memento Map experiences">
     {experiences.map((experience,index)=><button type="button" className={`experienceOption ${selected===index?"selected":""}`} aria-pressed={selected===index} onClick={()=>center(index)} key={experience.id}><img src={experience.image} alt={experience.alt}/><span>{experience.icon}</span><b>{experience.name}</b></button>)}
    </div>
    <button type="button" className="experienceArrow next" aria-label="Next experience" disabled={selected===experiences.length-1} onClick={()=>center(Math.min(experiences.length-1,selected+1))}>→</button>

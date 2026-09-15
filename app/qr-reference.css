@@ -68,7 +68,7 @@
 .qr-design-editorial .qrCard h2 i{font-family:Georgia,serif;color:#282621;letter-spacing:-.5px}
 .qr-design-editorial .qrCard .qrNames{color:#282621;letter-spacing:3px}
 .qr-design-editorial .qrCodeFrame{border-color:#282621}
-.qr-design-lavender-sage .qrCard{background:linear-gradient(180deg,#fff 0 14%,#f4f1f5 14% 86%,#fff 86%);border:3px solid #4d315e;box-shadow:inset 0 0 0 7px #cbd5bd,inset 0 0 0 9px #8d789f}
+.qr-design-lavender-sage .qrCard{background:linear-gradient(145deg,#f1eaf5 0%,#f4f1f5 55%,#e8eddf 100%);border:3px solid #4d315e;box-shadow:inset 0 0 0 7px #cbd5bd,inset 0 0 0 9px #8d789f}
 .qr-design-lavender-sage .qrCard::before{inset:14px;border:1px solid #b5b5b2;border-radius:0;opacity:.8}
 .qr-design-lavender-sage .qrCard h2 i,.qr-design-lavender-sage .qrCard .qrNames,.qr-design-lavender-sage .qrCard>small,.qr-design-lavender-sage .qrBrand span{color:#4d315e}
 .qr-design-lavender-sage .qrDivider::before,.qr-design-lavender-sage .qrDivider::after{background:#64774f}.qr-design-lavender-sage .qrDivider span{background:#8d789f}.qr-design-lavender-sage .qrCodeFrame{border:3px double #64774f}

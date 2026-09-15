@@ -2,6 +2,18 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {deliverBrowserFile,isAppleMobileBrowser} from '../lib/browser-download.ts';
 
+test('Android offers a user-initiated save link and image preview without claiming success',()=>{
+ const elements=[];let cleanup;
+ const page={title:'',createElement:tag=>({tag,style:{}}),body:{style:{},replaceChildren(){},append(...items){elements.push(...items)}}};
+ const preview={document:page,closed:false,addEventListener:(name,fn)=>{assert.equal(name,'pagehide');cleanup=fn}};
+ const notice=deliverBrowserFile(new Blob(['map'],{type:'image/png'}),'keepsake.png',{appleMobile:false,android:true,preview});
+ assert.equal(elements[1].download,'keepsake.png');
+ assert.match(elements[1].href,/^blob:/);
+ assert.equal(elements[2].src,elements[1].href);
+ assert.match(notice,/Tap Save keepsake/);
+ assert.equal(typeof cleanup,'function');cleanup();
+});
+
 test('export delivery recognizes iPhone, iPad, desktop Safari, and Android correctly',()=>{
  assert.equal(isAppleMobileBrowser('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)','iPhone',5),true);
  assert.equal(isAppleMobileBrowser('Mozilla/5.0 (iPad; CPU OS 18_0 like Mac OS X)','iPad',5),true);
@@ -30,6 +42,6 @@ test('desktop export keeps the direct-download path and filename',()=>{
  globalThis.document={createElement:()=>link,body:{appendChild:()=>{appended=true}}};
  try{
   const notice=deliverBrowserFile(new Blob(['map'],{type:'application/pdf'}),'map.pdf',{appleMobile:false,preview:null});
-  assert.equal(link.download,'map.pdf');assert.equal(clicked,true);assert.equal(appended,true);assert.match(notice,/downloaded/);
+  assert.equal(link.download,'map.pdf');assert.equal(clicked,true);assert.equal(appended,true);assert.match(notice,/download has started/);
  }finally{globalThis.window=previousWindow;globalThis.document=previousDocument}
 });
