@@ -12,9 +12,10 @@ test('each granular occasion preserves its identity and seeds matching contribut
  }
  assert.equal(parseMapOccasion('anniversary','next_chapter'),undefined);
 });
-test('celebration catalog has the requested product matrix and Next Chapter hierarchy',()=>{
- const expected={wedding:3,'family-reunion':3,'celebration-of-life':2,anniversary:3,retirement:3,graduation:2,'baby-shower':3,'new-home':3,'milestone-birthday':2};
- for(const [slug,count] of Object.entries(expected)){const item=CELEBRATIONS.find(row=>row.slug===slug);assert.equal(item.status,'Available now');assert.equal(item.products.length,count);assert.equal(item.products[0].href,'/memento-map/'+slug);assert.ok(item.products.every(product=>!product.href.startsWith('/contact')));}
- assert.deepEqual(CELEBRATIONS.find(row=>row.slug==='next-chapter').products.map(row=>row.name),['Retirement','Graduation','Baby Shower','New Home','Milestone Birthday']);
+test('celebration catalog has the product matrix and one customer-facing Next Chapter experience',()=>{
+ const expected={wedding:3,'family-reunion':3,'celebration-of-life':2,anniversary:3};
+ for(const [slug,count] of Object.entries(expected)){const item=CELEBRATIONS.find(row=>row.slug===slug);assert.equal(item.status,'Available now');assert.equal(item.products.length,count);assert.ok(item.products.every(product=>!product.href.startsWith('/contact')));}
+ assert.deepEqual(CELEBRATIONS.find(row=>row.slug==='next-chapter').products.map(row=>row.name),['Memento Map','Tile Board','Memento Deck']);
+ assert.equal(CELEBRATIONS.find(row=>row.slug==='next-chapter').products[0].href,'/memento-map/next-chapter');
  assert.ok(!CELEBRATION_GROUPS.some(row=>row.slug==='retirement'));
 });

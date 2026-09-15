@@ -11,13 +11,12 @@ export function PricingCard({id,name,price,subtitle,features,cta,href,popular}:P
   {popular&&<span className="popularTag">MOST POPULAR</span>}
   <div className="priceCardFace priceCardOverview" aria-hidden={details} inert={details?true:undefined}>
    <div><h3>{name}</h3><strong>${price}</strong><p>{subtitle}</p></div>
-   <div className="priceCardSummary"><span>One-time purchase</span><span>Digital access</span><span>Permanent link</span></div>
-   <button type="button" className="priceDetailsToggle" onClick={()=>setDetails(true)}>See everything included →</button>
+   <ul className="priceIncluded" aria-label={`Included with ${name}`}>{features.map(feature=><li key={feature}>✓ {feature}</li>)}</ul>
+   <button type="button" className="priceDetailsToggle" onClick={()=>setDetails(true)}>Purchase and fulfillment details →</button>
    <a href={href} className="button gold">{cta} →</a>
   </div>
   <div className="priceCardFace priceCardDetails" aria-hidden={!details} inert={!details?true:undefined}>
-   <div className="priceDetailsHeading"><div><small>{name}</small><h3>Everything included</h3></div><button type="button" onClick={()=>setDetails(false)} aria-label={`Return to ${name} package overview`}>×</button></div>
-   <ul>{features.map(feature=><li key={feature}>✓ {feature}</li>)}</ul>
+   <div className="priceDetailsHeading"><div><small>{name}</small><h3>Purchase details</h3></div><button type="button" onClick={()=>setDetails(false)} aria-label={`Return to ${name} package overview`}>×</button></div>
    <PurchaseTerms tier={id}/>
    <button type="button" className="priceDetailsToggle" onClick={()=>setDetails(false)}>← Back to overview</button>
   </div>

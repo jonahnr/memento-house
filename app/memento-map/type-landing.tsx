@@ -1,9 +1,10 @@
 import {ExportExample} from "./export-example";
-import {MEMENTO_MAP_TYPES,MEMENTO_MAP_TYPE_IDS,type MementoMapType,mapTypeConfig,MAP_OCCASIONS} from "../../lib/memento-map-types";
+import {MEMENTO_MAP_TYPES,MEMENTO_MAP_TYPE_IDS,type MementoMapType,mapTypeConfig} from "../../lib/memento-map-types";
 import {AudienceGuidance} from "./audience-guidance";
 import {AccountLink} from "../account-link";
 import {MapPricing} from "./map-pricing";
 import {MEMENTO_MAP_TYPE_VISUALS} from "./map-type-visuals";
+import {NextChapterExamples} from "./next-chapter-examples";
 
 export function MementoMapTypeLanding({type,occasion}:{type:MementoMapType;occasion?:string}){
  const config=mapTypeConfig(type,occasion),baseVisuals=MEMENTO_MAP_TYPE_VISUALS[type],visuals=occasion?{...baseVisuals,hero:{src:`/brand/celebrations/${occasion}-1.webp`,alt:`${config.name} celebration`}}:baseVisuals;
@@ -15,7 +16,7 @@ export function MementoMapTypeLanding({type,occasion}:{type:MementoMapType;occas
   <section className="categorySection typeCategories"><div><div className="eyebrow">What this map captures</div><h2>Every pin carries context.</h2><p>{config.memoryPrompt} Organize contributions into the places and memories that matter for this occasion.</p></div><div className="layerPreview">{config.categories.slice(0,4).map(category=><span key={category}><i className="storyLayer"/>{category}</span>)}</div></section>
   <section className="mapExamples" id="examples"><div className="eyebrow">Picture the finished map</div><h2>Real contributions feel like this.</h2><div className="pricingGrid three">{config.examples.map(([title,detail])=><article className="priceCard" key={title}><span className="tag">{config.shortName}</span><h3>{title}</h3><p>{detail}</p></article>)}</div></section>
   <section className="typeKeepsake"><div><div className="eyebrow">Made to last</div><h2>{config.timelineLabel}</h2><p>{config.longevity}</p><p>{config.timelineIntro}</p></div><figure><img src={visuals.keepsake.src} alt={visuals.keepsake.alt}/><figcaption>{occasion?"Example of the shared keepsake format, printed by a customer. Your file uses your own map details.":"Example of a customer-printed result."} Digital files only; print and frame are not included.</figcaption></figure></section>
-  <ExportExample/><AudienceGuidance type={type}/>{type==="next_chapter"&&!occasion&&<section className="mapTypeDiscovery"><h2>Which next chapter are you celebrating?</h2><div>{Object.entries(MAP_OCCASIONS).filter(([,item])=>item.type==="next_chapter").map(([slug,item])=><a key={slug} href={`/memento-map/${slug}`}><b>{item.name}</b><small>{item.headline}</small></a>)}</div></section>}<MapPricing type={type} occasion={occasion}/>
+  <ExportExample/><AudienceGuidance type={type}/>{type==="next_chapter"&&!occasion&&<NextChapterExamples/>}<MapPricing type={type} occasion={occasion}/>
   <section className="houseCta"><div className="eyebrow">Begin with the right experience</div><h2>{config.cta}.</h2><a href="#pricing" className="button gold">Choose a package →</a></section>
   <section className="mapTypeDiscovery"><div className="eyebrow">More Memento Map experiences</div><h2>Every meaningful gathering has a geography.</h2><div>{MEMENTO_MAP_TYPE_IDS.filter(id=>id!==type).map(id=><a href={`/memento-map/${MEMENTO_MAP_TYPES[id].route}`} key={id}><span>{MEMENTO_MAP_TYPES[id].icon}</span><b>{MEMENTO_MAP_TYPES[id].name}</b><small>{MEMENTO_MAP_TYPES[id].description}</small></a>)}</div></section>
   <footer><a href="/" className="brand"><img src="/brand/memento-house-logo.webp" alt="Memento House"/><span>Memento <i>Map</i></span></a><p>Made for the moment. Kept for a lifetime.</p></footer>
