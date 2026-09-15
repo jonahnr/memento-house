@@ -8,7 +8,7 @@ page.on('pageerror',e=>errors.push(e.message));
 let tier='timeline-plus';
 const user={id:'11111111-1111-4111-8111-111111111111',email:'preview@example.com',aud:'authenticated',role:'authenticated',user_metadata:{product_tier:tier}};
 const wedding={id:'22222222-2222-4222-8222-222222222222',partner_one_name:'Alice',partner_two_name:'Sam',wedding_date:'2026-10-01',title:'Our Adventure Map',slug:'alice-sam',accent_color:'#b78338'};
-await context.route('**/*.supabase.co/**',route=>{const u=new URL(route.request().url());return route.fulfill({json:u.pathname.includes('/auth/')?{user}:u.pathname.includes('/weddings')?wedding:[]})});
+await context.route('**/*.supabase.co/**',route=>{const u=new URL(route.request().url());return route.fulfill({json:u.pathname.includes('/auth/')?{user}:u.pathname.includes('/weddings')?[wedding]:[]})});
 await context.route('**/api/map-plan?**',route=>route.fulfill({json:{tier,access:true}}));
 await context.route('**/api/map-timeline?**',route=>route.fulfill({json:{entries:[]}}));
 await context.route('**/api/account/orders',route=>route.fulfill({json:{orders:[]}}));
@@ -16,7 +16,8 @@ await context.addInitScript(user=>localStorage.setItem('sb-kdcymeoldvwlmfwemfgq-
 await page.goto('http://127.0.0.1:3000/dashboard');await page.getByRole('button',{name:'QR Code',exact:true}).click();await page.getByRole('button',{name:'Print full-page sign ↓',exact:true}).waitFor();
 await page.waitForFunction(()=>[...document.querySelectorAll('.qrCard img')].every(i=>i.complete&&i.naturalWidth>0));
 const checks=[];
-for(const layout of ['single','double','4x6','5x7'])for(const design of ['classic','garden','editorial']){
+const designs=['classic','garden','editorial','lavender-sage','botanical-frame','rose-ribbon','midnight-gold','coastal-blue','terracotta-arch','champagne-lines'];
+for(const layout of ['single','double','4x6','5x7'])for(const design of designs){
  await page.emulateMedia({media:'screen'});await page.getByLabel('Print layout').selectOption(layout);await page.getByLabel('Sign design').selectOption(design);
  await page.setViewportSize({width:390,height:844});
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),`${layout}/${design} mobile page overflow`);
@@ -36,5 +37,5 @@ for(const layout of ['single','double','4x6','5x7'])for(const design of ['classi
  checks.push({layout,design,cards});
 }
 await page.emulateMedia({media:'screen'});tier='map-plus';await page.reload();await page.getByRole('button',{name:'QR Code',exact:true}).click();await page.locator('.realQr').waitFor();
-for(const layout of ['single','double','4x6','5x7'])for(const design of ['classic','garden','editorial']){await page.getByLabel('Print layout').selectOption(layout);await page.getByLabel('Sign design').selectOption(design);assert.doesNotMatch(await page.locator('.qrInvitation').first().innerText(),/memory/)}
+for(const layout of ['single','double','4x6','5x7'])for(const design of designs){await page.getByLabel('Print layout').selectOption(layout);await page.getByLabel('Sign design').selectOption(design);assert.doesNotMatch(await page.locator('.qrInvitation').first().innerText(),/memory/)}
 assert.deepEqual(errors,[]);await writeFile(`${out}/checks.json`,JSON.stringify(checks,null,2));console.log(JSON.stringify({passed:true,combinations:checks.length,minPpi:Math.min(...checks.flatMap(c=>c.cards.flatMap(card=>card.images.map(i=>i.ppi)))),errors}));await browser.close();

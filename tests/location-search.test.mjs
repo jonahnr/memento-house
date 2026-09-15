@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {searchPlaces} from '../lib/location-search.ts';
 import {googleAutocomplete,googlePlaceDetails} from '../lib/google-places.ts';
+import {compactMapLocation} from '../lib/map-location.ts';
 
 const match={matchedAddress:'1050 CHANCELLORS DR, STATHAM, GA, 30666',coordinates:{x:-83.590470383294,y:33.941078891457},tigerLine:{tigerLineId:'611733549',side:'L'}};
 const census={result:{addressMatches:[match]}},empty={result:{addressMatches:[]}};
@@ -56,8 +57,13 @@ test('Google Place Details resolves a selected prediction to an address and coor
  let request;
  const place=await googlePlaceDetails('ChIJ-example','server-secret','session-123456',async(url,options)=>{request={url,options};return Response.json({id:'ChIJ-example',formattedAddress:'5331 Rexford Ct, Montgomery, AL 36116, USA',location:{latitude:32.312,longitude:-86.214}})});
  assert.equal(request.url,'https://places.googleapis.com/v1/places/ChIJ-example?sessionToken=session-123456');
- assert.equal(request.options.headers['X-Goog-Api-Key'],'server-secret');assert.equal(request.options.headers['X-Goog-FieldMask'],'id,formattedAddress,displayName,location');
+ assert.equal(request.options.headers['X-Goog-Api-Key'],'server-secret');assert.equal(request.options.headers['X-Goog-FieldMask'],'id,formattedAddress,displayName,addressComponents,location');
  assert.deepEqual(place,{id:'google-ChIJ-example',name:'5331 Rexford Ct, Montgomery, AL 36116, USA',lat:32.312,lng:-86.214,provider:'google'});
+});
+test('Google Place Details adds the city when a provider address only names a county',async()=>{
+ const place=await googlePlaceDetails('county-result','server-secret','session-123456',async()=>Response.json({id:'county-result',formattedAddress:'Hamilton County, OH, USA',addressComponents:[{longText:'Cincinnati',types:['locality']},{longText:'Ohio',shortText:'OH',types:['administrative_area_level_1']}],location:{latitude:39.1031,longitude:-84.512}}));
+ assert.equal(place.name,'Cincinnati, Hamilton County, OH, USA');
+ assert.equal(compactMapLocation(place.name),'Cincinnati, OH');
 });
 test('Google rejects malformed responses instead of inventing coordinates',async()=>{
  await assert.rejects(googleAutocomplete('5331 Rex','key','session-123456',async()=>new Response('',{status:403})));

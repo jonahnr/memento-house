@@ -102,4 +102,5 @@ test("every printable QR layout brands the crest with the Memento House name",()
  assert.match(qr,/className="qrBrand"/);
  assert.match(qr,/<span>Memento House<\/span>/);
  for(const layout of ["qr-double","qr-4x6","qr-5x7"])assert.match(styles,new RegExp(layout));
+ for(const design of ["lavender-sage","botanical-frame","rose-ribbon","midnight-gold","coastal-blue","terracotta-arch","champagne-lines"]){assert.match(qr,new RegExp(`value="${design}"`));assert.match(styles,new RegExp(`qr-design-${design}`))}
 });

@@ -22,7 +22,7 @@ export async function searchPlaces(query:string,fetcher:typeof fetch=fetch){
   features=json.features||[];
   return features.map(feature=>{
    const p=feature.properties||{},street=[p.housenumber,p.street].filter(Boolean).join(" ");
-   const parts=[street,p.name,p.district,p.city,p.county,p.state,p.postcode,p.country].filter(Boolean);
+   const parts=[street,p.name,p.district,p.county,p.city,p.state,p.postcode,p.country].filter(Boolean);
    return {name:parts.filter((v,i,a)=>a.indexOf(v)===i).join(", ")||query,lng:Number(feature.geometry?.coordinates?.[0]),lat:Number(feature.geometry?.coordinates?.[1]),id:`${p.osm_type||"place"}${p.osm_id||crypto.randomUUID()}`,houseNumber:p.housenumber?String(p.housenumber).toLowerCase():undefined};
   }).filter(place=>Number.isFinite(place.lat)&&Number.isFinite(place.lng));
  })()];

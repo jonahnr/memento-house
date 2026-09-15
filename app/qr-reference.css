@@ -68,6 +68,29 @@
 .qr-design-editorial .qrCard h2 i{font-family:Georgia,serif;color:#282621;letter-spacing:-.5px}
 .qr-design-editorial .qrCard .qrNames{color:#282621;letter-spacing:3px}
 .qr-design-editorial .qrCodeFrame{border-color:#282621}
+.qr-design-lavender-sage .qrCard{background:linear-gradient(180deg,#fff 0 14%,#f4f1f5 14% 86%,#fff 86%);border:3px solid #4d315e;box-shadow:inset 0 0 0 7px #cbd5bd,inset 0 0 0 9px #8d789f}
+.qr-design-lavender-sage .qrCard::before{inset:14px;border:1px solid #b5b5b2;border-radius:0;opacity:.8}
+.qr-design-lavender-sage .qrCard h2 i,.qr-design-lavender-sage .qrCard .qrNames,.qr-design-lavender-sage .qrCard>small,.qr-design-lavender-sage .qrBrand span{color:#4d315e}
+.qr-design-lavender-sage .qrDivider::before,.qr-design-lavender-sage .qrDivider::after{background:#64774f}.qr-design-lavender-sage .qrDivider span{background:#8d789f}.qr-design-lavender-sage .qrCodeFrame{border:3px double #64774f}
+.qr-design-botanical-frame .qrCard{background:#f7f5ed;border:2px solid #365643;box-shadow:inset 0 0 0 9px #f7f5ed,inset 0 0 0 10px #91a18d}
+.qr-design-botanical-frame .qrCard::before{inset:18px 28px;border:1px solid #71866f;border-radius:50% 50% 8px 8px;opacity:.35}
+.qr-design-botanical-frame .qrCard h2 i,.qr-design-botanical-frame .qrCard .qrNames,.qr-design-botanical-frame .qrCard>small,.qr-design-botanical-frame .qrBrand span{color:#365643}.qr-design-botanical-frame .qrCodeFrame{border-color:#71866f}
+.qr-design-rose-ribbon .qrCard{background:#fff8f6;border:1px solid #b2787e;border-top:12px solid #b2787e;border-bottom:12px solid #b2787e}
+.qr-design-rose-ribbon .qrCard::before{inset:18px;border:1px solid #e1bfc0;border-radius:130px 130px 0 0;opacity:.8}
+.qr-design-rose-ribbon .qrCard h2 i,.qr-design-rose-ribbon .qrCard .qrNames,.qr-design-rose-ribbon .qrCard>small,.qr-design-rose-ribbon .qrBrand span{color:#8e555d}.qr-design-rose-ribbon .qrCodeFrame{border-color:#b2787e}
+.qr-design-midnight-gold .qrCard{background:#222833;color:#f8f0e3;border:2px solid #caa365;box-shadow:inset 0 0 0 7px #222833,inset 0 0 0 8px #7d694c}
+.qr-design-midnight-gold .qrCard::before{inset:18px;border:1px solid #caa365;border-radius:50%;opacity:.32}
+.qr-design-midnight-gold .qrBrandLogo{mix-blend-mode:screen;filter:brightness(0) saturate(100%) invert(78%) sepia(31%) saturate(717%) hue-rotate(358deg) brightness(89%) contrast(88%)}
+.qr-design-midnight-gold .qrCard h2,.qr-design-midnight-gold .qrCard .qrInvitation,.qr-design-midnight-gold .qrCard .qrAddress{color:#f8f0e3}.qr-design-midnight-gold .qrCard h2 i,.qr-design-midnight-gold .qrCard .qrNames,.qr-design-midnight-gold .qrCard>small,.qr-design-midnight-gold .qrBrand span{color:#d8b778}.qr-design-midnight-gold .qrCodeFrame{border:4px double #d8b778}
+.qr-design-coastal-blue .qrCard{background:#f2f8f8;border:1px solid #4f7f89;box-shadow:inset 0 12px 0 #d9e9e7,inset 0 -12px 0 #d9e9e7}
+.qr-design-coastal-blue .qrCard::before{inset:22px;border:1px solid #8fb1b5;border-radius:46% 46% 0 0;opacity:.45}
+.qr-design-coastal-blue .qrCard h2 i,.qr-design-coastal-blue .qrCard .qrNames,.qr-design-coastal-blue .qrCard>small,.qr-design-coastal-blue .qrBrand span{color:#315f69}.qr-design-coastal-blue .qrCodeFrame{border-color:#4f7f89}
+.qr-design-terracotta-arch .qrCard{background:#fcf2e9;border:2px solid #a8593f;border-radius:50% 50% 4px 4px / 13% 13% 4px 4px;padding-top:42px}
+.qr-design-terracotta-arch .qrCard::before{inset:13px;border:1px solid #d29a7e;border-radius:inherit;opacity:.8}
+.qr-design-terracotta-arch .qrCard h2 i,.qr-design-terracotta-arch .qrCard .qrNames,.qr-design-terracotta-arch .qrCard>small,.qr-design-terracotta-arch .qrBrand span{color:#8f4935}.qr-design-terracotta-arch .qrCodeFrame{border-color:#a8593f}
+.qr-design-champagne-lines .qrCard{background:#fffaf0;border:0;border-left:5px double #b78c4d;border-right:5px double #b78c4d}
+.qr-design-champagne-lines .qrCard::before{inset:14px 20px;border:1px solid #dcc69f;border-radius:0;opacity:.65}
+.qr-design-champagne-lines .qrCard h2 i,.qr-design-champagne-lines .qrCard .qrNames,.qr-design-champagne-lines .qrCard>small,.qr-design-champagne-lines .qrBrand span{color:#987039}.qr-design-champagne-lines .qrCodeFrame{border:3px double #b78c4d}
 .qr-4x6 .qrCard,.qr-5x7 .qrCard{max-width:360px;margin:auto;gap:7px;padding:20px}
 .qr-4x6 .qrCard .qrBrandLogo{width:95px;height:95px}
 .qr-5x7 .qrCard .qrBrandLogo{width:125px;height:125px}

@@ -21,7 +21,9 @@ export function compactMapLocation(location: string) {
   if (isUS || statePart) {
     const stateValue=statePart?.value||"",state=STATE_NAMES[stateValue.toLowerCase()]||stateValue.toUpperCase();
     const city = [...body.slice(0,statePart?.index??body.length)].reverse().find(part => !ADMIN_AREA.test(part) && !STREET.test(part) && !POSTCODE.test(part));
-    return city && state ? `${city}, ${state}` : original;
+    if(city&&state)return `${city}, ${state}`;
+    const nonAdministrative=body.find(part=>!ADMIN_AREA.test(part)&&!STREET.test(part)&&!POSTCODE.test(part)&&part!==stateValue);
+    return nonAdministrative&&state?`${nonAdministrative}, ${state}`:state||original;
   }
 
   const foreignBody = body[0] && STREET.test(body[0]) ? body.slice(1) : body;
