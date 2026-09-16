@@ -51,7 +51,7 @@ for(const route of ['/','/memento-map'])for(const width of [1440,390]){
  await expect(section).not.toContainText('Available now');
  if(route==='/'){
   const order=await page.evaluate(()=>{const why=document.querySelector('.houseStory'),carousel=document.querySelector('#celebrations'),start=document.querySelector('.keepsakeSelector');return Boolean(why.compareDocumentPosition(carousel)&Node.DOCUMENT_POSITION_FOLLOWING)&&Boolean(carousel.compareDocumentPosition(start)&Node.DOCUMENT_POSITION_FOLLOWING)});expect(order).toBe(true);
-  await expect(section.locator('.celebrationProducts').first()).toHaveText('Memento Map · Tile Board · Memento Deck');
+  await expect(section.locator('.experienceProducts').first()).toHaveText('Memento Map · Tile Board · Memento Deck');expect((await section.locator('.experienceProducts').first().boundingBox()).height).toBeLessThan(65);
   await expect(section.locator('img[src="/brand/map-celebration-of-life-hero.webp"]')).toHaveCount(1);
  }
 
