@@ -23,37 +23,50 @@
  .storyTimeline .photoExpanded .storyPhoto{height:clamp(250px,45dvh,400px)}
 }
 
-/* Timeline cards use separate photo and story targets so mobile gestures stay predictable. */
-.storyMemoryBody{min-width:0}.storyPhotoButton,.storyMemoryCard{display:block;width:100%;padding:0;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer}.storyMemoryCard{min-height:174px;perspective:900px}.storyCardInner{position:relative;display:block;min-height:174px;transform-style:preserve-3d;transition:transform .42s ease}.storyCardFront,.storyMemoryBack{position:absolute;inset:0;backface-visibility:hidden}.storyMemoryBack{display:flex;flex-direction:column;justify-content:center;gap:10px;padding:18px;overflow-y:auto;overflow-wrap:anywhere;background:#fcf5f2;transform:rotateY(180deg)}.storyFlipped .storyCardInner{transform:rotateY(180deg)}.storyMemoryCopy>small i{display:inline-grid;width:20px;height:20px;margin-right:5px;place-items:center;border-radius:50%;background:#efe3d4;color:#8f606b;font-style:normal}.storyMemoryBack>small{font:9px Arial;letter-spacing:1.5px;color:#8f606b}.storyMemoryBack>strong{font:25px/1.15 Georgia}.storyMemoryCopy em,.storyMemoryBack em{margin-top:auto;color:#9a8e80;font:italic 10px Georgia}.storyPhotoButton:focus-visible,.storyMemoryCard:focus-visible{outline:3px solid var(--gold);outline-offset:3px}.storyTimeline .photoExpanded .storyMemoryBody{display:block}.storyTimeline .photoExpanded .storyMemoryCard{display:none}
-@media(max-width:959px){.storyMemoryBody{display:grid;grid-template-columns:130px minmax(0,1fr);min-height:132px}.storyPhoto{height:100%;min-height:132px;aspect-ratio:auto}.storyMemoryCard,.storyCardInner{min-height:132px;height:100%}.storyMemoryCopy,.storyMemoryBack{padding:12px;gap:6px}.storyMemoryCopy>strong,.storyMemoryBack>strong{font-size:20px}.storyMemoryCopy em,.storyMemoryBack em{font-size:9px}.storyTimeline .photoExpanded .storyPhoto{height:clamp(250px,45dvh,400px)}}
-@media(max-width:600px){.mapStoryLayout .adventureMap{height:clamp(320px,44dvh,440px)}.storyPaneHeader{padding-top:18px}.storyPaneHeader h2{font-size:38px;line-height:1}.storyPaneSummary{font-size:16px;margin-top:8px;margin-bottom:14px}.storyPlaybackControls{display:grid;grid-template-columns:1fr}.storyPlaybackControls button{width:max-content;min-width:210px;border-radius:28px;padding-inline:24px;background:#a86f78;color:#fff;border-color:#a86f78;font:18px Georgia}.storyPlaybackControls span{font-size:10px}.storyTimeline{margin-left:16px;padding-left:20px}.storyDate i{width:38px;height:38px;left:-41px;top:7px;font-size:16px}.storyMemoryBody{grid-template-columns:116px minmax(0,1fr);min-height:116px}.storyPhoto{min-height:116px}.storyMemoryCard,.storyCardInner{min-height:116px}.storyMemoryCopy,.storyMemoryBack{padding:10px}.storyMemoryCopy>strong,.storyMemoryBack>strong{font-size:18px}.storyMemoryCopy em,.storyMemoryBack em{display:none}}
-@media(prefers-reduced-motion:reduce){.storyCardInner{transition:none}.storyFlipped .storyCardInner{transform:none}.storyFlipped .storyCardFront{display:none}.storyFlipped .storyMemoryBack{transform:none}}
+
+/* One expandable story surface; media controls remain independent. */
 .mapStoryLayout .realMap{overflow:hidden}.mapStoryLayout .realMap>.maplibregl-control-container{position:absolute;inset:0;overflow:hidden;pointer-events:none}.mapStoryLayout .realMap>.maplibregl-control-container .maplibregl-ctrl{pointer-events:auto}
-.storyMobileDate,.storyLocationCompact{display:none}.storyVideoSlot,.storyVideoSlot>.streamPlayer,.storyVideoSlot>.mediaState{width:100%;height:100%;min-height:100%;margin:0}.storyVideoSlot .streamPlayer iframe,.storyVideoSlot .streamPlayer>button{width:100%;height:100%;min-height:100%;border:0}.storyVideoSlot .streamPlayer>button{background-position:center;background-size:cover}
-@media(max-width:600px){.storyDate{height:0;padding:0}.storyDate>time{display:none}.storyMobileDate{display:block;color:#8f606b;font:12px/1.3 Georgia}.storyLocationFull{display:none}.storyLocationCompact{display:inline}.storyLocation{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.storyMemoryBody{grid-template-columns:minmax(138px,42%) minmax(0,1fr);min-height:146px}.storyPhoto{min-height:146px}.storyMemoryCard,.storyCardInner{min-height:146px}.storyMemoryCopy>small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.storyMemoryCopy>strong{overflow-wrap:anywhere}.storyMemoryCopy .loveMiles{display:none}.storyVideoSlot .streamPlayer>button b{font-size:10px}}
-
-/* Keep every story card readable and use the same compact place label at every size. */
-.storyPhoto .timelineLogoFallback img{width:100%!important;height:100%!important;max-height:none!important;object-fit:cover;padding:0}
-.storyLocationFull{display:none}.storyLocationCompact{display:inline}
-.storyCardFront{position:relative;inset:auto;min-height:174px}
-
+.mapStoryLayout.withStory{grid-template-columns:minmax(0,1fr) clamp(440px,42vw,640px)}
+.storyMemory{display:grid;grid-template-columns:minmax(130px,34%) minmax(0,1fr);border-radius:10px;overflow:hidden;background:#fffaf2;box-shadow:0 4px 14px #51453314}
+.storyDate{grid-column:1/-1;padding:14px 16px 8px;height:auto}.storyDate>time{display:block}
+.storyMemoryBody{display:contents}
+.storyPhotoButton{display:block;align-self:start;min-width:0;width:100%;padding:0;border:0;background:transparent;cursor:zoom-in}
+.storyPhoto{height:180px;min-height:0;aspect-ratio:auto;background:#f2ece1;margin:0;width:100%}
+.storyPhoto .timelineLogoFallback img{width:100%!important;height:100%!important;object-fit:contain!important;padding:10px!important}
+.storyMemoryCard{position:relative;display:flex;flex-direction:column;min-width:0;width:100%;padding:8px 16px 16px;gap:10px;border:0;border-left:1px solid #e5d9ca;background:transparent;color:inherit;text-align:left;cursor:pointer;align-self:stretch}
+.storyMemoryCopy>small{display:flex;align-items:flex-start;gap:6px;padding-right:24px;font:9px/1.5 Arial,sans-serif;letter-spacing:1.2px;white-space:normal;overflow-wrap:anywhere;color:#85475f;text-transform:uppercase}
+.storyMemoryCopy>small i{display:grid;place-items:center;flex:0 0 20px;width:20px;height:20px;border-radius:50%;background:#eee1d8;font-style:normal}
+.storyCardPlace{font:23px/1.15 Georgia!important;overflow-wrap:anywhere;padding-right:12px}
+.storyDescription{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap;font:14px/1.5 Georgia;color:#554d43}
+.storyExpanded .storyDescription{display:block;overflow:visible;-webkit-line-clamp:unset}
+.storyMemoryCopy .loveMiles{display:block;text-transform:none;letter-spacing:normal;margin-top:auto;padding-top:8px;color:#85475f;font:italic 12px/1.4 Georgia;text-align:right}
+.storyChevron{position:absolute;right:9px;top:5px;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#eee1d8;color:#85475f;font:22px/1 Georgia;transition:background .18s}
+.storyMemoryCard:hover .storyChevron{background:#e4d1c6}
+.weddingPage .storyMemory>.storySharedBy{grid-column:1/-1;display:flex;flex-direction:row;justify-content:flex-start;align-items:center;gap:10px;margin:0;padding:12px 16px;border:0;background:#82465d;color:#fff8f0;text-align:left;font:13px/1.45 Georgia;overflow-wrap:anywhere}
+.storySharedBy svg{width:22px;height:26px;flex:0 0 22px}.storySharedBy span{min-width:0;font-weight:400}
+.storyPhotoButton:focus-visible,.storyMemoryCard:focus-visible{outline:3px solid var(--gold);outline-offset:-3px}
+.storyVideoSlot,.storyVideoSlot>.streamPlayer,.storyVideoSlot>.mediaState{width:100%;height:180px;min-height:0;margin:0}.storyVideoSlot .streamPlayer iframe,.storyVideoSlot .streamPlayer>button{width:100%;height:100%;min-height:0;border:0}.storyVideoSlot .streamPlayer>button{background-position:center;background-size:cover}
+.storyTimeline .photoExpanded .storyPhoto{height:280px}.storyTimeline .photoExpanded .storyMemoryCopy{display:flex}
+@media(min-width:960px) and (max-width:1199px){.mapStoryLayout.withStory{grid-template-columns:minmax(0,1fr) 420px}.storyPaneScroll{padding-inline:14px}}
 @media(max-width:959px){
+ .mapStoryLayout.withStory{grid-template-columns:minmax(0,1fr)}
  .mapStoryLayout .adventureMap,.mapStoryLayout:has(.storyPane.isPlaying) .adventureMap{height:clamp(230px,32dvh,340px)}
- .storyMemoryCard,.storyCardInner{height:auto}
- .storyCardFront{min-height:146px}
+ .storyMemory{grid-template-columns:minmax(105px,32%) minmax(0,1fr);grid-template-rows:min-content 1fr auto}
+ .storyDate{grid-column:1;grid-row:1;padding:10px 8px;font-size:11px;align-self:start}
+ .storyPhotoButton,.storyMemoryBody>.storyPhoto{grid-column:1;grid-row:2;align-self:start}
+ .storyMemoryCard{grid-column:2;grid-row:1/3;padding:12px;gap:8px}
+ .storyPhoto,.storyVideoSlot,.storyVideoSlot>.streamPlayer,.storyVideoSlot>.mediaState{height:140px}
+ .storyCardPlace{font-size:20px!important}.storyDescription{font-size:13px;-webkit-line-clamp:3}
+ .storyMemoryCopy .loveMiles{display:none}.storyExpanded .storyMemoryCopy .loveMiles{display:block}
+ .storyMemoryCopy>small{font-size:9px;letter-spacing:1px}
+ .storyTimeline .photoExpanded .storyPhoto{height:230px}
 }
-
-/* Contributions stay on the readable front; secondary journey metadata stays on the back. */
-.storyCardFront{display:flex;min-height:174px}.storyCardPlace{font:22px/1.15 Georgia!important}.storyMemoryCard{cursor:pointer}.storyContributionScroll{display:block;width:100%;min-height:58px;max-height:82px;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;resize:none;padding:2px 0;border:0;background:transparent;color:#554d43;font:13px/1.55 Georgia;white-space:pre-wrap;cursor:auto;scrollbar-width:thin;scrollbar-color:#bca88c transparent}.storyContributionScroll:focus-visible{outline:2px solid var(--gold);outline-offset:2px}.storyMemoryBack{justify-content:flex-start}.storyMemoryBack>span,.storyMemoryBack>time{color:#6f6559;font:12px/1.45 Georgia}.storyMemoryBack>strong{margin-top:5px}.storyPhoto .timelineLogoFallback img{width:100%!important;height:100%!important;max-height:none!important;object-fit:cover!important;padding:0!important}
-@media(max-width:959px){.storyCardFront{min-height:146px}.storyContributionScroll{min-height:48px;max-height:66px;font-size:12px;line-height:1.45}.storyCardPlace{font-size:18px!important}}
-@media(max-width:600px){.storyContributionScroll{max-height:72px;padding:6px 7px}.storyMemoryBack>span,.storyMemoryBack>time{font-size:11px}}
 @media(max-width:600px){
- .mapStoryLayout .adventureMap,.mapStoryLayout:has(.storyPane.isPlaying) .adventureMap{height:clamp(230px,32dvh,340px)}
  .storyPaneHeader{padding:8px 14px 0}.storyPaneHeader h2{font-size:26px;line-height:1.05;margin:2px 0}.storyPaneHeader small{font-size:6px}
- .storyPaneSummary{font-size:12px;line-height:1.3;margin:2px 14px 6px}
- .storyPaneScroll{padding:0 14px 12px 20px}
- .storyPlaybackControls{display:block;margin-bottom:6px;padding:2px 0 5px}
- .storyPlaybackControls button{width:100%;min-width:0;min-height:38px;padding:7px 14px;font-size:15px}
- .storyPlaybackControls span{display:none}
- .storyCardFront{min-height:146px}
+ .storyPaneSummary{font-size:12px;line-height:1.3;margin:2px 14px 6px}.storyPaneScroll{padding:0 12px 12px 12px}
+ .storyPlaybackControls{display:block;margin-bottom:6px;padding:2px 0 5px}.storyPlaybackControls button{width:100%;min-width:0;min-height:38px;padding:7px 14px;font-size:15px}.storyPlaybackControls span{display:none}
+ .storyTimeline{margin-left:12px;padding-left:13px}.storyDate i{width:26px;height:26px;left:-27px;top:7px;font-size:11px}
+ .storyMemory{grid-template-columns:minmax(90px,32%) minmax(0,1fr)}.storyMemoryCard{padding:10px 9px;gap:7px}.storyMemoryCopy>small{font-size:8px;letter-spacing:.8px;padding-right:20px;gap:4px}.storyMemoryCopy>small i{flex-basis:16px;width:16px;height:16px}.storyCardPlace{font-size:18px!important}.storyDescription{font-size:12px;line-height:1.45}.storyDate{font-size:10px}.storyChevron{right:4px;width:22px;height:22px}.storyPhoto{height:124px}
+ .weddingPage .storyMemory>.storySharedBy{padding:10px;gap:8px;font-size:12px}.storyVideoSlot .streamPlayer>button b{font-size:10px}
 }
+@media(prefers-reduced-motion:reduce){.storyChevron{transition:none}}
