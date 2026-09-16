@@ -47,6 +47,9 @@ await page.getByRole('button',{name:'Clear',exact:true}).click();await expect(pa
 await page.getByRole('button',{name:'▶ Play our story',exact:true}).click();await expect(page.getByRole('button',{name:'Pause story',exact:true})).toBeVisible();await page.getByRole('button',{name:'Pause story',exact:true}).click();
 for(const route of ['/','/memento-map'])for(const width of [1440,390]){
  await page.setViewportSize({width,height:1000});await page.goto('http://127.0.0.1:3000'+route);
+ const nav=page.locator(route==='/'?'.houseNav':'.nav');
+ if(width===1440){await expect(nav.locator('.mobileAccountAccess')).toBeHidden();await expect(nav.locator('a[href="/login"]:visible')).toHaveCount(1)}
+ if(width===390){await expect(nav.locator('.mobileAccountAccess').getByRole('link',{name:'Sign in'})).toBeVisible()}
  const section=page.locator('.experienceSelector');await section.scrollIntoViewIfNeeded();
  await expect(section).not.toContainText('Available now');
  if(route==='/'){

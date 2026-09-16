@@ -272,11 +272,11 @@
 .celebrationExperienceSelector .experienceSelect{position:absolute;z-index:1;left:0;right:0;bottom:0;padding:18px;color:var(--ink)}
 .celebrationExperienceSelector .experienceSelect>span{margin:0 auto 9px;background:#fffdf8e8}
 .celebrationExperienceSelector .experienceProducts{color:#665d52}
-.mobileAccountAccess{display:none}
+.houseNav>.mobileAccountAccess,.nav>.mobileAccountAccess{display:none}
 .mobileSignedOutLinks{display:flex;align-items:center;gap:8px}
 .mobileSignedOutLinks a:last-child{padding:8px 10px;border:1px solid var(--gold);border-radius:4px;color:#76552a}
 @media(max-width:700px){
- .houseNav>.mobileAccountAccess{display:block!important;margin-left:auto;font-size:11px}.mobileAccountAccess .mobileSignedOutLinks a:last-child{display:none}
+ .houseNav>.mobileAccountAccess,.nav>.mobileAccountAccess{display:block!important;margin-left:auto;font-size:11px}.mobileAccountAccess .mobileSignedOutLinks a:last-child{display:none}
  .mobileMenu{margin-left:8px}.mobileMenu .mobileSignedOutLinks{display:grid;gap:0;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--line)}
  .mobileMenu .mobileSignedOutLinks a:last-child{border:0;border-radius:0}
  .celebrationExperienceSelector .experienceOption{min-height:280px}
