@@ -13,7 +13,7 @@ const experiences=[
 ] as const;
 
 export function ExperienceSelector({celebrations=false}:{celebrations?:boolean}){
- const options=celebrations?CELEBRATION_GROUPS.map(occasion=>{const visual=experiences.find(item=>item.id===occasion.slug)!;return {...visual,id:occasion.slug,name:occasion.name,href:`/celebrations/${occasion.slug}`,description:occasion.intro,prompt:occasion.products.map(product=>product.name).join(" · ")}}):experiences;
+ const options=celebrations?CELEBRATION_GROUPS.map(occasion=>{const visual=experiences.find(item=>item.id===occasion.slug)!;return {...visual,id:occasion.slug,name:occasion.name,href:`/celebrations/${occasion.slug}`,image:({"celebration-of-life":"/brand/map-celebration-of-life-hero.webp","events-communities":"/brand/map-events-hero.webp","next-chapter":"/brand/map-next-chapter-hero.webp"} as Record<string,string>)[occasion.slug]||`/brand/celebrations/${occasion.slug}-1.webp`,description:occasion.intro,prompt:occasion.products.map(product=>product.name).join(" · ")}}):experiences;
  const sectionId=celebrations?"celebrations":"experiences",titleId=`${sectionId}-selector-title`;
 
  const [selected,setSelected]=useState(0),track=useRef<HTMLDivElement>(null),scrollTimer=useRef<ReturnType<typeof setTimeout>|null>(null),manualScroll=useRef(false);
@@ -26,7 +26,7 @@ export function ExperienceSelector({celebrations=false}:{celebrations?:boolean})
   <div className="experienceCarousel">
    <button type="button" className="experienceArrow previous" aria-label="Previous experience" disabled={selected===0} onClick={()=>center(Math.max(0,selected-1))}>←</button>
    <div className="experienceTrack" ref={track} onScroll={onScroll} onPointerDown={()=>{manualScroll.current=true}} onWheel={()=>{manualScroll.current=true}} aria-label={celebrations?"Shop by celebration":"Memento Map experiences"}>
-    {options.map((experience,index)=><div className={`experienceOption ${selected===index?"selected":""}`} key={experience.id}><a href={experience.href} aria-label={`Explore ${experience.name}`} onClick={event=>{if(selected!==index&&!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&!event.altKey){event.preventDefault();center(index)}}}><img src={experience.image} alt={experience.alt}/></a><button type="button" className="experienceSelect" aria-pressed={selected===index} onClick={()=>center(index)}><span aria-hidden="true">{experience.icon}</span><b>{experience.name}</b></button></div>)}
+    {options.map((experience,index)=><div className={`experienceOption ${selected===index?"selected":""}`} key={experience.id}><a href={experience.href} aria-label={`Explore ${experience.name}`} onClick={event=>{if(selected!==index&&!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&!event.altKey){event.preventDefault();center(index)}}}><img src={experience.image} alt={experience.alt}/></a><button type="button" className="experienceSelect" aria-pressed={selected===index} onClick={()=>center(index)}><span aria-hidden="true">{experience.icon}</span><b>{experience.name}</b>{celebrations&&<small className="celebrationProducts">{experience.prompt}</small>}</button></div>)}
    </div>
    <button type="button" className="experienceArrow next" aria-label="Next experience" disabled={selected===options.length-1} onClick={()=>center(Math.min(options.length-1,selected+1))}>→</button>
   </div>

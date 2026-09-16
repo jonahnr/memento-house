@@ -263,3 +263,5 @@
 .experienceOption>a{display:block}.experienceSelect{display:block;width:100%;padding:0;border:0;background:transparent;color:inherit;cursor:pointer}.experienceOption>a:focus-visible,.experienceSelect:focus-visible{outline:3px solid var(--gold);outline-offset:-3px}
 
 .experienceOption img{max-width:none}
+
+.celebrationProducts{display:block;margin:12px 0 0;color:var(--muted);font:13px/1.5 Georgia;text-transform:none;letter-spacing:0}

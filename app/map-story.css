@@ -32,7 +32,7 @@
 .storyMemoryBody{display:contents}
 .storyPhotoButton{display:block;align-self:start;min-width:0;width:100%;padding:0;border:0;background:transparent;cursor:zoom-in}
 .storyPhoto{height:180px;min-height:0;aspect-ratio:auto;background:#f2ece1;margin:0;width:100%}
-.storyPhoto .timelineLogoFallback img{width:100%!important;height:100%!important;object-fit:contain!important;padding:10px!important}
+.storyPhoto .timelineLogoFallback img{width:100%!important;height:100%!important;object-fit:cover!important;padding:0!important}
 .storyMemoryCard{position:relative;display:flex;flex-direction:column;min-width:0;width:100%;padding:8px 16px 16px;gap:10px;border:0;border-left:1px solid #e5d9ca;background:transparent;color:inherit;text-align:left;cursor:pointer;align-self:stretch}
 .storyMemoryCopy>small{display:flex;align-items:flex-start;gap:6px;padding-right:24px;font:9px/1.5 Arial,sans-serif;letter-spacing:1.2px;white-space:normal;overflow-wrap:anywhere;color:#85475f;text-transform:uppercase}
 .storyMemoryCopy>small i{display:grid;place-items:center;flex:0 0 20px;width:20px;height:20px;border-radius:50%;background:#eee1d8;font-style:normal}
@@ -70,3 +70,7 @@
  .weddingPage .storyMemory>.storySharedBy{padding:10px;gap:8px;font-size:12px}.storyVideoSlot .streamPlayer>button b{font-size:10px}
 }
 @media(prefers-reduced-motion:reduce){.storyChevron{transition:none}}
+
+/* Photo expansion shares the card evenly with its story. */
+.storyTimeline .photoExpanded .storyMemory{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.storyTimeline .photoExpanded .storyPhotoButton{cursor:zoom-out}
