@@ -50,16 +50,18 @@ for(const route of ['/','/memento-map'])for(const width of [1440,390]){
  const section=page.locator('.experienceSelector');await section.scrollIntoViewIfNeeded();
  await expect(section).not.toContainText('Available now');
  if(route==='/'){
-  const order=await page.evaluate(()=>{const why=document.querySelector('.houseStory'),carousel=document.querySelector('#celebrations'),start=document.querySelector('.keepsakeSelector');return Boolean(why.compareDocumentPosition(carousel)&Node.DOCUMENT_POSITION_FOLLOWING)&&Boolean(carousel.compareDocumentPosition(start)&Node.DOCUMENT_POSITION_FOLLOWING)});expect(order).toBe(true);
+  const order=await page.evaluate(()=>{const why=document.querySelector('.houseStory'),carousel=document.querySelector('#celebrations'),start=document.querySelector('.keepsakeSelector');return Boolean(start.compareDocumentPosition(carousel)&Node.DOCUMENT_POSITION_FOLLOWING)&&Boolean(carousel.compareDocumentPosition(why)&Node.DOCUMENT_POSITION_FOLLOWING)});expect(order).toBe(true);
   await expect(section.locator('.experienceProducts').first()).toHaveText('Memento Map · Tile Board · Memento Deck');expect((await section.locator('.experienceProducts').first().boundingBox()).height).toBeLessThan(65);
   await expect(section.locator('img[src="/brand/map-celebration-of-life-hero.webp"]')).toHaveCount(1);
+  expect(await section.locator('.experienceOption').nth(3).evaluate(node=>{const image=node.querySelector('img').getBoundingClientRect(),card=node.getBoundingClientRect();return Math.abs(image.width-card.width)<2&&Math.abs(image.height-card.height)<2})).toBe(true);
+  if(width===390){await expect(page.locator('.mobileAccountAccess').getByRole('link',{name:'Sign in'})).toBeVisible();await page.locator('.mobileMenu summary').click();await expect(page.locator('.mobileMenu').getByRole('link',{name:'Sign up'})).toBeVisible()}
  }
 
  const target=section.locator('.experienceOption').nth(2),link=target.locator('a');
- await link.click();await expect(target).toHaveClass(/selected/);expect(new URL(page.url()).pathname).toBe(route);
+ await link.click({position:{x:24,y:24}});await expect(target).toHaveClass(/selected/);expect(new URL(page.url()).pathname).toBe(route);
  await page.waitForTimeout(700);await expect(target).toHaveClass(/selected/);
  await section.screenshot({path:`outputs/story-redesign/carousel-${route==='/'?'home':'map'}-${width}.png`});
- const href=await link.getAttribute('href');await link.click();await expect(page).toHaveURL(new RegExp(href+'$'));
+ const href=await link.getAttribute('href');await link.click({position:{x:24,y:24}});await expect(page).toHaveURL(new RegExp(href+'$'));
 }
 expect(errors).toEqual([]);console.log(JSON.stringify({passed:true,results,errors},null,2));
 }finally{await browser.close()}

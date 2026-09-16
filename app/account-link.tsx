@@ -8,7 +8,7 @@ type AccountState={signedIn:boolean;hasMap:boolean};
 type AccountAccess={mapAccessOverride?:string;orders?:{product?:string;entitlement_status?:string}[]};
 const mapProducts=new Set(["map","memento-map"]);
 
-export function AccountLink(){
+export function AccountLink({mobile=false}:{mobile?:boolean}){
  const[state,setState]=useState<AccountState>({signedIn:false,hasMap:false});
  useEffect(()=>{
   const client=getSupabaseBrowserClient();if(!client)return;
@@ -27,6 +27,6 @@ export function AccountLink(){
   const{data}=client.auth.onAuthStateChange((_event,session)=>void update(session));
   return()=>{active=false;data.subscription.unsubscribe()};
  },[]);
- if(!state.signedIn)return <a href="/login">Sign in</a>;
+ if(!state.signedIn)return mobile?<span className="mobileSignedOutLinks"><a href="/login">Sign in</a><a href="/signup">Sign up</a></span>:<a href="/login">Sign in</a>;
  return <><details className="globalAccountMenu"><summary>My account</summary><div><a href="/account">Account overview</a>{state.hasMap&&<a href="/dashboard">Open Memento Map</a>}</div></details><CartLink/></>;
 }
