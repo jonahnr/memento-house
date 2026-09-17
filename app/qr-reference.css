@@ -34,7 +34,7 @@
 .qr-double .qrCard .qrCodeFrame .realQr{width:124px;height:124px;grid-column:auto;grid-row:auto}
 .qr-double .qrCard .qrAddress,.qr-double .qrCard .qrFooterDivider,.qr-double .qrCard>small{grid-column:1/-1}
 @media print{
- body:has(.qrLayout),body:has(.qrLayout) .dash,body:has(.qrLayout) .dashMain,body:has(.qrLayout) .qrLayout{height:10.5in!important;min-height:0!important;max-height:10.5in!important;margin:0!important;overflow:hidden!important}
+ body:has(.qrLayout),body:has(.qrLayout) .dash,body:has(.qrLayout) .dashMain,body:has(.qrLayout) .qrLayout{height:11in!important;min-height:0!important;max-height:11in!important;margin:0!important;overflow:hidden!important}
  body:has(.qrLayout) .qrPrintSheet .qrCard{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:.11in!important;padding:.28in .4in!important}
  body:has(.qrLayout) .qrCard .qrNames{font-size:14px!important;letter-spacing:5px!important}
  body:has(.qrLayout) .qrCard .qrBrandLogo{width:2.45in!important;height:2.45in!important;margin:-.15in auto -.12in!important;flex-shrink:0}
@@ -100,10 +100,10 @@
 .qr-4x6 .qrCard .realQr{width:145px;height:145px}
 .qrPrintQuality{font-size:12px;line-height:1.6}
 @media print{
- body:has(.qr-4x6),body:has(.qr-4x6) .dash,body:has(.qr-4x6) .dashMain,body:has(.qr-4x6) .qrLayout{height:5.5in!important;max-height:5.5in!important}
- body:has(.qr-5x7),body:has(.qr-5x7) .dash,body:has(.qr-5x7) .dashMain,body:has(.qr-5x7) .qrLayout{height:6.5in!important;max-height:6.5in!important}
- body:has(.qr-4x6) .qrPrintSheet,body:has(.qr-4x6) .qrPrintSheet .qrCard{width:3.5in!important;height:5.5in!important}
- body:has(.qr-5x7) .qrPrintSheet,body:has(.qr-5x7) .qrPrintSheet .qrCard{width:4.5in!important;height:6.5in!important}
+ body:has(.qr-4x6),body:has(.qr-4x6) .dash,body:has(.qr-4x6) .dashMain,body:has(.qr-4x6) .qrLayout{height:6in!important;max-height:6in!important}
+ body:has(.qr-5x7),body:has(.qr-5x7) .dash,body:has(.qr-5x7) .dashMain,body:has(.qr-5x7) .qrLayout{height:7in!important;max-height:7in!important}
+ body:has(.qr-4x6) .qrPrintSheet,body:has(.qr-4x6) .qrPrintSheet .qrCard{width:4in!important;height:6in!important}
+ body:has(.qr-5x7) .qrPrintSheet,body:has(.qr-5x7) .qrPrintSheet .qrCard{width:5in!important;height:7in!important}
  body:has(.qr-4x6) .qrPrintSheet .qrCard{padding:.16in .18in!important;gap:.055in!important}
  body:has(.qr-4x6) .qrCard .qrNames{font-size:8px!important;letter-spacing:2px!important}
  body:has(.qr-4x6) .qrCard .qrBrandLogo{width:.88in!important;height:.88in!important;margin:-.06in auto -.04in!important}

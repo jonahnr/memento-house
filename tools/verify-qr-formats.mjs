@@ -30,7 +30,8 @@ for(const layout of ['single','double','4x6','5x7'])for(const design of designs)
    images:[...el.querySelectorAll('img')].map(i=>({name:i.className,ppi:i.naturalWidth/(i.getBoundingClientRect().width/96)}))};
  }));
  assert.equal(cards.length,layout==='double'?2:1);
- for(const card of cards){assert.ok(card.scrollHeight<=card.height+1,`${layout}/${design} vertical overflow`);assert.ok(card.scrollWidth<=card.width+1,`${layout}/${design} horizontal overflow`);for(const image of card.images)assert.ok(image.ppi>=300,`${layout}/${design} ${image.name} ${image.ppi} PPI`);for(const child of card.children)assert.ok(child.top>=card.y-1&&child.bottom<=card.y+card.height+1&&child.left>=card.x-1&&child.right<=card.x+card.width+1,`${layout}/${design} clipped ${child.name}`)}
+ const dimensions={single:[816,1056],double:[816,528],"4x6":[384,576],"5x7":[480,672]}[layout];
+ for(const card of cards){assert.equal(card.width,dimensions[0]);assert.equal(card.height,dimensions[1]);assert.ok(card.scrollHeight<=card.height+1,`${layout}/${design} vertical overflow`);assert.ok(card.scrollWidth<=card.width+1,`${layout}/${design} horizontal overflow`);for(const image of card.images)assert.ok(image.ppi>=300,`${layout}/${design} ${image.name} ${image.ppi} PPI`);for(const child of card.children)assert.ok(child.top>=card.y-1&&child.bottom<=card.y+card.height+1&&child.left>=card.x-1&&child.right<=card.x+card.width+1,`${layout}/${design} clipped ${child.name}`)}
  if(cards.length===2)assert.ok(cards[1].y>=cards[0].y+cards[0].height-1);
  await page.pdf({path:`${out}/${layout}-${design}.pdf`,preferCSSPageSize:true,printBackground:true});
  await page.locator('.qrPrintSheet').screenshot({path:`${out}/${layout}-${design}-print.png`});

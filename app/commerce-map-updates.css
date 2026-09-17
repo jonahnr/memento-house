@@ -19,10 +19,10 @@
 .cartTotal{display:flex;justify-content:space-between;font-size:20px;margin:24px 0}
 .checkoutButton+.checkoutButton{margin-top:12px}
 @media print{
- body:has(.qrLayout) .qrPrintSheet{visibility:visible!important;position:fixed!important;inset:0!important;width:8in!important;height:10.5in!important;margin:0!important;display:block!important}
- body:has(.qrLayout) .qrPrintSheet .qrCard{position:relative!important;inset:auto!important;margin:0!important;width:8in!important;height:10.5in!important;max-width:none!important;padding:.45in!important;box-sizing:border-box!important;break-inside:avoid!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+ body:has(.qrLayout) .qrPrintSheet{visibility:visible!important;position:fixed!important;inset:0!important;width:8.5in!important;height:11in!important;margin:0!important;display:block!important}
+ body:has(.qrLayout) .qrPrintSheet .qrCard{position:relative!important;inset:auto!important;margin:0!important;width:8.5in!important;height:11in!important;max-width:none!important;padding:.45in!important;box-sizing:border-box!important;break-inside:avoid!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}
  body:has(.qr-double) .qrPrintSheet{display:grid!important;grid-template-rows:1fr 1fr!important;gap:0!important}
- body:has(.qr-double) .qrPrintSheet .qrCard{height:5.25in!important;width:8in!important;display:grid!important;grid-template-columns:1fr 2.7in!important;grid-template-rows:auto auto auto auto auto!important;column-gap:.25in!important;padding:.35in!important;align-content:center!important;justify-content:normal!important}
+ body:has(.qr-double) .qrPrintSheet .qrCard{height:5.5in!important;width:8.5in!important;display:grid!important;grid-template-columns:1fr 2.7in!important;grid-template-rows:auto auto auto auto auto!important;column-gap:.25in!important;padding:.35in!important;align-content:center!important;justify-content:normal!important}
  body:has(.qr-double) .qrCard h2{font-size:32px!important;margin:8px 0!important}
  body:has(.qr-double) .qrCard p{font-size:15px!important;margin:8px 0!important}
  body:has(.qr-double) .qrCard .realQr{width:2.7in!important;height:2.7in!important;grid-column:2!important;grid-row:1/6!important;margin:0!important}

@@ -281,3 +281,17 @@
  .mobileMenu .mobileSignedOutLinks a:last-child{border:0;border-radius:0}
  .celebrationExperienceSelector .experienceOption{min-height:280px}
 }
+
+/* Make every part of the card a single navigation target. */
+.experienceOption>a{height:100%;text-align:center}
+.experienceOption:not(:has(.experienceProducts)){padding:0}
+.experienceOption:not(:has(.experienceProducts)) img{width:100%;margin:0}
+.experienceOption:not(:has(.experienceProducts)) .experienceSelect{padding:0 18px 20px}
+@media(max-width:700px){
+ .nav>.navLinks{display:none!important}
+ .nav>.mobileAccountAccess,.houseNav>.mobileAccountAccess{display:flex!important;align-items:center;flex-shrink:0;white-space:nowrap}
+ .mobileAccountAccess a{display:inline-flex!important;align-items:center;min-height:44px}
+ .houseNav>.mobileAccountAccess{order:2}.houseNav>.mobileMenu{order:3}
+ .celebrationExperiencePage>nav{flex-wrap:wrap;gap:12px}
+}
+

@@ -28,5 +28,6 @@ export function AccountLink({mobile=false}:{mobile?:boolean}){
   return()=>{active=false;data.subscription.unsubscribe()};
  },[]);
  if(!state.signedIn)return mobile?<span className="mobileSignedOutLinks"><a href="/login">Sign in</a><a href="/signup">Sign up</a></span>:<a href="/login">Sign in</a>;
+ if(mobile)return <a className="mobileAccountLink" href="/account">My account</a>;
  return <><details className="globalAccountMenu"><summary>My account</summary><div><a href="/account">Account overview</a>{state.hasMap&&<a href="/dashboard">Open Memento Map</a>}</div></details><CartLink/></>;
 }

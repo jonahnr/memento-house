@@ -74,3 +74,7 @@
 /* Photo expansion shares the card evenly with its story. */
 .storyTimeline .photoExpanded .storyMemory{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 .storyTimeline .photoExpanded .storyPhotoButton{cursor:zoom-out}
+
+/* Let the fallback fill its slot without the legacy thumbnail height cap. */
+.storyPhoto .timelineLogoFallback{display:grid!important;place-items:center}
+.storyPhoto .timelineLogoFallback img{display:block;width:100%!important;height:100%!important;max-height:none;object-fit:contain!important;object-position:center;padding:0!important;margin:0;opacity:1}
