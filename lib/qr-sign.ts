@@ -12,7 +12,7 @@ export function qrSignCopy(event:SignEvent,tier:string){
  return {name:couple?[event.partner_one_name,event.partner_two_name].filter(Boolean).join(" & ")||event.title:event.title||config.name,
   secondary:event.map_type==="celebration_of_life"?"to Their Map":event.map_type==="next_chapter"?"to the Next Chapter":"to Our Map",
   supporting:`Help build this ${config.eventSingular} map with meaningful places, travel recommendations${tier==="timeline-plus"?", and memories":""}.`,
-  instructions:[{title:"Scan the QR code",text:"Open your camera and scan to get started."},{title:"Add a place",text:"Share where you came from or recommend a place to visit."},{title:"Add your recommendation",text:"Tell us why this place matters, then submit your pin."},...(tier==="timeline-plus"?[{title:"Next, share a memory",text:"Share a dated memory, or skip to explore the map."}]:[{title:"Explore the map",text:"See the places everyone has shared."}]) ]};
+  instructions:[{title:"Scan the QR code",text:"Open your camera and scan to get started."},{title:"Add a place",text:"Share where you came from or recommend a place to visit."},{title:"Leave us a note",text:"Share a recommendation, advice, or message with your pin."},...(tier==="timeline-plus"?[{title:"Next, share a memory",text:"Share a dated memory, or skip to explore the map."}]:[{title:"Explore the map",text:"See the places everyone has shared."}]) ]};
 }
 const loadImage=(src:string)=>new Promise<HTMLImageElement>((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error("The sign image could not load. Please try again."));image.src=src});
 type WorldGeometry={type:"Polygon"|"MultiPolygon";coordinates:number[][][]|number[][][][]};
@@ -33,7 +33,7 @@ export async function renderQrSign(event:SignEvent,mapUrl:string,tier:string,lay
  }
  function drawIcon(kind:number,x:number,y:number,size:number){
   const s=size/24;ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.strokeStyle=colors.ink;ctx.fillStyle="transparent";ctx.lineWidth=2;ctx.lineCap="round";ctx.lineJoin="round";
-  if(kind===0){ctx.strokeRect(5,2,14,20);ctx.strokeRect(8,0,8,2);ctx.beginPath();ctx.arc(12,12,4,0,Math.PI*2);ctx.stroke()}
+  if(kind===0){ctx.beginPath();ctx.roundRect(5,0,14,24,2);ctx.stroke();ctx.beginPath();ctx.moveTo(10,3);ctx.lineTo(14,3);ctx.stroke();ctx.beginPath();ctx.arc(12,21,1,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.roundRect(7.5,8,9,7,1);ctx.stroke();ctx.beginPath();ctx.arc(12,11.5,2,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(9,8);ctx.lineTo(10,6.5);ctx.lineTo(13,6.5);ctx.lineTo(14,8);ctx.stroke()}
   if(kind===1){ctx.beginPath();ctx.moveTo(12,23);ctx.bezierCurveTo(10,18,5,14,5,9);ctx.arc(12,9,7,Math.PI,0);ctx.bezierCurveTo(19,14,14,18,12,23);ctx.stroke();ctx.beginPath();ctx.arc(12,9,2.5,0,Math.PI*2);ctx.stroke()}
   if(kind===2){ctx.strokeRect(2,4,20,14);ctx.beginPath();ctx.moveTo(7,18);ctx.lineTo(5,22);ctx.lineTo(12,18);ctx.stroke();ctx.beginPath();ctx.moveTo(8,10);ctx.bezierCurveTo(8,6,12,8,12,10);ctx.bezierCurveTo(12,8,16,6,16,10);ctx.bezierCurveTo(16,13,12,15,12,15);ctx.bezierCurveTo(12,15,8,13,8,10);ctx.stroke()}
   if(kind===3){ctx.beginPath();ctx.moveTo(1,11);ctx.lineTo(23,2);ctx.lineTo(16,22);ctx.lineTo(11,14);ctx.closePath();ctx.stroke();ctx.beginPath();ctx.moveTo(11,14);ctx.lineTo(23,2);ctx.stroke()}
@@ -43,8 +43,9 @@ export async function renderQrSign(event:SignEvent,mapUrl:string,tier:string,lay
   ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();ctx.fillStyle=colors.accent;ctx.globalAlpha=.17;
   if(world)for(const feature of world.features){if(!feature.geometry)continue;const groups=feature.geometry.type==="Polygon"?[feature.geometry.coordinates as number[][][]]:feature.geometry.coordinates as number[][][][];for(const polygon of groups){for(const ring of polygon){ctx.beginPath();ring.forEach(([lng,lat],index)=>{const px=x+(lng+180)/360*w,py=y+(90-lat)/180*h;(index?ctx.lineTo(px,py):ctx.moveTo(px,py))});ctx.fill()}}}
   else{for(const [cx,cy,rx,ry] of [[.18,.46,.15,.26],[.38,.35,.09,.18],[.52,.48,.12,.28],[.69,.37,.19,.22],[.82,.69,.1,.12]]){ctx.beginPath();ctx.ellipse(x+w*cx,y+h*cy,w*rx,h*ry,0,0,Math.PI*2);ctx.fill()}}
-  ctx.globalAlpha=1;ctx.strokeStyle=colors.ink;ctx.lineWidth=1.5;ctx.setLineDash([7,6]);ctx.beginPath();ctx.moveTo(x+w*.18,y+h*.55);ctx.bezierCurveTo(x+w*.38,y+h*.15,x+w*.55,y+h*.78,x+w*.82,y+h*.33);ctx.stroke();ctx.setLineDash([]);
-  for(const [px,py] of [[.18,.55],[.48,.52],[.82,.33]]){ctx.fillStyle=colors.ink;ctx.beginPath();ctx.arc(x+w*px,y+h*py,5,0,Math.PI*2);ctx.fill()}
+  ctx.globalAlpha=1;ctx.strokeStyle=colors.ink;ctx.lineWidth=1.5;ctx.setLineDash([7,6]);ctx.beginPath();ctx.moveTo(x+w*.43,y+h*.70);ctx.bezierCurveTo(x+w*.55,y+h*.70,x+w*.69,y+h*.40,x+w*.88,y+h*.22);ctx.stroke();ctx.setLineDash([]);
+  const markerSize=h<100?9:14,markers:Array<[number,number,"home"|"plane"|"heart"]>=[[.12,.38,"home"],[.28,.59,"plane"],[.43,.70,"heart"],[.55,.25,"home"],[.75,.47,"home"],[.88,.22,"plane"]];
+  for(const [px,py,symbol] of markers){const mx=x+w*px,my=y+h*py,r=markerSize;ctx.fillStyle=colors.ink;ctx.beginPath();ctx.arc(mx,my-r*.3,r*.68,Math.PI,0);ctx.bezierCurveTo(mx+r*.68,my+r*.28,mx,my+r,mx,my+r);ctx.bezierCurveTo(mx,my+r,mx-r*.68,my+r*.28,mx-r*.68,my-r*.3);ctx.fill();ctx.strokeStyle=colors.paper;ctx.fillStyle=colors.paper;ctx.lineWidth=1.25;ctx.beginPath();if(symbol==="home"){ctx.moveTo(mx-r*.34,my-r*.28);ctx.lineTo(mx,my-r*.56);ctx.lineTo(mx+r*.34,my-r*.28);ctx.moveTo(mx-r*.25,my-r*.27);ctx.lineTo(mx-r*.25,my+r*.18);ctx.lineTo(mx+r*.25,my+r*.18);ctx.lineTo(mx+r*.25,my-r*.27)}else if(symbol==="plane"){ctx.moveTo(mx-r*.42,my-r*.08);ctx.lineTo(mx+r*.42,my-r*.08);ctx.moveTo(mx,my-r*.48);ctx.lineTo(mx,my+r*.32);ctx.moveTo(mx-r*.25,my+r*.18);ctx.lineTo(mx,my+r*.02);ctx.lineTo(mx+r*.25,my+r*.18)}else{ctx.moveTo(mx,my+r*.25);ctx.bezierCurveTo(mx-r*.55,my-r*.08,mx-r*.28,my-r*.5,mx,my-r*.18);ctx.bezierCurveTo(mx+r*.28,my-r*.5,mx+r*.55,my-r*.08,mx,my+r*.25)}ctx.stroke()}
   ctx.restore();
  }
  function drawCard(yOffset:number,cardHeight:number){
@@ -60,8 +61,8 @@ export async function renderQrSign(event:SignEvent,mapUrl:string,tier:string,lay
   const start=landscape?262:H*.41,step=landscape?46:H*.104;
   copy.instructions.forEach((instruction,index)=>{
    const y=start+index*step;ctx.fillStyle=colors.accent;ctx.beginPath();ctx.arc(67,y+14,landscape?13:18,0,Math.PI*2);ctx.fill();ctx.fillStyle=colors.paper;text(String(index+1),67,y+(landscape?4:0),30,landscape?17:23);
-   drawIcon(index,landscape?94:91,y+(landscape?3:4),landscape?23:31);
-   ctx.fillStyle=colors.ink;text(instruction.title.toUpperCase(),landscape?124:135,y-1,landscape?275:270,landscape?16:21,"Georgia","left",1,"700");text(landscape?(["Open your camera and scan to get started.","Pin your origin or a place to visit.","Tell us why, then submit your pin.",tier==="timeline-plus"?"Share a memory, or skip to explore.":"Explore the places everyone shared."][index]):instruction.text,landscape?124:135,y+(landscape?20:31),landscape?275:265,landscape?12:18,"Georgia","left",3);
+   drawIcon(index,landscape?93:89,y+(landscape?2:2),landscape?26:35);
+   ctx.fillStyle=colors.ink;text(instruction.title.toUpperCase(),landscape?124:135,y-1,landscape?275:270,landscape?16:21,"Georgia","left",1,"700");text(landscape?(["Open your camera and scan to get started.","Pin your origin or a place to visit.","Share a recommendation, advice, or note.",tier==="timeline-plus"?"Share a memory, or skip to explore.":"Explore the places everyone shared."][index]):instruction.text,landscape?124:135,y+(landscape?20:31),landscape?275:265,landscape?12:18,"Georgia","left",3);
   });
   ctx.strokeStyle=colors.accent;ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(435,start-8);ctx.lineTo(435,landscape?456:H*.805);ctx.stroke();
   const mapX=landscape?486:474,mapY=landscape?244:H*.405,mapW=landscape?285:315,mapH=landscape?72:155;drawWorldMap(mapX,mapY,mapW,mapH);
