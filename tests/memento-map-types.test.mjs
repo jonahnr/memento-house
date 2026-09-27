@@ -98,9 +98,8 @@ test("umbrella marketing explains the complete Memento Map journey without Weddi
 });
 
 test("every printable QR layout brands the crest with the Memento House name",()=>{
- const qr=read("app/dashboard/components/qr-card.tsx"),styles=read("app/qr-reference.css");
- assert.match(qr,/className="qrBrand"/);
- assert.match(qr,/<span>Memento House<\/span>/);
- for(const layout of ["qr-double","qr-4x6","qr-5x7"])assert.match(styles,new RegExp(layout));
- for(const design of ["lavender-sage","botanical-frame","rose-ribbon","midnight-gold","coastal-blue","terracotta-arch","champagne-lines"]){assert.match(qr,new RegExp(`value="${design}"`));assert.match(styles,new RegExp(`qr-design-${design}`))}
+ const qr=read("app/dashboard/components/qr-card.tsx"),renderer=read("lib/qr-sign.ts");
+ assert.match(qr,/renderQrSign/);assert.match(renderer,/memento-house-logo-print.webp/);assert.match(renderer,/MEMENTO HOUSE/);
+ for(const layout of ["single","double","4x6","5x7"])assert.match(renderer,new RegExp(layout));
+ for(const design of ["lavender-sage","botanical-frame","rose-ribbon","midnight-gold","coastal-blue","terracotta-arch","champagne-lines"])assert.match(renderer,new RegExp(design));
 });

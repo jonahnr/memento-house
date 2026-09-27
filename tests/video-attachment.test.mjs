@@ -7,15 +7,17 @@ const routeUrl=new URL('../app/api/timeline-memory/route.ts',import.meta.url);
 let source=await readFile(routeUrl,'utf8');
 source=source.replace('"@supabase/supabase-js"',JSON.stringify(import.meta.resolve('@supabase/supabase-js')));
 source=source.replace('"../../../lib/server-config"',JSON.stringify(new URL('../lib/server-config.ts',import.meta.url).href));
+source=source.replace('"../../../lib/map-entitlement"',JSON.stringify(new URL('../lib/map-entitlement.ts',import.meta.url).href));
 const {POST}=await import('data:text/javascript;base64,'+Buffer.from(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText).toString('base64'));
 const hash=value=>createHash('sha256').update(value).digest('hex');
 for(const kind of ['owner','guest','wrong-owner'])test(`memory upload identity: ${kind==='wrong-owner'?'rejects an unrelated owner':kind+' attaches successfully'}`,async()=>{
  const original=global.fetch,prior=process.env.SUPABASE_SERVICE_ROLE_KEY;process.env.SUPABASE_SERVICE_ROLE_KEY='test-only';
- const expected=hash(kind==='guest'?'test-ip:guest-identity-12345':'owner:owner-user');let attached=false,inserted=0;
+ const expected=hash(kind==='guest'?'test-ip:guest-identity-12345':'owner:11111111-1111-4111-8111-111111111111');let attached=false,inserted=0;
  global.fetch=async(input,init)=>{
   const url=new URL(typeof input==='string'?input:input.url||input),method=init?.method||'GET';let body=[];
-  if(url.pathname.endsWith('/auth/v1/user'))body={id:kind==='wrong-owner'?'other-user':'owner-user'};
-  else if(url.pathname.endsWith('/weddings'))body={id:'wedding-one',owner_user_id:'owner-user',contribution_status:'open'};
+  if(url.pathname.endsWith('/auth/v1/user'))body={id:kind==='wrong-owner'?'other-user':'11111111-1111-4111-8111-111111111111'};
+  else if(url.pathname.includes('/auth/v1/admin/users/'))body={user:{id:'11111111-1111-4111-8111-111111111111',user_metadata:{}}};
+  else if(url.pathname.endsWith('/weddings'))body={map_tier:'timeline-plus',id:'wedding-one',owner_user_id:'11111111-1111-4111-8111-111111111111',contribution_status:'open'};
   else if(url.pathname.includes('/rpc/claim_guest_action'))body=true;
   else if(url.pathname.endsWith('/destinations'))body={id:'destination-one'};
   else if(url.pathname.endsWith('/timeline_entries')){if(method==='POST')inserted++;body={id:'entry-one'}}

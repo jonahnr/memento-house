@@ -1,4 +1,5 @@
 "use client";
+import {eventQrUrl} from "../../lib/map-presentation";
 
 import {useEffect, useState} from "react";
 import {getSupabaseBrowserClient} from "../../lib/supabase";
@@ -59,7 +60,7 @@ export default function Account() {
           <div><dt>Plan level</dt><dd>{human(map.map_tier||plan)}</dd></div>
           <div><dt>Map status</dt><dd>{mapEnabled ? "Active" : "Paused"}</dd></div>
           <div><dt>Public contribution link</dt><dd><a href={`/map/${map.slug}`}>{eventUrl}</a></dd></div>
-          <div><dt>QR code</dt><dd><img className="accountQr" src={`/api/qr?url=${encodeURIComponent(eventUrl)}`} alt={`QR code for ${map.slug}`}/></dd></div>
+          <div><dt>QR code</dt><dd><img className="accountQr" src={`/api/qr?url=${encodeURIComponent(eventQrUrl(eventUrl))}`} alt={`QR code for ${map.slug}`}/></dd></div>
         </dl>
       </article>}) : <div className="emptyAccount"><h2>No digital experiences yet</h2><p>A Memento Map purchase will appear here with its plan, status, event link, and QR code.</p></div>}
     </section>

@@ -1,28 +1,31 @@
 "use client";
-import {mapExperienceLabels,mapTimelineLabels,type MementoMapType} from "../../../lib/memento-map-types";
-import {useEffect,useState} from "react";
-import QRCode from "qrcode";
+import {useEffect,useRef,useState} from "react";
+import {mapExperienceLabels} from "../../../lib/memento-map-types";
+import {eventQrUrl} from "../../../lib/map-presentation";
+import {qrLayouts,qrDesigns,qrSignCopy,renderQrSign,type QrLayout,type QrDesign,type SignEvent} from "../../../lib/qr-sign";
+import {pngWithDpi} from "../../../lib/png-density";
+import {pdfFromCanvas} from "../../../lib/canvas-pdf";
+import {prepareFileDelivery,deliverBrowserFile} from "../../../lib/browser-download";
 
-const layouts={single:{label:"One full-page sign · 8.5 × 11 inches",page:"8.5in 11in"},double:{label:"Two landscape cards · one 8.5 × 11 sheet",page:"8.5in 11in"},"4x6":{label:"Small sign · 4 × 6 inches",page:"4in 6in"},"5x7":{label:"Table sign · 5 × 7 inches",page:"5in 7in"}};
-type Layout=keyof typeof layouts;
-export function QR({wedding,mapUrl,tier}:{wedding:{partner_one_name:string;partner_two_name:string;title:string;map_type?:MementoMapType};mapUrl:string;tier:string}){
- const labels=mapExperienceLabels(wedding.map_type),timelineLabels=mapTimelineLabels(wedding.map_type),names=wedding.map_type&&wedding.map_type!=="wedding"?wedding.title:`${wedding.partner_one_name} & ${wedding.partner_two_name}`;
- const[qr,setQr]=useState(""),[error,setError]=useState(""),[copied,setCopied]=useState(false),[layout,setLayout]=useState<Layout>("single"),[design,setDesign]=useState("classic"),[logoReady,setLogoReady]=useState(false);
- useEffect(()=>{let active=true;setQr("");setError("");(async()=>{
-  const canvas=document.createElement("canvas");
-  await QRCode.toCanvas(canvas,mapUrl,{width:960,margin:4,errorCorrectionLevel:"H",color:{dark:"#282621",light:"#ffffff"}});
-  if(active)setQr(canvas.toDataURL("image/png"));
- })().catch(()=>{if(active)setError("The QR code could not load. Please refresh and try again.")});return()=>{active=false}},[mapUrl]);
- const invitation=wedding.map_type&&wedding.map_type!=="wedding"?timelineLabels.qrInvitation:tier==="timeline-plus"?timelineLabels.qrInvitation:"Scan to share where you came from or recommend a place for us to visit.",footer=wedding.map_type&&wedding.map_type!=="wedding"?"THANK YOU FOR BEING PART OF THIS STORY":"THANK YOU FOR BEING PART OF OUR STORY";
- const card=(copy:number)=><div className="qrCard" key={copy}><div className="eyebrow qrNames">{names}</div><div className="qrBrand"><img className="qrBrandLogo" src="/brand/memento-house-logo-print.webp" alt="" onLoad={()=>setLogoReady(true)} onError={()=>{setLogoReady(false);setError("The logo could not load. Refresh before printing.")}}/><span>Memento House</span></div><h2>{timelineLabels.qrHeading}<br/><i>{wedding.title||"Memento Map"}</i></h2><div className="qrDivider" aria-hidden="true"><span/></div><p className="qrInvitation">{invitation}</p><div className="qrCodeFrame">{qr?<img className="realQr" src={qr} alt={`Scannable QR code for ${names}'s map`}/>:<p role="status">{error||"Generating QR code…"}</p>}</div><b className="qrAddress">{mapUrl.replace(/^https?:\/\//,"")}</b><div className="qrDivider qrFooterDivider" aria-hidden="true"><span/></div><small>{footer}</small></div>;
- return <div className={`qrLayout qr-${layout} qr-design-${design}`}>
-  <style>{`@media print{@page{size:${layouts[layout].page};margin:0}}`}</style>
-  <div className="qrPrintSheet">{card(0)}{layout==="double"&&card(1)}</div>
-  <div className="qrTools"><h2>{labels.qrTitle}</h2><p>{labels.qrContext}</p>
-   <label>Print layout<select value={layout} onChange={e=>setLayout(e.target.value as Layout)}>{Object.entries(layouts).map(([value,option])=><option key={value} value={value}>{option.label}</option>)}</select></label>
-   <label>Sign design<select value={design} onChange={e=>setDesign(e.target.value)}><option value="classic">Classic Gold · original design</option><option value="garden">Garden Arch · soft sage</option><option value="editorial">Modern Editorial · ink & ivory</option><option value="lavender-sage">Lavender & Sage · purple garden</option><option value="botanical-frame">Botanical Frame · evergreen</option><option value="rose-ribbon">Rose Ribbon · soft romantic</option><option value="midnight-gold">Midnight Gold · evening celebration</option><option value="coastal-blue">Coastal Blue · airy and calm</option><option value="terracotta-arch">Terracotta Arch · warm modern</option><option value="champagne-lines">Champagne Lines · quiet elegance</option></select></label>
-   <p className="qrPrintQuality">Print-ready at 300+ PPI. Choose the matching paper size and 100% scale, with headers and footers off. You can also select “Save as PDF” in the print dialog.</p>
-   <label>{labels.mapLinkLabel}<input value={mapUrl} readOnly/></label><a href={mapUrl} className="button gold">{labels.openMap} ↗</a><button className="button light" onClick={async()=>{try{await navigator.clipboard.writeText(mapUrl);setCopied(true)}catch{setError(`Copy the ${labels.mapLinkLabel.toLowerCase()} from the field above.`)}}}>{copied?"Link copied ✓":"Copy link"}</button><button className="button light" disabled={!qr||!logoReady} onClick={()=>window.print()}>Print {layout==="double"?"two cards":layout==="single"?"full-page sign":`${layout.replace("x"," × ")} sign`} ↓</button>{error&&<p role="alert">{error}</p>}
-  </div>
+export function QR({wedding,mapUrl,tier}:{wedding:SignEvent;mapUrl:string;tier:string}){
+ const [layout,setLayout]=useState<QrLayout>("single"),[design,setDesign]=useState<QrDesign>("classic"),[preview,setPreview]=useState(""),[error,setError]=useState(""),[notice,setNotice]=useState(""),[exporting,setExporting]=useState(false),[ready,setReady]=useState(false),canvas=useRef<HTMLCanvasElement|null>(null);
+ const labels=mapExperienceLabels(wedding.map_type,wedding.map_subtype),size=qrLayouts[layout],copy=qrSignCopy(wedding,tier),qrUrl=eventQrUrl(mapUrl);
+ useEffect(()=>{let active=true;setReady(false);setError("");canvas.current=null;void renderQrSign(wedding,mapUrl,tier,layout,design).then(result=>{if(active){canvas.current=result;setPreview(result.toDataURL("image/png"));setReady(true)}}).catch(reason=>{if(active)setError(reason instanceof Error?reason.message:"The sign could not be prepared.")});return()=>{active=false}},[wedding.partner_one_name,wedding.partner_two_name,wedding.title,wedding.wedding_date,wedding.map_type,wedding.map_subtype,mapUrl,tier,layout,design]);
+ async function download(format:"png"|"pdf"){
+  if(!canvas.current||!ready||exporting)return;const delivery=prepareFileDelivery();setExporting(true);setError("");setNotice("");
+  try{const blob=format==="pdf"?pdfFromCanvas(canvas.current,size.width,size.height):await new Promise<Blob>((resolve,reject)=>canvas.current!.toBlob(value=>value?resolve(value):reject(new Error("The PNG could not be prepared.")),"image/png"));setNotice(deliverBrowserFile(format==="png"?await pngWithDpi(blob):blob,`memento-map-event-sign-${layout}.${format}`,delivery))}catch(reason){delivery.preview?.close();setError((reason as Error).message)}finally{setExporting(false)}
+ }
+ return <div className="eventSignLayout">
+  <style>{`@media print{@page{size:${size.width}in ${size.height}in;margin:0}.eventSignPrint{width:${size.width}in!important;height:${size.height}in!important}}`}</style>
+  <div className="eventSignPreview"><div className="eventSignPrint">{preview&&<img src={preview} alt={`${copy.name} event sign. ADD YOUR MARK ${copy.secondary}. ${copy.instructions.map(step=>step.title).join(". ")}. START HERE. Scan to add your mark. Memento House.`}/>}</div>{!ready&&<p role="status">Preparing your event sign…</p>}<p className="eventSignDimensions">{size.width} × {size.height} inches · 300 PPI</p></div>
+  <section className="qrTools"><div className="eyebrow">Ready for your gathering</div><h2>{labels.qrTitle}</h2><p>Your personalized sign guides people from their first place to the contributions included in your package.</p>
+   <label>Print layout<select value={layout} onChange={event=>setLayout(event.target.value as QrLayout)}>{Object.entries(qrLayouts).map(([key,value])=><option key={key} value={key}>{value.label}</option>)}</select></label>
+   <label>Sign design<select value={design} onChange={event=>setDesign(event.target.value as QrDesign)}>{Object.entries(qrDesigns).map(([key,value])=><option key={key} value={key}>{value.name}</option>)}</select></label>
+   <div className="buttonRow"><button className="button gold" disabled={!ready||exporting} onClick={()=>void download("pdf")}>Download print-ready PDF</button><button className="button light" disabled={!ready||exporting} onClick={()=>void download("png")}>Download 300 PPI PNG</button><button className="button light" disabled={!ready} onClick={()=>window.print()}>Print sign</button></div>
+   <p className="qrPrintQuality">The PDF has the exact selected page size. Print at actual size (100%), with headers and footers off. Use borderless printing or larger paper and trim if your printer requires margins.</p>
+   <label>Event QR link<input readOnly value={qrUrl}/></label><p>Scanning starts the place contribution. {tier==="timeline-plus"?"After adding a place, Next opens the separate memory step.":"After adding a place, Next returns to the map."}</p>
+   <a className="button light" href={qrUrl} target="_blank" rel="noreferrer">Try the guest QR experience ↗</a><a className="textLink" href={mapUrl}>{labels.openMap} ↗</a>
+   {notice&&<p role="status">{notice}</p>}{error&&<p className="authError" role="alert">{error}</p>}
+  </section>
  </div>;
 }

@@ -3,9 +3,9 @@
 import {useState} from "react";
 import {PurchaseTerms} from "./purchase-terms";
 
-type PricingCardProps={id:string;name:string;price:number;subtitle:string;features:string[];cta:string;href:string;popular?:boolean};
+type PricingCardProps={id:string;name:string;price:number;subtitle:string;features:string[];cta:string;href:string;popular?:boolean;onChoose?:()=>void};
 
-export function PricingCard({id,name,price,subtitle,features,cta,href,popular}:PricingCardProps){
+export function PricingCard({id,name,price,subtitle,features,cta,href,popular,onChoose}:PricingCardProps){
  const[details,setDetails]=useState(false);
  return <article className={`priceCard priceFlipCard ${popular?"popular":""} ${details?"showDetails":""}`}>
   {popular&&<span className="popularTag">MOST POPULAR</span>}
@@ -13,7 +13,7 @@ export function PricingCard({id,name,price,subtitle,features,cta,href,popular}:P
    <div><h3>{name}</h3><strong>${price}</strong><p>{subtitle}</p></div>
    <ul className="priceIncluded" aria-label={`Included with ${name}`}>{features.map(feature=><li key={feature}>✓ {feature}</li>)}</ul>
    <button type="button" className="priceDetailsToggle" onClick={()=>setDetails(true)}>Purchase and fulfillment details →</button>
-   <a href={href} className="button gold">{cta} →</a>
+   {onChoose?<button type="button" className="button gold" onClick={onChoose}>{cta} →</button>:<a href={href} className="button gold">{cta} →</a>}
   </div>
   <div className="priceCardFace priceCardDetails" aria-hidden={!details} inert={!details?true:undefined}>
    <div className="priceDetailsHeading"><div><small>{name}</small><h3>Purchase details</h3></div><button type="button" onClick={()=>setDetails(false)} aria-label={`Return to ${name} package overview`}>×</button></div>

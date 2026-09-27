@@ -1,3 +1,4 @@
+import {resolveMapTier} from "../../../lib/map-entitlement";
 import {createClient} from "@supabase/supabase-js";
 import {supabaseServerConfig} from "../../../lib/server-config";
 
@@ -14,8 +15,12 @@ export async function POST(request:Request){
  const validDate=/^\d{4}-\d{2}-\d{2}$/.test(date)&&!Number.isNaN(Date.parse(`${date}T00:00:00Z`));
  if(!weddingId||guest.length<1||title.length<2||story.length<5||place.length<2||!validDate||anonymousId.length<10||Date.now()-startedAt<1200||!Number.isFinite(lat)||!Number.isFinite(lng))return Response.json({error:"Please complete each required field, including the date and location."},{status:400});
  if(photo instanceof File&&(photo.size>8_000_000||!allowedPhotos.has(photo.type)))return Response.json({error:"Choose an optional JPG, PNG, or WebP photo smaller than 8 MB."},{status:400});
- const admin=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}}),wedding=await admin.from("weddings").select("id,owner_user_id,contribution_status").eq("id",weddingId).eq("status","active").maybeSingle();
+ const admin=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}}),wedding=await admin.from("weddings").select("id,owner_user_id,contribution_status,contribution_closes_at").eq("id",weddingId).eq("status","active").maybeSingle();
  if(!wedding.data||wedding.data.contribution_status==="closed"||wedding.data.contribution_status==="paused")return Response.json({error:"This map is not accepting memories right now."},{status:403});
+ const ownerAccount=await admin.auth.admin.getUserById(wedding.data.owner_user_id);
+ const tier=await resolveMapTier(admin,wedding.data.owner_user_id,ownerAccount.data.user?.user_metadata,ownerAccount.data.user?.email,weddingId);
+ if(tier!=="timeline-plus")return Response.json({error:"This map does not accept Timeline memories."},{status:403});
+ if(wedding.data.contribution_closes_at&&new Date(wedding.data.contribution_closes_at)<=new Date())return Response.json({error:"The contribution window has closed."},{status:403});
  const ip=clean(request.headers.get("cf-connecting-ip")||request.headers.get("x-forwarded-for")?.split(",")[0]||"unknown",80),token=(request.headers.get("authorization")||"").replace(/^Bearer\s+/i,""),auth=token?await admin.auth.getUser(token):null,owner=auth?.data.user?.id===wedding.data.owner_user_id,actorHash=await digest(owner?`owner:${auth!.data.user!.id}`:`${ip}:${anonymousId}`),claimed=await admin.rpc("claim_guest_action",{p_wedding_id:weddingId,p_actor_hash:actorHash,p_action:"memory",p_limit:3,p_window_seconds:900});
  if(!claimed.error&&!claimed.data)return Response.json({error:"Too many memories were submitted. Please try again later."},{status:429});
  if(mediaId){const media=await admin.from("media_assets").select("id").eq("id",mediaId).eq("wedding_id",weddingId).eq("actor_hash",actorHash).eq("media_type","video").is("timeline_entry_id",null).is("deleted_at",null).maybeSingle();if(media.error||!media.data)return Response.json({error:"The uploaded video could not be attached. Please select the video again before saving."},{status:409})}
