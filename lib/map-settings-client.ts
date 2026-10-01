@@ -1,6 +1,6 @@
 import {getSupabaseBrowserClient} from "./supabase";
 import type {EventMetadata} from "./map-presentation";
-export async function saveMapPresentation(mapId:string,patch:Pick<EventMetadata,"typography_theme"|"include_guest_memories"|"participation_guide_reviewed"|"excluded_story_memory_ids">){
+export async function saveMapPresentation(mapId:string,patch:Pick<EventMetadata,"typography_theme"|"include_guest_memories"|"participation_guide_reviewed"|"excluded_story_memory_ids"|"guided_walkthrough_completed">){
  const session=(await getSupabaseBrowserClient()?.auth.getSession())?.data.session;
  if(!session)throw new Error("Please sign in again before saving.");
  const response=await fetch("/api/maps/settings",{method:"PATCH",headers:{"Content-Type":"application/json",Authorization:`Bearer ${session.access_token}`},body:JSON.stringify({mapId,...patch})});

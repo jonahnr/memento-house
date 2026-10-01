@@ -17,6 +17,7 @@ export async function PATCH(request:Request){
  }
  if("participation_guide_reviewed" in body){if(body.participation_guide_reviewed!==true)return Response.json({error:"Invalid guide review."},{status:400});patch.participation_guide_reviewed=true}
  if("excluded_story_memory_ids" in body){if(!Array.isArray(body.excluded_story_memory_ids)||body.excluded_story_memory_ids.some((id:unknown)=>typeof id!=="string"))return Response.json({error:"Invalid memory selection."},{status:400});const entries=await identity.admin.from("timeline_entries").select("id").eq("wedding_id",current.data.id);if(entries.error||body.excluded_story_memory_ids.some((id:string)=>!entries.data?.some(entry=>entry.id===id)))return Response.json({error:"Memory not found."},{status:400});patch.excluded_story_memory_ids=body.excluded_story_memory_ids}
+ if("guided_walkthrough_completed" in body){if(body.guided_walkthrough_completed!==true)return Response.json({error:"Complete the walkthrough before continuing."},{status:400});patch.guided_walkthrough_completed=true}
  if(!Object.keys(patch).length)return Response.json({error:"No settings supplied."},{status:400});
  const result=await identity.admin.from("weddings").update({event_metadata:{...current.data.event_metadata,...patch},updated_at:new Date().toISOString()}).eq("id",current.data.id).eq("owner_user_id",identity.user.id).select().single();
  return result.error?Response.json({error:"Settings could not be saved."},{status:500}):Response.json({map:result.data});
