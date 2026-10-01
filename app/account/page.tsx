@@ -1,4 +1,5 @@
 "use client";
+import {DeleteExperience} from "./delete-experience";
 import {eventQrUrl} from "../../lib/map-presentation";
 
 import {useEffect, useState} from "react";
@@ -37,7 +38,6 @@ export default function Account() {
   const mapOrder = data.orders?.find((order: any) => order.product === "map" && order.entitlement_status === "active"), maps = data.maps || [];
   const forcedTier = ["map", "plus", "timeline-plus"].includes(data.mapAccessOverride) ? data.mapAccessOverride : null;
   const mapEnabled = data.mapAccessOverride !== "off" && (Boolean(mapOrder) || Boolean(forcedTier));
-  const showMapAccess = Boolean(mapOrder) || Boolean(forcedTier) || data.mapAccessOverride === "off";
   const plan = human(forcedTier || mapOrder?.tier || "Map");
 
   return <AccountShell email={data.email} mapEnabled={mapEnabled}>
@@ -51,7 +51,7 @@ export default function Account() {
 
     <section className="accountPanel" id="digital">
       <div className="eyebrow">My digital experiences</div>
-      {showMapAccess ? maps.map((map:any)=>{const eventUrl=`https://mementohouse.com/map/${map.slug}`;return <article key={map.id} className={`digitalExperienceCard ${mapEnabled ? "active" : "paused"}`}>
+      {maps.length ? maps.map((map:any)=>{const eventUrl=`https://mementohouse.com/map/${map.slug}`;return <article key={map.id} className={`digitalExperienceCard ${mapEnabled ? "active" : "paused"}`}>
         <header>
           <div><small>{human(map.map_type||"wedding")} MEMENTO MAP</small><h2>{map.title||"Your map experience"}</h2></div>
           {mapEnabled && <a className="button gold" href={map.configured_at?`/dashboard?map=${map.id}`:`/memento-map/create?map=${map.id}`}>{map.configured_at?"Open Memento Map →":"Set up Memento Map →"}</a>}
@@ -62,6 +62,7 @@ export default function Account() {
           <div><dt>Public contribution link</dt><dd><a href={`/map/${map.slug}`}>{eventUrl}</a></dd></div>
           <div><dt>QR code</dt><dd><img className="accountQr" src={`/api/qr?url=${encodeURIComponent(eventQrUrl(eventUrl))}`} alt={`QR code for ${map.slug}`}/></dd></div>
         </dl>
+        <DeleteExperience id={map.id} name={map.title||"Your map experience"} onDeleted={()=>setData((value:any)=>({...value,maps:value.maps.filter((item:any)=>item.id!==map.id),orders:value.orders.map((order:any)=>order.map_id===map.id?{...order,map_id:null}:order)}))}/>
       </article>}) : <div className="emptyAccount"><h2>No digital experiences yet</h2><p>A Memento Map purchase will appear here with its plan, status, event link, and QR code.</p></div>}
     </section>
 

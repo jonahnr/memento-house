@@ -28,3 +28,10 @@ test('non-Wedding maps and Anniversary never acquire an invented wedding chapter
  for(const map_type of ['family_reunion','celebration_of_life','next_chapter','events_community'])assert.deepEqual(withWeddingStory({id:'map',wedding_date:'2026-01-01',map_type},[]),[]);
  assert.deepEqual(withWeddingStory({id:'map',wedding_date:'2026-01-01',map_type:'wedding',map_subtype:'anniversary'},[]),[]);
 });
+
+test('individual story exclusions preserve defaults and the saved global opt-out',()=>{
+ const memories=[{id:'included',category:'Guest Memory'},{id:'excluded',category:'Guest Memory'},{id:'owner',category:'Milestone'}];
+ assert.deepEqual(visibleStoryMemories(memories,{excluded_story_memory_ids:['excluded']}),[memories[0],memories[2]]);
+ assert.deepEqual(visibleStoryMemories(memories,{include_guest_memories:false,excluded_story_memory_ids:['excluded']}),[memories[2]]);
+ assert.equal(memories.length,3);
+});

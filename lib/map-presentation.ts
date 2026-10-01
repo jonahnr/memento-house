@@ -7,10 +7,10 @@ export const typographyThemes = [
  {id:"timeless",name:"Timeless",description:"Traditional serif headlines and supporting text",headline:'"Times New Roman", Times, serif',body:'Georgia, serif',accent:'"Times New Roman", Times, serif'},
 ] as const;
 export type TypographyTheme = typeof typographyThemes[number]["id"];
-export type EventMetadata = Record<string,unknown> & {typography_theme?:TypographyTheme;include_guest_memories?:boolean};
+export type EventMetadata = Record<string,unknown> & {typography_theme?:TypographyTheme;include_guest_memories?:boolean;participation_guide_reviewed?:boolean;excluded_story_memory_ids?:string[]};
 export function typographyTheme(value:unknown){return typographyThemes.find(theme=>theme.id===value)||typographyThemes[0]}
 export function includesGuestMemories(metadata?:EventMetadata|null){return metadata?.include_guest_memories!==false}
 export function isGuestMemory(entry:{category:string}){return entry.category==="Guest Memory"}
-export function visibleStoryMemories<T extends {category:string}>(entries:T[],metadata?:EventMetadata|null){return includesGuestMemories(metadata)?[...entries]:entries.filter(entry=>!isGuestMemory(entry))}
+export function visibleStoryMemories<T extends {category:string;id?:string}>(entries:T[],metadata?:EventMetadata|null){return entries.filter(entry=>(includesGuestMemories(metadata)||!isGuestMemory(entry))&&!(entry.id&&metadata?.excluded_story_memory_ids?.includes(entry.id)))}
 export function eventQrUrl(mapUrl:string){const url=new URL(mapUrl);url.searchParams.set("source","qr");url.searchParams.set("utm_source","event_qr");url.searchParams.set("utm_medium","print");return url.toString()}
 export function isQrVisit(search:string){return new URLSearchParams(search).get("source")==="qr"}
