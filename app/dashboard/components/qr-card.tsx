@@ -1,4 +1,5 @@
 "use client";
+import {ParticipationGuideModal} from "./participation-guide-modal";
 import {useEffect,useRef,useState} from "react";
 import {mapExperienceLabels} from "../../../lib/memento-map-types";
 import {eventQrUrl} from "../../../lib/map-presentation";
@@ -7,15 +8,17 @@ import {pngWithDpi} from "../../../lib/png-density";
 import {pdfFromCanvas} from "../../../lib/canvas-pdf";
 import {prepareFileDelivery,deliverBrowserFile} from "../../../lib/browser-download";
 
-export function QR({wedding,mapUrl,tier}:{wedding:SignEvent;mapUrl:string;tier:string}){
+export function QR({wedding,mapUrl,tier,onGuideViewed}:{wedding:SignEvent;mapUrl:string;tier:string;onGuideViewed?:()=>Promise<void>}){
+ const [showGuide,setShowGuide]=useState(false);
  const [layout,setLayout]=useState<QrLayout>("single"),[design,setDesign]=useState<QrDesign>("classic"),[preview,setPreview]=useState(""),[error,setError]=useState(""),[notice,setNotice]=useState(""),[exporting,setExporting]=useState(false),[ready,setReady]=useState(false),canvas=useRef<HTMLCanvasElement|null>(null);
  const labels=mapExperienceLabels(wedding.map_type,wedding.map_subtype),size=qrLayouts[layout],copy=qrSignCopy(wedding,tier),qrUrl=eventQrUrl(mapUrl);
  useEffect(()=>{let active=true;setReady(false);setError("");canvas.current=null;void renderQrSign(wedding,mapUrl,tier,layout,design).then(result=>{if(active){canvas.current=result;setPreview(result.toDataURL("image/png"));setReady(true)}}).catch(reason=>{if(active)setError(reason instanceof Error?reason.message:"The sign could not be prepared.")});return()=>{active=false}},[wedding.partner_one_name,wedding.partner_two_name,wedding.title,wedding.wedding_date,wedding.map_type,wedding.map_subtype,mapUrl,tier,layout,design]);
  async function download(format:"png"|"pdf"){
-  if(!canvas.current||!ready||exporting)return;const delivery=prepareFileDelivery();setExporting(true);setError("");setNotice("");
+  if(!canvas.current||!ready||exporting)return;const delivery=prepareFileDelivery();setShowGuide(true);setExporting(true);setError("");setNotice("");
   try{const blob=format==="pdf"?pdfFromCanvas(canvas.current,size.width,size.height):await new Promise<Blob>((resolve,reject)=>canvas.current!.toBlob(value=>value?resolve(value):reject(new Error("The PNG could not be prepared.")),"image/png"));setNotice(deliverBrowserFile(format==="png"?await pngWithDpi(blob):blob,`memento-map-event-sign-${layout}.${format}`,delivery))}catch(reason){delivery.preview?.close();setError((reason as Error).message)}finally{setExporting(false)}
  }
  return <div className="eventSignLayout">
+  {showGuide&&<ParticipationGuideModal onClose={()=>setShowGuide(false)} onViewed={onGuideViewed}/>}
   <style>{`@media print{@page{size:${size.width}in ${size.height}in;margin:0}.eventSignPrint{width:${size.width}in!important;height:${size.height}in!important}}`}</style>
   <div className="eventSignPreview"><div className="eventSignPrint">{preview&&<img src={preview} alt={`${copy.name} event sign. ADD YOUR MARK ${copy.secondary}. ${copy.instructions.map(step=>step.title).join(". ")}. START HERE. Scan to add your mark. Memento House.`}/>}</div>{!ready&&<p role="status">Preparing your event sign…</p>}<p className="eventSignDimensions">{size.width} × {size.height} inches · 300 PPI</p></div>
   <section className="qrTools"><div className="eyebrow">Ready for your gathering</div><h2>{labels.qrTitle}</h2><p>Your personalized sign guides people from their first place to the contributions included in your package.</p>
