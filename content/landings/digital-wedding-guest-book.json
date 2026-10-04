@@ -1,0 +1,138 @@
+{
+  "title": "A Digital Wedding Guestbook That Fits the Way You Want to Remember",
+  "slug": "digital-wedding-guest-book",
+  "description": "Compare digital wedding guestbooks, media, accessibility, access, and physical alternatives before choosing a format.",
+  "publishedDate": "2026-10-03",
+  "updatedDate": "2026-10-03",
+  "author": "Memento House Editorial",
+  "category": "guest-book-ideas",
+  "tags": [
+    "guest-book-ideas",
+    "wedding",
+    "guestbook"
+  ],
+  "heroImage": "/brand/memento-map-digital-story.webp",
+  "heroImageAlt": "Digital map and wedding story displayed across devices",
+  "seoTitle": "Digital Wedding Guest Book | Memento House",
+  "seoDescription": "Compare digital wedding guestbooks, media, accessibility, access, and physical alternatives before choosing a format.",
+  "relatedArticles": [
+    "10-alternatives-to-a-traditional-wedding-guestbook",
+    "how-to-get-guests-to-scan-your-wedding-qr-code",
+    "what-to-do-with-your-wedding-guestbook-after-the-wedding"
+  ],
+  "relatedProduct": "memento-map-wedding",
+  "intro": [
+    "A digital guestbook collects contributions through a link rather than a single physical book. Different services collect different things: text, audio, video, photos, places, or a combination. Choose the format around what guests can comfortably contribute and what you want to keep afterward."
+  ],
+  "sections": [
+    {
+      "heading": "Digital is a delivery method, not one set of features",
+      "paragraphs": [
+        "One service may offer a photo gallery, another a voice recording, and another an interactive map. Do not assume a product includes every medium because it uses a QR code. Look at the actual guest form, owner tools, storage terms, and export options.",
+        "For Memento Map, locations connect the experience. Guests add meaningful places and recommendations; package features determine planning, exports, and the chronological story. The sample wedding map can explain the format, but the package page is the place to confirm what you will receive."
+      ]
+    },
+    {
+      "heading": "What digital guestbooks make easier",
+      "paragraphs": [
+        "A link can be shared before or after the event and displayed in several places without moving a signing book around the venue. Digital contributions can be organized and viewed on devices, and some formats let you return to the collection as it grows.",
+        "You also avoid deciphering handwriting in fields like a place name. With a map, location search can attach the place to real coordinates. These conveniences do not guarantee participation; guests still need a reason to contribute and a simple first step."
+      ]
+    },
+    {
+      "heading": "The tradeoffs to plan for",
+      "paragraphs": [
+        "A digital format needs suitable connectivity, an understandable interface, and guests willing to use their devices. People may have flat batteries, accessibility needs, or a preference for a phone-free evening. A few paper cards can provide an alternative without changing the main invitation.",
+        "Test your chosen link with someone who has not seen it before. Check whether accounts or apps are required, how errors appear, and how guests leave the form. Make sure the station does not rely only on a decorative QR sign that gives no explanation of the activity."
+      ]
+    },
+    {
+      "heading": "Compare the contribution you want to keep",
+      "paragraphs": [
+        "Choose text when the written message matters, audio when you want voices, and photographs or video when expressions are part of the memory. A physical signed piece may be a better fit if you mainly want artwork for your home.",
+        "An interactive map adds place and context. It can suit guests from different regions, couples who enjoy travel, or people interested in recommendations they will use later. Avoid choosing a platform only because its demo contains every possible feature."
+      ],
+      "table": {
+        "headers": [
+          "Format",
+          "What it captures",
+          "What to check"
+        ],
+        "rows": [
+          [
+            "Traditional book",
+            "Handwritten messages",
+            "Space; pens; storage"
+          ],
+          [
+            "Audio",
+            "Voices and stories",
+            "Quiet station; file delivery"
+          ],
+          [
+            "Photo album or gallery",
+            "Images and captions",
+            "Film or upload process"
+          ],
+          [
+            "Digital message collection",
+            "Typed text and supported media",
+            "Guest access; backup options"
+          ],
+          [
+            "Interactive map",
+            "Places with messages and recommendations",
+            "Location search; package-specific features"
+          ]
+        ]
+      }
+    },
+    {
+      "heading": "Media, access, and backup questions",
+      "paragraphs": [
+        "Ask how photos and videos are uploaded, which formats and limits apply, and whether you can download the collection. Distinguish an interactive link from a printable file. They preserve different parts of the experience.",
+        "Memento Map is a one-time digital purchase. Plus and Timeline Plus include high-resolution PNG and print-ready PDF export files; no mailed print or frame is included. Review the current media limits and purchase details on the product page rather than assuming every upload will fit."
+      ]
+    },
+    {
+      "heading": "Make digital participation welcoming",
+      "paragraphs": [
+        "Place signs where people pause, provide the direct link when sending a message, and invite a clear contribution. A short announcement and one reminder help guests understand why you chose the activity. Assign a helper to answer simple questions without taking over anyoneâ€™s device.",
+        "Explain whether contributions can be seen by people with the shared link and do not ask for information you do not need. A city-level origin or a public destination is usually a clearer prompt than a private address. Keep recording or photo contributions optional."
+      ],
+      "links": [
+        {
+          "label": "Improve QR Participation",
+          "href": "/ideas/how-to-get-guests-to-scan-your-wedding-qr-code"
+        }
+      ]
+    },
+    {
+      "heading": "Explore the format before you decide",
+      "paragraphs": [
+        "Open the wedding demo to see what browsing a shared map feels like. Then compare the actual packages with your priorities: a shared map, a Travel Journal, or a chronological story. Use the quiz if you are still deciding between a physical keepsake and a digital experience.",
+        "A digital guestbook works best when it fits your guests and your habits afterward. If you enjoy revisiting places and planning future experiences, a map can be useful. If you want handwritten art without managing files or devices, choose the physical route with confidence."
+      ],
+      "links": [
+        {
+          "label": "Try the Wedding Demo",
+          "href": "/map/jonah-kate"
+        },
+        {
+          "label": "Find Your Guestbook",
+          "href": "/wedding-guest-book-quiz"
+        }
+      ]
+    }
+  ],
+  "faqs": [
+    {
+      "question": "Does every digital guestbook include video?",
+      "answer": "No. Media types, limits, and package features vary. Confirm them on the productâ€™s current details before purchase."
+    },
+    {
+      "question": "Do Memento Map guests need an account?",
+      "answer": "No. Guests open a shared link in their browser and contribute without creating an account."
+    }
+  ]
+}

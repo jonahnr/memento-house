@@ -1,0 +1,108 @@
+{
+  "title": "A Wedding Map Guestbook Where Every Place Has a Story",
+  "slug": "wedding-map-guest-book",
+  "description": "Connect guest origins, relationship places, recommendations, and memories in a wedding map guestbook.",
+  "publishedDate": "2026-10-03",
+  "updatedDate": "2026-10-03",
+  "author": "Memento House Editorial",
+  "category": "travel-and-maps",
+  "tags": [
+    "travel-and-maps",
+    "wedding",
+    "guestbook"
+  ],
+  "heroImage": "/brand/map-wedding-map.webp",
+  "heroImageAlt": "Wedding map with places connected to guests and the couple",
+  "seoTitle": "Wedding Map Guest Book | Memento House",
+  "seoDescription": "Connect guest origins, relationship places, recommendations, and memories in a wedding map guestbook.",
+  "relatedArticles": [
+    "wedding-guest-book-ideas-for-travel-lovers",
+    "interactive-wedding-guest-book-ideas",
+    "what-to-do-with-your-wedding-guestbook-after-the-wedding"
+  ],
+  "relatedProduct": "memento-map-wedding",
+  "intro": [
+    "A wedding map guestbook organizes contributions around real locations. It can show where guests came from, places that shaped your relationship, and destinations your friends think you would love. The meaning belongs to the people and messages attached to each place."
+  ],
+  "sections": [
+    {
+      "heading": "Map guest origins with a clear question",
+      "paragraphs": [
+        "Ask guests where they traveled from or where they call home. Choose one question for the origin layer so the map tells a coherent story. A hometown, current city, and departure airport may all differ.",
+        "An origin map can reveal connections across regions without asking guests to share a private address. Keep names and short messages attached so two people from the same city still have their own contribution. The geographic spread is interesting, but the community behind it is what makes the map personal."
+      ]
+    },
+    {
+      "heading": "Add the places in your relationship",
+      "paragraphs": [
+        "Your own relationship places give the map a foundation before guests join. Think about a first meeting, a familiar restaurant, a shared trip, the engagement, a home, and your wedding venue. A short explanation tells visitors why the location belongs.",
+        "Choose specific places when they matter and broader locations when that feels more appropriate. You do not need a pin for every outing. A handful of meaningful milestones can make the map easier to understand than a dense collection with no context."
+      ]
+    },
+    {
+      "heading": "Let guests recommend where you should go next",
+      "paragraphs": [
+        "Ask for a real location and a practical reason to visit. Restaurants, local outings, weekend trips, and larger destinations can all belong. A recommendation gains value when the guest adds what to do or a detail they wish they had known.",
+        "In Memento Map, guest recommendations remain attached to the contributor. Map Plus lets the couple add chosen places to the Travel Journal, rank them, and track their journey. Recommendations are inspiration; the journal is where the couple chooses what becomes a plan."
+      ]
+    },
+    {
+      "heading": "Connect places to memories",
+      "paragraphs": [
+        "A place can remind a guest of a road trip, a family tradition, or the first time they met you. Text and supported media add context that a pin by itself cannot hold. Invite a story without making a long answer mandatory.",
+        "Timeline Plus also connects dated guest memories with the couple’s chronological story. The owner can manage whether guest memories appear. A map and timeline are different ways to explore the same broader relationship: one starts with geography, the other with time."
+      ]
+    },
+    {
+      "heading": "Understand the map layers before you share",
+      "paragraphs": [
+        "Label origins, recommendations, visited adventures, and relationship places so guests can tell them apart. Clear categories help visitors know whether a pin represents where someone lives, where you have been, or somewhere you hope to go.",
+        "Prepare your own details and test the guest link before printing signs. Use the same event link throughout the room and offer a clear prompt beneath the code. Do not send guests to the product purchase page when they are trying to contribute to your celebration."
+      ]
+    },
+    {
+      "heading": "Compare a printed signature map",
+      "paragraphs": [
+        "A printed map can create a simple physical keepsake. Guests add names or marks, and the result can be framed. Its limits are space and the amount of explanation a signature can carry; consider a separate message card when you want longer stories.",
+        "An interactive map can attach messages to locations and support later organization by package. It needs connectivity and guest comfort with phones. Neither format is automatically better. Choose based on whether your main goal is a display object or a place-centered collection you can explore and continue using."
+      ],
+      "links": [
+        {
+          "label": "Travel-Themed Guestbook Options",
+          "href": "/travel-themed-wedding-guest-book"
+        }
+      ]
+    },
+    {
+      "heading": "See a wedding map in action",
+      "paragraphs": [
+        "Use the live Jonah and Kate sample to understand how a finished map can look. Explore the actual map, recommendations, and story rather than judging the product from a single screenshot. The sample remains separate from every customer experience.",
+        "After the demo, review the wedding product page and current packages. Choose planning if guest recommendations will become trips, and choose Timeline Plus if a dated chronological story is important. Plus and Timeline Plus also include digital export files for printing you arrange separately."
+      ],
+      "links": [
+        {
+          "label": "Explore the Wedding Map Demo",
+          "href": "/map/jonah-kate"
+        },
+        {
+          "label": "View Wedding Packages",
+          "href": "/memento-map/wedding"
+        },
+        {
+          "label": "Read Travel-Lover Guestbook Ideas",
+          "href": "/ideas/wedding-guest-book-ideas-for-travel-lovers"
+        }
+      ]
+    }
+  ],
+  "faqs": [
+    {
+      "question": "Is a wedding map only for destination weddings?",
+      "answer": "No. Local weddings can map guest origins, relationship places, and future ideas too."
+    },
+    {
+      "question": "Does a pin alone tell the whole story?",
+      "answer": "No. Names, messages, recommendations, milestones, and supported media give the location its meaning."
+    }
+  ]
+}

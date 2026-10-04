@@ -1,0 +1,5 @@
+import {marketingMetadata} from "../../../lib/marketing-seo";
+import {MarketingShell,Breadcrumbs} from "../../marketing/components";
+import {GuestbookGenerator} from "../../marketing/interactive-tools";
+export const metadata=marketingMetadata("Wedding Guest Book Idea Generator | Memento House","Build five personalized wedding guestbook ideas around your style, size, participation preferences, and planning budget.","/tools/wedding-guest-book-idea-generator");
+export default function Generator(){return <MarketingShell><Breadcrumbs items={[{name:"Home",href:"/"},{name:"Ideas",href:"/ideas"},{name:"Guestbook idea generator",href:"/tools/wedding-guest-book-idea-generator"}]}/><header className="editorialHero compactHero"><div className="eyebrow">Make the shortlist yours</div><h1>Wedding Guest Book Idea Generator</h1><p>Compare five ideas by why they fit, how much setup they need, how guests join, and what you can do with the result afterward.</p></header><GuestbookGenerator/></MarketingShell>}

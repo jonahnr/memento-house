@@ -1,0 +1,6 @@
+"use client";
+import {sendGAEvent} from "@next/third-parties/google";
+import {useEffect,useRef,type ReactNode} from "react";
+export function MarketingView({event,properties}:{event:"seo_landing_view"|"ideas_article_viewed";properties:Record<string,string>}){const tracked=useRef(false);useEffect(()=>{if(!tracked.current){tracked.current=true;sendGAEvent("event",event,properties)}},[event,properties]);return null}
+export function MarketingLink({href,source,label,event,children,className="textLink",newTab=false}:{href:string;source:string;label:string;event?:"article_product_cta_clicked"|"related_article_clicked";children:ReactNode;className?:string;newTab?:boolean}){return <a href={href} className={className} target={newTab?"_blank":undefined} rel={newTab?"noreferrer":undefined} onClick={()=>{sendGAEvent("event","seo_cta_click",{source_page:source,cta:label,destination:href});if(href==="/map/jonah-kate")sendGAEvent("event","demo_opened",{source_page:source});if(event)sendGAEvent("event",event,{source_page:source,cta:label,destination:href})}}>{children}</a>}
+export function ViewDemoCTA({source,label="View Live Demo",className="button light",newTab=false}:{source:string;label?:string;className?:string;newTab?:boolean}){return <MarketingLink source={source} href="/map/jonah-kate" label={label} className={className} newTab={newTab}>{label} ↗</MarketingLink>}
