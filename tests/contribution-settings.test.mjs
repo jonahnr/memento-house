@@ -1,0 +1,18 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {contributionMode,localClosingTime,closingTimeForSave} from '../lib/contribution-settings.ts';
+// The browser uses its own local zone. Pin it here to reproduce the evening UTC boundary.
+process.env.TZ='America/New_York';
+test('an expired scheduled window never masquerades as manual Open',()=>{assert.equal(contributionMode('open','2026-10-18T00:00:00Z'),'scheduled');assert.equal(contributionMode('open',null),'open');assert.equal(contributionMode('paused','2026-10-18T00:00:00Z'),'paused')});
+test('selecting Open clears a stale or future deadline; pause/close preserve manual status without hidden deadlines',()=>{for(const mode of ['open','paused','closed'])for(const deadline of ['2026-01-01T00:00:00Z','2027-01-01T00:00:00Z'])assert.equal(closingTimeForSave(mode,'',deadline),null)});
+test('UTC closing times display in local time and local midnight saves at the correct instant',()=>{assert.equal(localClosingTime('2026-10-18T00:00:00Z'),'2026-10-17T20:00');assert.equal(closingTimeForSave('scheduled','2026-10-18T00:00',null,0),'2026-10-18T04:00:00.000Z');assert.equal(closingTimeForSave('scheduled','2026-12-18T00:00',null,0),'2026-12-18T05:00:00.000Z')});
+test('unchanged schedules retain their exact timestamp and expired schedules require an explicit decision',()=>{assert.equal(closingTimeForSave('scheduled','2026-10-17T20:00','2026-10-18T00:00:31Z',0),'2026-10-18T00:00:31Z');assert.throws(()=>closingTimeForSave('scheduled','2026-10-17T20:00',null,Date.parse('2026-10-18T00:01:00Z')),/passed/);for(const value of ['','bad','2026-03-08T02:30'])assert.throws(()=>closingTimeForSave('scheduled',value,null,0))});
+import {loadTs} from './helpers/load-ts.mjs';
+const {POST}=await loadTs('app/api/contribution/route.ts');
+test('guest API accepts a reopened window and still enforces the expected 14-day wedding cutoff',async()=>{
+ const originalFetch=global.fetch,originalKey=process.env.SUPABASE_SERVICE_ROLE_KEY;process.env.SUPABASE_SERVICE_ROLE_KEY='fixture-service';
+ const wedding={id:'fixture-map',map_type:'wedding',wedding_date:new Date().toISOString().slice(0,10),contribution_status:'open',contribution_closes_at:'2026-01-01T00:00:00Z'};
+ global.fetch=async(input,init)=>{const url=new URL(typeof input==='string'?input:input.url||input);if(url.pathname.endsWith('/weddings'))return Response.json(wedding);if(url.pathname.endsWith('/map_categories'))return Response.json([]);if(url.pathname.endsWith('/claim_guest_action'))return Response.json(true);if(url.pathname.endsWith('/destinations'))return Response.json({id:'destination-fixture'});if(url.pathname.endsWith('/recommendations')){if(init?.method==='POST')return Response.json({id:'recommendation-fixture'});if(url.searchParams.has('limit'))return Response.json(null);return new Response(null,{headers:{'content-range':'0-0/0'}})}throw new Error('Unexpected request '+url.pathname)};
+ const submit=()=>POST(new Request('https://example.com/api/contribution',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({weddingId:wedding.id,anonymousId:'fixture-device-id',startedAt:Date.now()-5000,place:'Cincinnati',guest:'Guest',message:'A favorite place to visit',lat:39,lng:-84})}));
+ try{assert.equal((await submit()).status,403);wedding.contribution_closes_at=closingTimeForSave('open','',wedding.contribution_closes_at);assert.equal((await submit()).status,200);wedding.wedding_date='2026-01-01';const response=await submit();assert.equal(response.status,403);assert.match((await response.json()).error,/now closed/)}finally{global.fetch=originalFetch;if(originalKey===undefined)delete process.env.SUPABASE_SERVICE_ROLE_KEY;else process.env.SUPABASE_SERVICE_ROLE_KEY=originalKey}
+});
